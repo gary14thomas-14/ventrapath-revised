@@ -1,0 +1,191 @@
+version: 1
+phase: 0
+description: Expanded benchmark matrix for VentraPath Phase 0 validation.
+
+groups:
+  simple:
+    - id: VP-P0-004
+      country: United States
+      industry: local services
+      idea: >
+        A premium home maintenance membership that coordinates recurring handyman, gutter,
+        filter, and seasonal maintenance visits for busy homeowners.
+    - id: VP-P0-005
+      country: Australia
+      industry: kids activities
+      idea: >
+        A platform that helps parents find, compare, and rebook after-school sports and arts
+        activities near them.
+    - id: VP-P0-006
+      country: Singapore
+      industry: food and beverage
+      idea: >
+        A service that helps office managers run rotating team lunch ordering from local vendors
+        with budgets and dietary preferences handled automatically.
+    - id: VP-P0-007
+      country: United Kingdom
+      industry: property
+      idea: >
+        A service that helps landlords manage small repair jobs, tenant reminders, and contractor
+        coordination without using heavy property software.
+    - id: VP-P0-008
+      country: Canada
+      industry: education
+      idea: >
+        A membership that helps high school students plan scholarship applications, deadlines,
+        and essay progress.
+    - id: VP-P0-009
+      country: New Zealand
+      industry: tourism
+      idea: >
+        A concierge-style itinerary builder for couples planning short regional getaways with
+        accommodation, activities, and dining bundled into one flow.
+    - id: VP-P0-010
+      country: Ireland
+      industry: healthcare admin
+      idea: >
+        A service that helps small clinics reduce no-shows using reminder flows, rebooking prompts,
+        and waiting-list fill tools.
+    - id: VP-P0-011
+      country: Germany
+      industry: pets
+      idea: >
+        A membership for cat owners that bundles sitting visits, medication routines, and travel-time
+        care coordination.
+    - id: VP-P0-012
+      country: India
+      industry: recruitment
+      idea: >
+        A lightweight hiring workflow tool for small agencies handling WhatsApp candidate chats,
+        interview scheduling, and follow-ups.
+    - id: VP-P0-013
+      country: South Africa
+      industry: automotive
+      idea: >
+        A service that helps busy drivers manage vehicle servicing, repair quotes, pickup logistics,
+        and reminders through one membership.
+
+  medium:
+    - id: VP-P0-014
+      country: United States
+      industry: creator economy
+      idea: >
+        A back-office service for YouTubers and podcasters that turns rough content ideas into
+        production schedules, sponsor follow-ups, and publishing workflows.
+    - id: VP-P0-015
+      country: Australia
+      industry: aged care support
+      idea: >
+        A family-facing coordination platform for adult children managing appointments, transport,
+        medication reminders, and home visits for elderly parents.
+    - id: VP-P0-016
+      country: United Kingdom
+      industry: construction
+      idea: >
+        A quoting and job-flow platform for independent builders handling leads from WhatsApp,
+        Facebook, and referrals.
+    - id: VP-P0-017
+      country: Canada
+      industry: mental performance
+      idea: >
+        A program that helps managers avoid burnout and improve energy using AI check-ins,
+        accountability, and small group support.
+    - id: VP-P0-018
+      country: Netherlands
+      industry: ecommerce ops
+      idea: >
+        A lightweight operations layer for small Shopify brands that turns scattered support and
+        fulfilment issues into one action queue.
+    - id: VP-P0-019
+      country: Singapore
+      industry: property services
+      idea: >
+        A subscription service for condo residents that handles aircon servicing, cleaning,
+        repairs, and move-in/move-out task bundles.
+    - id: VP-P0-020
+      country: Ireland
+      industry: legal admin
+      idea: >
+        A client-intake and follow-up workflow service for small law firms that lose leads through
+        inconsistent response and manual scheduling.
+    - id: VP-P0-021
+      country: India
+      industry: education / tutoring
+      idea: >
+        A service that helps tutoring centres convert WhatsApp enquiries into paid trial sessions,
+        renewals, and attendance reminders.
+    - id: VP-P0-022
+      country: Germany
+      industry: workforce training
+      idea: >
+        A platform that helps skilled trades apprentices track practice, get coach feedback,
+        and stay on top of certification milestones.
+    - id: VP-P0-023
+      country: New Zealand
+      industry: wellness services
+      idea: >
+        A membership that helps freelancers stay healthy using preventive physio routines,
+        posture coaching, and accountability check-ins.
+
+  messy:
+    - id: VP-P0-024
+      country: United States
+      industry: wellbeing / AI
+      idea: >
+        I want to build something that helps overwhelmed mothers use AI and community to feel more
+        in control, but I do not know whether it is an app, a support group, or a service.
+    - id: VP-P0-025
+      country: Australia
+      industry: education / careers
+      idea: >
+        Maybe something for teenagers figuring out future careers with AI, mentors, and community,
+        but I am not sure who would pay.
+    - id: VP-P0-026
+      country: United Kingdom
+      industry: creator tools
+      idea: >
+        I want to help creators stop burning out and run the business side better, maybe with an AI
+        assistant, maybe with people, maybe with templates.
+    - id: VP-P0-027
+      country: Canada
+      industry: family logistics
+      idea: >
+        Something around helping separated parents coordinate kids, schedules, and communication,
+        but without making it feel like legal software.
+    - id: VP-P0-028
+      country: Singapore
+      industry: elder support
+      idea: >
+        An AI and community product for adult children stressed about ageing parents, not sure if
+        it should be content, membership, concierge, or software.
+    - id: VP-P0-029
+      country: Germany
+      industry: sustainability / home
+      idea: >
+        I want to help homeowners make greener home upgrades but I do not know if this is a marketplace,
+        advisory service, membership, or installer network.
+    - id: VP-P0-030
+      country: Ireland
+      industry: local business ops
+      idea: >
+        A tool for small businesses to stop losing customers in messages and calls, but I do not want
+        it to be just another CRM.
+    - id: VP-P0-031
+      country: India
+      industry: health / habits
+      idea: >
+        Something around diabetes support with AI reminders, family accountability, and coaching,
+        but I do not know how clinical it should be.
+    - id: VP-P0-032
+      country: South Africa
+      industry: jobs / skills
+      idea: >
+        I want to build a community that helps young people get work using AI, peer support, and
+        training, but I am not sure what the business model is.
+    - id: VP-P0-033
+      country: New Zealand
+      industry: travel / families
+      idea: >
+        A family travel planning thing with AI and experts that handles itineraries, kids, meals,
+        and stress, but I do not know if this should be software or concierge.
+
