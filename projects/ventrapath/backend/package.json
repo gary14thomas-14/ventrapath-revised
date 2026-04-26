@@ -1,0 +1,14 @@
+{
+  "name": "ventrapath-backend",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "check": "node --check src/server.js && node --check src/app.js && node --check src/config/env.js && node --check src/lib/http.js && node --check src/routes/health.js && node --check src/routes/projects.js && node --check src/routes/blueprint.js"
+  }
+}
