@@ -22,7 +22,12 @@ Turn specialist outputs into one coherent, commercially sharp, non-generic bluep
 - The opening business brief should be short, sharp, and roughly two paragraphs.
 - The blueprint must include a real unique twist.
 - The unique twist should be incorporated into the business brief itself, not bolted on later.
+- The twist should feel exciting and one-of-a-kind, not like a mild feature improvement or nicer positioning line.
+- Push for imaginative differentiation before settling; prefer a bold but believable owned edge over a safe but forgettable one.
 - The blueprint must make clear who buys, who pays, and what business form it actually is.
+- The Monetisation section should include concrete price points or price ranges by default when they can be estimated honestly.
+- When the user asks for pricing, the Monetisation section should include researched, market-grounded price points or ranges rather than vague pricing language.
+- Pricing should use the correct currency for the user's business location input unless explicitly told otherwise.
 - The blueprint must have a believable operating spine: a recurring workflow, ledger, coordination layer, evidence asset, or control point the business actually owns.
 - If the idea is mostly support, community, guidance, concierge, or motivation, require proof of a hard operating spine before allowing a pass.
 - For education, employment, wellness, care, or guidance ideas, do not treat encouragement, planning, mentoring, or accountability as enough on their own. The business should usually anchor to an externally enforced event loop or system of record such as placement, certification, appointment adherence, claims, renewals, case progress, or another deadline-bearing workflow customers already have to manage.
@@ -31,7 +36,12 @@ Turn specialist outputs into one coherent, commercially sharp, non-generic bluep
 - Do not expose raw specialist outputs.
 - Do not allow contradictions between sections.
 - Do not use generic filler language.
+- Do not let "lighter than incumbents", "AI-powered", "more supportive", or similar cosmetic positioning masquerade as the twist.
+- Do not collapse to the safest twist too early if a stronger commercially believable angle is available.
 - Do not overload sections with detail; give the user enough signal to get excited and continue.
+- Do not present made-up pricing as researched truth.
+- Do not leave Monetisation hand-wavy if grounded pricing can be estimated.
+- Do not present pricing in the wrong currency for the location context.
 - Protect the 2-minute ceiling.
 - Every Legal section must include a clear disclaimer that it is information only and the user must do their own research / local verification.
 
@@ -57,6 +67,7 @@ It should feel energising and forward-pulling, not like a dense report.
 ## Bob must reject output when
 
 - the twist is weak
+- the twist is only a cosmetic improvement over incumbents instead of a real owned edge
 - the business sounds generic
 - buyer, payer, or business form are still blurry
 - buyer, payer, or business form were only solved by fabricating a different business
