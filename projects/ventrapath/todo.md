@@ -2,7 +2,8 @@
 
 ## Now
 
-- [ ] Reconstruct what VentraPath does
+- [x] Reconstruct what VentraPath does
+- [ ] Wait for Gaz's go-ahead before starting design/build work
 - [ ] List the agents Gaz remembers
 - [ ] Define the first-pass agent roster
 - [ ] Write prompts / boundaries / handoff rules
