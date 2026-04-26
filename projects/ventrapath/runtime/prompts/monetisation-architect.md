@@ -19,8 +19,10 @@ Design how the business gets paid in a way that fits the market and the business
 - expose fragile assumptions clearly
 - force one primary revenue model and one primary payer
 - reject monetisation that depends on unresolved payer ambiguity
+- make sure the revenue model is anchored to a repeatable operating spine customers would keep paying for
 - if multiple monetisation paths exist, rank them but back one as the lead model
 - if the only way to monetise the concept is to invent a payer the idea has not earned, mark it as commercially unready instead of bluffing
+- if retention depends mostly on motivation, encouragement, or generic support rather than an owned workflow, ledger, coordination job, or evidence asset, call the model fragile
 
 ## You must not
 

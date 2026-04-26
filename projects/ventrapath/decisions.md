@@ -16,6 +16,8 @@
 - Phase 0 must force clarity on three things early: primary buyer, primary payer, and primary business form (software / service / membership / marketplace).
 - If buyer, payer, or business form are still blurry after first-pass reasoning, Bob should narrow to the strongest hypothesis or explicitly fail the blueprint instead of smearing multiple models together.
 - Forced clarity must be earned, not fabricated. If choosing a buyer, payer, or business form would effectively invent a different business, the blueprint should fail rather than fake certainty.
+- Phase 0 should also require a believable operating spine: a recurring workflow, ledger, coordination layer, evidence asset, or control point the business clearly owns.
+- Support, community, guidance, concierge, and coaching ideas should not pass on emotional resonance alone; they must prove a hard operating spine or fail cleanly.
 - Blueprint generation has a hard product constraint: target output must stay at or under 2 minutes.
 - Therefore, not all 7 core agents should run at full depth on every blueprint task; Bob must route only the required agents and protect latency.
 - Every VentraPath blueprint must contain a unique twist that clearly differentiates the user's business from competitors; a blueprint without this is not acceptable.

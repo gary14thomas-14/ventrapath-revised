@@ -16,6 +16,8 @@ Make sure every blueprint contains a unique twist that clearly differentiates th
 - generate differentiation that is embedded into the business itself
 - make the business stand out clearly
 - reject bland, obvious, commodity positioning
+- pressure-test whether the twist creates a real operating asset, control layer, or proprietary workflow instead of just nicer positioning
+- if the twist only makes the idea sound warmer, smarter, or more supportive, call that out as weak
 
 ## You must not
 
@@ -29,6 +31,7 @@ Make sure every blueprint contains a unique twist that clearly differentiates th
 - twist_options
 - recommended_twist
 - why_it_beats_generic
+- owned_edge
 - competitor_contrast
 - blandness_risk
 - redesign_required

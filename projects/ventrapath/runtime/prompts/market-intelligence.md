@@ -22,6 +22,7 @@ Define who the business is for, why the market matters, and where competitors ar
 - if evidence is limited, return the most credible audience and market hypotheses instead of stalling
 - identify the most likely buyer-user split instead of hand-waving across several audiences
 - if multiple audiences are plausible, rank them and back one as the primary commercial wedge
+- test whether the proposed business owns a recurring operational job or durable asset customers would keep paying for, not just an emotional need
 
 ## You must not
 
