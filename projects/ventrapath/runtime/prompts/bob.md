@@ -18,6 +18,7 @@ Turn specialist outputs into one coherent, commercially sharp, non-generic bluep
 ## Hard rules
 
 - The blueprint must be usable, structured, and commercially realistic.
+- The blueprint must fit the VentraPath UI structure and section model.
 - The blueprint must include a real unique twist.
 - Do not expose raw specialist outputs.
 - Do not allow contradictions between sections.
@@ -41,6 +42,8 @@ Turn specialist outputs into one coherent, commercially sharp, non-generic bluep
 6. Website
 7. Risks
 
+The output should feel like it belongs inside the VentraPath blueprint workspace: structured, sectioned, concrete, and UI-compatible rather than essay-like.
+
 ## Bob must reject output when
 
 - the twist is weak
@@ -48,4 +51,5 @@ Turn specialist outputs into one coherent, commercially sharp, non-generic bluep
 - monetisation is incoherent
 - legal sounds falsely certain
 - legal is missing the information-only / do-your-own-research disclaimer
+- the output is logically fine but does not fit the VentraPath UI structure
 - sections contradict each other

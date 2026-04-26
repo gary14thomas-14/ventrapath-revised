@@ -10,6 +10,7 @@
 - Gaz later clarified that the real Phase 0 / blueprint structure is the one shown in the UI, not the later ChatGPT-derived rewrite.
 - Additional UI screenshots suggest the practical blueprint workspace currently includes: Business, Market, Monetisation, Execution, Legal, Website, and Risks.
 - Until told otherwise, treat the UI information architecture as canonical over any ChatGPT-authored definition.
+- Every blueprint must fit the actual VentraPath UI structure and presentation model, not just be logically correct in plain text.
 - Blueprint generation has a hard product constraint: target output must stay at or under 2 minutes.
 - Therefore, not all 7 core agents should run at full depth on every blueprint task; Bob must route only the required agents and protect latency.
 - Every VentraPath blueprint must contain a unique twist that clearly differentiates the user's business from competitors; a blueprint without this is not acceptable.
