@@ -78,12 +78,74 @@ function verifyMigrations() {
   console.log(`Verified ${files.length} migration(s) in ${migrationsDir}`);
 }
 
+async function applyMigrations() {
+  const databaseUrl = process.env.DATABASE_URL;
+
+  if (!databaseUrl) {
+    throw new Error('DATABASE_URL is required for migrations:apply');
+  }
+
+  const { Pool } = await import('pg');
+  const pool = new Pool({ connectionString: databaseUrl });
+  const client = await pool.connect();
+
+  try {
+    await client.query('begin');
+    await client.query('create extension if not exists pgcrypto;');
+    await client.query(`
+      create table if not exists schema_migrations (
+        version text primary key,
+        applied_at timestamptz not null default now()
+      )
+    `);
+    await client.query('commit');
+
+    const appliedResult = await client.query('select version from schema_migrations');
+    const appliedVersions = new Set(appliedResult.rows.map((row) => row.version));
+
+    const migrations = getMigrationFiles().map(parseMigration);
+    let appliedCount = 0;
+
+    for (const migration of migrations) {
+      const version = migration.file.slice(0, 4);
+
+      if (appliedVersions.has(version)) {
+        continue;
+      }
+
+      await client.query('begin');
+
+      try {
+        await client.query(migration.sql);
+        await client.query('insert into schema_migrations (version) values ($1)', [version]);
+        await client.query('commit');
+        appliedCount += 1;
+        console.log(`Applied ${migration.file}`);
+      } catch (error) {
+        await client.query('rollback');
+        throw new Error(`Failed applying ${migration.file}: ${error.message}`);
+      }
+    }
+
+    if (appliedCount === 0) {
+      console.log('No pending migrations to apply.');
+    } else {
+      console.log(`Applied ${appliedCount} migration(s).`);
+    }
+  } finally {
+    client.release();
+    await pool.end();
+  }
+}
+
 const command = process.argv[2] ?? 'list';
 
 if (command === 'list') {
   listMigrations();
 } else if (command === 'verify') {
   verifyMigrations();
+} else if (command === 'apply') {
+  await applyMigrations();
 } else {
   console.error(`Unknown migration command: ${command}`);
   process.exit(1);

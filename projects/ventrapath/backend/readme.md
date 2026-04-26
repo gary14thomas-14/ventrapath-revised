@@ -78,7 +78,7 @@ It persists versioned outputs and route shape now so the app loop is real before
 
 ## Next build passes
 
-1. install the actual Postgres driver/package (`pg`) when approved
+1. set `DATABASE_URL` to a real reachable Postgres instance
 2. set `PERSISTENCE_DRIVER=postgres`
 3. apply `0001`-`0005`
 4. replace scaffolded blueprint generation with the real orchestration layer
@@ -109,12 +109,14 @@ npm start
 ```bash
 npm run migrations:list
 npm run migrations:verify
+npm run migrations:apply
 ```
 
-These commands do local validation only for now.
-They do **not** apply SQL to Postgres yet.
+`migrations:apply` is now real.
 
-That final step depends on the DB client/tool choice.
+It requires:
+- `DATABASE_URL` set
+- reachable Postgres server
 
 ## Persistence driver switch
 
@@ -126,6 +128,8 @@ PERSISTENCE_DRIVER=json
 
 Prepared but not yet installed:
 
+Prepared for live use:
+
 ```bash
 PERSISTENCE_DRIVER=postgres
 DATABASE_URL=postgres://...
@@ -133,8 +137,8 @@ DATABASE_URL=postgres://...
 
 Important:
 - the Postgres repository seam is wired
-- the actual `pg` package is **not installed yet**
-- selecting `postgres` now will fail loudly until that package is installed
+- the `pg` package is installed
+- selecting `postgres` will still fail until the database itself is reachable
 
 ## Bottom line
 
