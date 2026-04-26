@@ -3,10 +3,11 @@
 ## Now
 
 - [x] Reconstruct what VentraPath does
-- [ ] Wait for Gaz's go-ahead before starting design/build work
-- [ ] List the agents Gaz remembers
-- [ ] Define the first-pass agent roster
-- [ ] Write prompts / boundaries / handoff rules
+- [x] Wait for Gaz's go-ahead before starting design/build work
+- [x] Define the first-pass agent roster
+- [x] Write prompts / boundaries / handoff rules
+- [ ] Design the latency benchmark for sub-2-minute blueprint generation
+- [ ] Decide which agents stay in the default Phase 0 hot path
 - [ ] Commit a checkpoint after the first stable design
 
 ## Later

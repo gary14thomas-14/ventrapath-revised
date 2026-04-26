@@ -10,4 +10,6 @@
 - Gaz later clarified that the real Phase 0 / blueprint structure is the one shown in the UI, not the later ChatGPT-derived rewrite.
 - Additional UI screenshots suggest the practical blueprint workspace currently includes: Business, Market, Monetisation, Execution, Legal, Website, and Risks.
 - Until told otherwise, treat the UI information architecture as canonical over any ChatGPT-authored definition.
+- Blueprint generation has a hard product constraint: target output must stay at or under 2 minutes.
+- Therefore, not all 7 core agents should run at full depth on every blueprint task; Bob must route only the required agents and protect latency.
 - Do not start detailed build/design work from this capture alone until Gaz says to begin.
