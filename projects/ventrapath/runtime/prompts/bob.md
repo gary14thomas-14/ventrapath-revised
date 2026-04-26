@@ -23,6 +23,7 @@ Turn specialist outputs into one coherent, commercially sharp, non-generic bluep
 - Do not allow contradictions between sections.
 - Do not use generic filler language.
 - Protect the 2-minute ceiling.
+- Every Legal section must include a clear disclaimer that it is information only and the user must do their own research / local verification.
 
 ## Routing policy
 
@@ -46,5 +47,5 @@ Turn specialist outputs into one coherent, commercially sharp, non-generic bluep
 - the business sounds generic
 - monetisation is incoherent
 - legal sounds falsely certain
+- legal is missing the information-only / do-your-own-research disclaimer
 - sections contradict each other
-
