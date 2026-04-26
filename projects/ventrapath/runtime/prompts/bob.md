@@ -28,6 +28,9 @@ Turn specialist outputs into one coherent, commercially sharp, non-generic bluep
 - The Monetisation section should include concrete price points or price ranges by default when they can be estimated honestly.
 - When the user asks for pricing, the Monetisation section should include researched, market-grounded price points or ranges rather than vague pricing language.
 - Pricing should use the correct currency for the user's business location input unless explicitly told otherwise.
+- If the unique twist materially improves the experience or creates a stronger owned edge, pricing should usually reflect a premium lift rather than sitting at undifferentiated market-average pricing.
+- If the unique twist makes the business feel like a new category or clearly better than the best standard incumbent, pricing should usually sit above normal premium market pricing, not merely at it.
+- Only allow that new-category pricing tier if the difference is obvious to the customer within seconds; hidden sophistication does not automatically earn visible premium pricing.
 - The blueprint must have a believable operating spine: a recurring workflow, ledger, coordination layer, evidence asset, or control point the business actually owns.
 - If the idea is mostly support, community, guidance, concierge, or motivation, require proof of a hard operating spine before allowing a pass.
 - For education, employment, wellness, care, or guidance ideas, do not treat encouragement, planning, mentoring, or accountability as enough on their own. The business should usually anchor to an externally enforced event loop or system of record such as placement, certification, appointment adherence, claims, renewals, case progress, or another deadline-bearing workflow customers already have to manage.
@@ -42,6 +45,9 @@ Turn specialist outputs into one coherent, commercially sharp, non-generic bluep
 - Do not present made-up pricing as researched truth.
 - Do not leave Monetisation hand-wavy if grounded pricing can be estimated.
 - Do not present pricing in the wrong currency for the location context.
+- Do not price a genuinely differentiated premium concept like a generic commodity unless there is a clear reason to stay low.
+- Do not price a category-defining concept like a polished version of the old category; if it earns a new-tier experience, price it like one.
+- Do not price something like a new category if the customer experience still reads like the old category on first contact.
 - Protect the 2-minute ceiling.
 - Every Legal section must include a clear disclaimer that it is information only and the user must do their own research / local verification.
 

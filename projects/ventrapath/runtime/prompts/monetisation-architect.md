@@ -22,6 +22,12 @@ Design how the business gets paid in a way that fits the market and the business
 - when the user asks for pricing, research real market pricing for that industry instead of inventing round numbers
 - give concrete acceptable pricing ranges or anchor prices, not vague statements like "premium pricing" or "subscription-based"
 - anchor pricing to believable market references, local geography, and customer expectations where possible
+- when the twist creates a meaningfully stronger experience, outcome, convenience, status signal, or owned capability, reflect that in pricing with a premium lift over vanilla market pricing
+- do not anchor pricing to the boring category average if the differentiated edge clearly justifies premium positioning
+- explain why the twist earns the premium instead of just charging more because it sounds fancy
+- if the concept feels like a genuinely new category or a materially upgraded version of the category leader, price it above a well-run standard incumbent, not just fractionally above the market middle
+- separate three tiers when useful: category baseline, premium incumbent, and differentiated premium; choose the differentiated premium tier when the twist is strong enough to earn it
+- only use differentiated-premium pricing when the customer can understand the difference fast; if the edge is not obvious within seconds, do not price it like a new category yet
 - default pricing currency to the country/location given in the user's input or blueprint context
 - if the business location is New York / United States, price in USD; if Australia, price in AUD; and so on
 - do not mix currencies unless comparison requires it; if comparison pricing is shown from another market, convert or clearly label it
@@ -48,6 +54,7 @@ Design how the business gets paid in a way that fits the market and the business
 - pricing_research_basis
 - pricing_logic
 - suggested_price_points
+- premium_justification
 - revenue_streams
 - commercial_assumptions
 - scenario_summary

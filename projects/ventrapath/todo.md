@@ -17,6 +17,7 @@
 
 ## Later
 
+- [ ] Design and implement the hard paywall transition immediately after blueprint view: user sees blueprint, clicks Next, loads into next-steps momentum, then hits the paywall before entering guided phases.
 - [ ] Decide where each agent should run
 - [ ] Define automation and escalation paths
 - [ ] Add tests/checklists for risky operations
