@@ -13,7 +13,7 @@ The job is to create a sane place for the first vertical slice to live.
 - minimal Node service scaffold
 - environment loading
 - health endpoint
-- dev-only local JSON persistence for project CRUD
+- dev-only local JSON persistence for project CRUD + blueprint versioning
 - local migration list/verify tooling
 - first SQL migrations for:
   - bootstrap database
@@ -65,24 +65,22 @@ backend/
 - `GET /api/projects`
 - `POST /api/projects`
 - `GET /api/projects/:projectId`
-
-These project CRUD routes currently use a **dev-only local JSON store** under `.data/`.
-That is deliberate: real endpoint behaviour now, Postgres adapter later.
-
-### Scaffolded placeholders
 - `POST /api/projects/:projectId/blueprint/generate`
 - `GET /api/projects/:projectId/blueprint`
+- `GET /api/projects/:projectId/blueprint/versions`
 
-Blueprint routes still return `501 Not Implemented` on purpose.
+These routes currently use a **dev-only local JSON store** under `.data/`.
+That is deliberate: real endpoint behaviour now, Postgres adapter later.
 
-That is better than fake success.
+Blueprint generation is currently a dev scaffold, not the real Bob-orchestrated system.
+It persists versioned outputs and route shape now so the app loop is real before orchestration wiring lands.
 
 ## Next build passes
 
 1. choose/install the actual Postgres client path
 2. replace the dev JSON project store with a Postgres-backed repository
 3. apply `0001`-`0005`
-4. wire blueprint generation + persistence
+4. replace scaffolded blueprint generation with the real orchestration layer
 5. add project updates when needed
 
 ## Ticket alignment

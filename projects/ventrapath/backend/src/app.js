@@ -1,6 +1,6 @@
 import { notFound } from './lib/http.js';
 import { handleHealth } from './routes/health.js';
-import { handleGenerateBlueprint, handleGetBlueprint } from './routes/blueprint.js';
+import { handleGenerateBlueprint, handleGetBlueprint, handleListBlueprintVersions } from './routes/blueprint.js';
 import { handleCreateProject, handleGetProject, handleListProjects } from './routes/projects.js';
 
 function match(pathname, pattern) {
@@ -33,12 +33,17 @@ export async function handleRequest(req, res, env) {
 
   const generateBlueprintMatch = match(pathname, /^\/api\/projects\/([^/]+)\/blueprint\/generate$/);
   if (generateBlueprintMatch && req.method === 'POST') {
-    return handleGenerateBlueprint(req, res, generateBlueprintMatch[1]);
+    return handleGenerateBlueprint(req, res, generateBlueprintMatch[1], env);
   }
 
   const getBlueprintMatch = match(pathname, /^\/api\/projects\/([^/]+)\/blueprint$/);
   if (getBlueprintMatch && req.method === 'GET') {
-    return handleGetBlueprint(req, res, getBlueprintMatch[1]);
+    return handleGetBlueprint(req, res, getBlueprintMatch[1], env);
+  }
+
+  const listBlueprintVersionsMatch = match(pathname, /^\/api\/projects\/([^/]+)\/blueprint\/versions$/);
+  if (listBlueprintVersionsMatch && req.method === 'GET') {
+    return handleListBlueprintVersions(req, res, listBlueprintVersionsMatch[1], env);
   }
 
   return notFound(res);
