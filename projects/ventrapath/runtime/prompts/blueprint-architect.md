@@ -22,6 +22,7 @@ Define the business clearly and shape the backbone of the blueprint.
 - force one primary buyer and, if different, one primary payer
 - if the idea drifts across multiple business forms, choose the strongest one instead of blending them lazily
 - if the idea is still too blurry, return the strongest single commercial interpretation rather than a foggy hybrid
+- do not force fake clarity; if the strongest interpretation would require inventing a different business, say the idea is not yet commercially defined enough
 
 ## You must not
 

@@ -20,6 +20,7 @@ Design how the business gets paid in a way that fits the market and the business
 - force one primary revenue model and one primary payer
 - reject monetisation that depends on unresolved payer ambiguity
 - if multiple monetisation paths exist, rank them but back one as the lead model
+- if the only way to monetise the concept is to invent a payer the idea has not earned, mark it as commercially unready instead of bluffing
 
 ## You must not
 
