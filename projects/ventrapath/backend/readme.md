@@ -13,9 +13,15 @@ The job is to create a sane place for the first vertical slice to live.
 - minimal Node service scaffold
 - environment loading
 - health endpoint
-- placeholder API route shells for:
+- dev-only local JSON persistence for project CRUD
+- local migration list/verify tooling
+- first SQL migrations for:
+  - bootstrap database
+  - users
   - projects
-  - blueprint
+  - agent runs
+  - blueprint versions
+- blueprint route shells
 - migration folder aligned to `migration-plan.md`
 
 ## Why it looks this lean
@@ -56,25 +62,28 @@ backend/
 ### Live
 - `GET /health`
 - `GET /api/health`
-
-### Scaffolded placeholders
 - `GET /api/projects`
 - `POST /api/projects`
 - `GET /api/projects/:projectId`
+
+These project CRUD routes currently use a **dev-only local JSON store** under `.data/`.
+That is deliberate: real endpoint behaviour now, Postgres adapter later.
+
+### Scaffolded placeholders
 - `POST /api/projects/:projectId/blueprint/generate`
 - `GET /api/projects/:projectId/blueprint`
 
-Placeholder routes currently return `501 Not Implemented` on purpose.
+Blueprint routes still return `501 Not Implemented` on purpose.
 
 That is better than fake success.
 
 ## Next build passes
 
-1. wire migration tooling
-2. implement `users`, `projects`, `agent_runs`
-3. make `POST /api/projects` real
-4. make `GET /api/projects` real
-5. wire blueprint generation + persistence
+1. choose/install the actual Postgres client path
+2. replace the dev JSON project store with a Postgres-backed repository
+3. apply `0001`-`0005`
+4. wire blueprint generation + persistence
+5. add project updates when needed
 
 ## Ticket alignment
 
@@ -95,6 +104,18 @@ or
 ```bash
 npm start
 ```
+
+## Migration commands
+
+```bash
+npm run migrations:list
+npm run migrations:verify
+```
+
+These commands do local validation only for now.
+They do **not** apply SQL to Postgres yet.
+
+That final step depends on the DB client/tool choice.
 
 ## Bottom line
 

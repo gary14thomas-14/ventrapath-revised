@@ -18,17 +18,17 @@ export async function handleRequest(req, res, env) {
 
   if (pathname === '/api/projects') {
     if (req.method === 'GET') {
-      return handleListProjects(req, res);
+      return handleListProjects(req, res, env);
     }
 
     if (req.method === 'POST') {
-      return handleCreateProject(req, res);
+      return handleCreateProject(req, res, env);
     }
   }
 
   const projectMatch = match(pathname, /^\/api\/projects\/([^/]+)$/);
   if (projectMatch && req.method === 'GET') {
-    return handleGetProject(req, res, projectMatch[1]);
+    return handleGetProject(req, res, projectMatch[1], env);
   }
 
   const generateBlueprintMatch = match(pathname, /^\/api\/projects\/([^/]+)\/blueprint\/generate$/);

@@ -4,6 +4,11 @@ This folder is reserved for the migration sequence defined in:
 
 - `../migration-plan.md`
 
+Current status:
+- `0001` to `0005` now exist for the first Project + Blueprint slice
+- local verification is available through `npm run migrations:list` and `npm run migrations:verify`
+- actual apply execution is still pending a chosen Postgres client/tooling path
+
 Recommended file order:
 
 1. `0001_bootstrap_database.sql`
