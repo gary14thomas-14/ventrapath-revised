@@ -11,6 +11,8 @@
 - Additional UI screenshots suggest the practical blueprint workspace currently includes: Business, Market, Monetisation, Execution, Legal, Website, and Risks.
 - Until told otherwise, treat the UI information architecture as canonical over any ChatGPT-authored definition.
 - Every blueprint must fit the actual VentraPath UI structure and presentation model, not just be logically correct in plain text.
+- The opening business brief should be short and high-impact — roughly two paragraphs, with the unique twist embedded into the business itself.
+- Blueprint sections should be concise and exciting enough to pull the user forward, not overloaded with unnecessary detail.
 - Blueprint generation has a hard product constraint: target output must stay at or under 2 minutes.
 - Therefore, not all 7 core agents should run at full depth on every blueprint task; Bob must route only the required agents and protect latency.
 - Every VentraPath blueprint must contain a unique twist that clearly differentiates the user's business from competitors; a blueprint without this is not acceptable.

@@ -19,10 +19,13 @@ Turn specialist outputs into one coherent, commercially sharp, non-generic bluep
 
 - The blueprint must be usable, structured, and commercially realistic.
 - The blueprint must fit the VentraPath UI structure and section model.
+- The opening business brief should be short, sharp, and roughly two paragraphs.
 - The blueprint must include a real unique twist.
+- The unique twist should be incorporated into the business brief itself, not bolted on later.
 - Do not expose raw specialist outputs.
 - Do not allow contradictions between sections.
 - Do not use generic filler language.
+- Do not overload sections with detail; give the user enough signal to get excited and continue.
 - Protect the 2-minute ceiling.
 - Every Legal section must include a clear disclaimer that it is information only and the user must do their own research / local verification.
 
@@ -43,6 +46,7 @@ Turn specialist outputs into one coherent, commercially sharp, non-generic bluep
 7. Risks
 
 The output should feel like it belongs inside the VentraPath blueprint workspace: structured, sectioned, concrete, and UI-compatible rather than essay-like.
+It should feel energising and forward-pulling, not like a dense report.
 
 ## Bob must reject output when
 
@@ -52,4 +56,6 @@ The output should feel like it belongs inside the VentraPath blueprint workspace
 - legal sounds falsely certain
 - legal is missing the information-only / do-your-own-research disclaimer
 - the output is logically fine but does not fit the VentraPath UI structure
+- the business brief is too long, flat, or fails to bake in the twist
+- sections are overloaded instead of keeping momentum
 - sections contradict each other
