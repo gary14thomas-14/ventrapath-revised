@@ -11,6 +11,9 @@
 - [x] Convert the agent contracts into executable prompts/config
 - [ ] Run the latency benchmark before calling the team production-ready
 - [ ] Commit a checkpoint after the first stable design
+- [ ] Split benchmarking into blueprint-generation lane vs messy rescue/rejection lane
+- [ ] Define lane-specific pass criteria and scorecards
+- [ ] Run a clean reround for both lanes and compare separately
 
 ## Later
 

@@ -24,4 +24,6 @@
 - Therefore, not all 7 core agents should run at full depth on every blueprint task; Bob must route only the required agents and protect latency.
 - Every VentraPath blueprint must contain a unique twist that clearly differentiates the user's business from competitors; a blueprint without this is not acceptable.
 - Every Legal section must clearly state that it is information only and the user must do their own research / local verification.
+- Benchmarking should now split into two lanes with different success criteria: (1) company blueprint generation and (2) messy idea rescue/rejection.
+- In the messy-idea lane, a clean commercially honest rejection counts as success; the goal is not to force every fuzzy input into a pass.
 - Do not start detailed build/design work from this capture alone until Gaz says to begin.

@@ -8,8 +8,10 @@ Prove that the default Phase 0 hot path can produce acceptable blueprint outputs
 
 ## Current mode
 
-- Initial pilot benchmark
-- Focus: Phase 0 hot path
+- Phase 0 hot path benchmarked end-to-end
+- Now moving to a split-lane evaluation model:
+  - **Blueprint lane** — can VentraPath turn already-legible business ideas into strong UI-fit blueprints?
+  - **Messy lane** — can VentraPath honestly rescue fuzzy ideas or reject them cleanly for the right reason?
 - Agents under test:
   - Blueprint Architect
   - Differentiation Strategist
@@ -21,4 +23,6 @@ Prove that the default Phase 0 hot path can produce acceptable blueprint outputs
 
 - `phase0-pilot-cases.yaml` — first benchmark case set
 - `phase0-results.md` — result log
-
+- `benchmark-lanes.md` — split-lane benchmark model and success criteria
+- `blueprint-lane-cases.md` — company blueprint generation lane case set
+- `messy-lane-cases.md` — messy idea rescue/rejection lane case set
