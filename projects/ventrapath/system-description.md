@@ -39,7 +39,9 @@ VentraPath outputs are divided into two layers.
 
 This is the foundation of the business.
 
-It is a structured, controlled output with four sections:
+Per Gaz's correction, the Phase 0 structure should follow the real UI, not the later ChatGPT-derived rewrite.
+
+It is a structured, controlled output with these sections:
 
 1. **Business**
    - Defines the business clearly
@@ -49,14 +51,13 @@ It is a structured, controlled output with four sections:
    - Defines the target audience
    - Identifies demand
    - Identifies competitor weaknesses
-3. **Offer & Pricing**
-   - Defines what is being sold
-   - Defines how it is positioned
-   - Defines pricing logic relative to the selected market
-4. **Revenue Model**
-   - Defines how the business generates revenue
-   - Includes structured revenue logic based on assumptions
-   - Includes multiple outcome scenarios
+3. **Monetisation**
+   - Defines revenue strategy and how the business gets paid
+   - Covers pricing / monetisation logic in the blueprint layer
+4. **Execution**
+   - Captures launch roadmap / execution planning within the blueprint experience
+5. **Legal**
+   - Captures location-aware legal requirements within the blueprint experience
 
 #### Blueprint rules
 
