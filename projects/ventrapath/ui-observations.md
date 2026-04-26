@@ -140,6 +140,82 @@ More importantly, it now gives us a much clearer picture of what the real produc
 
 The current UI information architecture should be treated as the source of truth unless Gaz says otherwise.
 
+## 11. Phase 1 — Brand screen
+- Header shows `PHASE 1 OF 10` with title `Brand`
+- Subtitle: business identity / positioning / foundation language
+- Separate progress block shows `0/5 steps complete`
+- Main phase UI is a vertical stack of 5 accordion cards, not a single rich-content page
+- Top-right navigation goes `Back to Blueprint`
+- Bottom navigation includes `Back to Risks` and `Continue to Phase 2`
+
+### Observed Phase 1 step order
+1. Business Name
+2. Brand Positioning
+3. Logo & Visual Identity
+4. Domain & Email Setup
+5. Social Handles
+
+### Shared step pattern
+Every opened Brand step shown by Gaz includes:
+- numbered step badge
+- title
+- short description
+- collapse chevron
+- `How to do this` helper button
+- `Example` helper button
+
+This implies helper/example content is part of the intended product shape, not decoration.
+
+### 11a. Business Name
+- one text input: `Enter your business name`
+- CTA: `Check Availability`
+- looks like a decision + validation step, not passive content
+
+### 11b. Brand Positioning
+- three labeled text areas:
+  - `What does your business do?`
+  - `Who is it for?`
+  - `What makes it different?`
+- placeholders suggest user-editable guidance fields rather than static copy blocks
+
+### 11c. Logo & Visual Identity
+- two large choice cards:
+  - `Upload Logo`
+  - `Generate with AI`
+- visual system controls shown directly in the step:
+  - colour palette groups (`Primary`, `Accent`, `Success`, `Neutral`)
+  - font style choices (`Inter`, `Poppins`, `Space Grotesk`)
+- this is much more interactive than the earlier generic brand-contract assumption
+
+### 11d. Domain & Email Setup
+- provider recommendation list with outbound/open-link icons
+- shown providers:
+  - Namecheap
+  - Google Domains
+  - Cloudflare
+- each provider has short recommendation copy beneath it
+- looks like curated provider suggestions, not a freeform note field
+
+### 11e. Social Handles
+- platform-specific handle inputs:
+  - Instagram
+  - TikTok
+  - Twitter / X
+  - LinkedIn
+- CTA: `Check All Handle Availability`
+- this step clearly expects multi-platform structured inputs
+
+## What this changes
+- Phase 1 Brand should be treated as a **step-driven guided workflow**
+- Backend output should include:
+  - ordered steps
+  - per-step helper content
+  - per-step example content
+  - input config / placeholders / CTA labels
+  - completion state
+- The older generic `content + tasks` model is not wrong, but it is too abstract on its own
+- Brand content should still exist underneath, but it should feed this step UI rather than arrive as one undifferentiated block
+
 ## Status
 
-Observation only. No build/design changes started from this note.
+Observation now detailed enough to drive Brand backend contract shape.
