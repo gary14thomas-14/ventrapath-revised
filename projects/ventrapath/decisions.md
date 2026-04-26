@@ -31,7 +31,15 @@
 - If exact live pricing is not available, VentraPath should use the closest defensible comparables and label the result as directional rather than pretending precision.
 - Pricing should default to the correct currency based on the business location in the user's input or blueprint context, unless the user explicitly asks for another currency.
 - If cross-market comparables are used, VentraPath should clearly label them and convert or contextualise them instead of mixing currencies sloppily.
+- If the unique twist creates a materially better experience, stronger outcome, or clearer premium edge, pricing should usually rise above standard category pricing rather than anchoring to the plain-market baseline.
+- VentraPath should explain why the twist earns that premium instead of just adding a random markup.
+- If the twist makes the product feel like a genuinely new category or a clear step above the best standard incumbent, pricing should usually exceed normal premium category pricing rather than matching a well-run incumbent.
+- New-category pricing is only justified when the difference is obvious to the customer quickly; if the premium edge is not legible within seconds, VentraPath should price more conservatively.
+- VentraPath should use a hard paywall immediately after the blueprint experience: the user gets the blueprint first, clicks Next, sees the next-steps transition/load, and then hits the paywall before proceeding into the guided build phases.
+- The blueprint should create excitement; the paywall should trigger at the exact moment of forward momentum, not before the user has seen the blueprint value.
 - Every Legal section must clearly state that it is information only and the user must do their own research / local verification.
+- Phase 2 Legal must be country-specific, link users to the correct official or primary authority sites where possible, and show visible disclaimer language inside the phase UI itself.
+- Legal template or provider links must never be confused with official filing authorities; if the exact regional authority is unclear, VentraPath should label the uncertainty instead of bluffing.
 - Benchmarking should now split into two lanes with different success criteria: (1) company blueprint generation and (2) messy idea rescue/rejection.
 - In the messy-idea lane, a clean commercially honest rejection counts as success; the goal is not to force every fuzzy input into a pass.
 - Do not start detailed build/design work from this capture alone until Gaz says to begin.
