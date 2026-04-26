@@ -1,0 +1,34 @@
+version: 1
+phase: 0
+cases:
+  - id: VP-P0-001
+    difficulty: simple
+    country: Australia
+    idea: >
+      A subscription-based platform that helps busy dog owners book vetted dog walkers,
+      pet sitters, and short-term home check-ins in their local area.
+    notes:
+      - Consumer marketplace
+      - Familiar category
+      - Good test for whether VentraPath can still generate a non-generic twist
+
+  - id: VP-P0-002
+    difficulty: medium
+    country: United Kingdom
+    idea: >
+      A service that helps small trades businesses like plumbers, electricians, and roofers
+      turn WhatsApp conversations into booked jobs, quotes, reminders, and follow-ups.
+    notes:
+      - SMB B2B service/software hybrid
+      - Good test for monetisation and differentiation
+
+  - id: VP-P0-003
+    difficulty: messy
+    country: Canada
+    idea: >
+      I want to build something around wellness, AI, and community for people who are burned out,
+      but I am not sure if it should be an app, coaching business, membership, or service.
+    notes:
+      - Vague input on purpose
+      - Good test of business clarity and anti-generic handling
+
