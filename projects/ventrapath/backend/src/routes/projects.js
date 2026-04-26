@@ -96,7 +96,7 @@ export async function handleListProjects(req, res, env) {
     return fail(res, 401, 'UNAUTHENTICATED', 'Authenticated user is required');
   }
 
-  const projects = await listProjectsForUser(userId);
+  const projects = await listProjectsForUser(userId, env);
 
   return ok(res, {
     projects: projects.map(toProjectListItem),
@@ -142,9 +142,9 @@ export async function handleCreateProject(req, res, env) {
     updatedAt: now,
   };
 
-  await createProject(project);
+  const createdProject = await createProject(project, env);
 
-  return ok(res, { project }, 201);
+  return ok(res, { project: createdProject }, 201);
 }
 
 export async function handleGetProject(req, res, projectId, env) {
@@ -154,7 +154,7 @@ export async function handleGetProject(req, res, projectId, env) {
     return fail(res, 401, 'UNAUTHENTICATED', 'Authenticated user is required');
   }
 
-  const project = await getProjectByIdForUser(projectId, userId);
+  const project = await getProjectByIdForUser(projectId, userId, env);
 
   if (!project) {
     return fail(res, 404, 'PROJECT_NOT_FOUND', `Project ${projectId} was not found`);

@@ -15,10 +15,17 @@ export function loadEnv() {
     throw new Error('PORT must be a positive integer');
   }
 
+  const persistenceDriver = process.env.PERSISTENCE_DRIVER ?? 'json';
+
+  if (!['json', 'postgres'].includes(persistenceDriver)) {
+    throw new Error('PERSISTENCE_DRIVER must be either "json" or "postgres"');
+  }
+
   return {
     nodeEnv: process.env.NODE_ENV ?? 'development',
     port,
     appBaseUrl: requireEnv('APP_BASE_URL', `http://localhost:${port}`),
+    persistenceDriver,
     databaseUrl: process.env.DATABASE_URL ?? null,
   };
 }

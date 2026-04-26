@@ -13,6 +13,7 @@ The job is to create a sane place for the first vertical slice to live.
 - minimal Node service scaffold
 - environment loading
 - health endpoint
+- repository seam for `json` and `postgres` persistence drivers
 - dev-only local JSON persistence for project CRUD + blueprint versioning
 - local migration list/verify tooling
 - first SQL migrations for:
@@ -69,16 +70,16 @@ backend/
 - `GET /api/projects/:projectId/blueprint`
 - `GET /api/projects/:projectId/blueprint/versions`
 
-These routes currently use a **dev-only local JSON store** under `.data/`.
-That is deliberate: real endpoint behaviour now, Postgres adapter later.
+These routes currently use the `json` persistence driver by default, backed by a dev-only local store under `.data/`.
+That is deliberate: real endpoint behaviour now, Postgres adapter ready for the handoff.
 
 Blueprint generation is currently a dev scaffold, not the real Bob-orchestrated system.
 It persists versioned outputs and route shape now so the app loop is real before orchestration wiring lands.
 
 ## Next build passes
 
-1. choose/install the actual Postgres client path
-2. replace the dev JSON project store with a Postgres-backed repository
+1. install the actual Postgres driver/package (`pg`) when approved
+2. set `PERSISTENCE_DRIVER=postgres`
 3. apply `0001`-`0005`
 4. replace scaffolded blueprint generation with the real orchestration layer
 5. add project updates when needed
@@ -114,6 +115,26 @@ These commands do local validation only for now.
 They do **not** apply SQL to Postgres yet.
 
 That final step depends on the DB client/tool choice.
+
+## Persistence driver switch
+
+Default:
+
+```bash
+PERSISTENCE_DRIVER=json
+```
+
+Prepared but not yet installed:
+
+```bash
+PERSISTENCE_DRIVER=postgres
+DATABASE_URL=postgres://...
+```
+
+Important:
+- the Postgres repository seam is wired
+- the actual `pg` package is **not installed yet**
+- selecting `postgres` now will fail loudly until that package is installed
 
 ## Bottom line
 

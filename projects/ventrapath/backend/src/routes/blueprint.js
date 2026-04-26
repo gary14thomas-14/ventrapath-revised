@@ -55,7 +55,7 @@ export async function handleGenerateBlueprint(req, res, projectId, env) {
   }
 
   const regenerate = Boolean(body?.regenerate);
-  const existing = await getLatestBlueprintForProject(projectId, userId);
+  const existing = await getLatestBlueprintForProject(projectId, userId, env);
 
   if (existing && !regenerate) {
     return ok(res, {
@@ -69,13 +69,13 @@ export async function handleGenerateBlueprint(req, res, projectId, env) {
     });
   }
 
-  const project = await getProjectByIdForUser(projectId, userId);
+  const project = await getProjectByIdForUser(projectId, userId, env);
 
   if (!project) {
     return fail(res, 404, 'PROJECT_NOT_FOUND', `Project ${projectId} was not found`);
   }
 
-  const blueprint = await createBlueprintVersionForProject(projectId, userId, buildBlueprintSections(project));
+  const blueprint = await createBlueprintVersionForProject(projectId, userId, buildBlueprintSections(project), env);
 
   if (!blueprint) {
     return fail(res, 404, 'PROJECT_NOT_FOUND', `Project ${projectId} was not found`);
@@ -98,7 +98,7 @@ export async function handleGetBlueprint(req, res, projectId, env) {
     return fail(res, 401, 'UNAUTHENTICATED', 'Authenticated user is required');
   }
 
-  const blueprint = await getLatestBlueprintForProject(projectId, userId);
+  const blueprint = await getLatestBlueprintForProject(projectId, userId, env);
 
   if (!blueprint) {
     return fail(res, 404, 'BLUEPRINT_NOT_FOUND', `No blueprint exists for project ${projectId}`);
@@ -114,7 +114,7 @@ export async function handleListBlueprintVersions(req, res, projectId, env) {
     return fail(res, 401, 'UNAUTHENTICATED', 'Authenticated user is required');
   }
 
-  const versions = await listBlueprintVersionsForProject(projectId, userId);
+  const versions = await listBlueprintVersionsForProject(projectId, userId, env);
 
   if (!versions) {
     return fail(res, 404, 'PROJECT_NOT_FOUND', `Project ${projectId} was not found`);

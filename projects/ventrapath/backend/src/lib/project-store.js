@@ -1,131 +1,52 @@
-import { randomUUID } from 'node:crypto';
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
-import { dirname, resolve } from 'node:path';
+import { createJsonProjectStore } from './stores/json-project-store.js';
+import { createPostgresProjectStore } from './stores/postgres-project-store.js';
 
-const storePath = resolve(process.cwd(), '.data', 'projects.json');
+const stores = new Map();
 
-async function ensureStoreDir() {
-  await mkdir(dirname(storePath), { recursive: true });
+function getStoreKey(env) {
+  const driver = env.persistenceDriver ?? 'json';
+  const databaseUrl = env.databaseUrl ?? 'no-db';
+  return `${driver}:${databaseUrl}`;
 }
 
-async function readStore() {
-  await ensureStoreDir();
-
-  try {
-    const raw = await readFile(storePath, 'utf8');
-    const parsed = JSON.parse(raw);
-
-    if (
-      !parsed
-      || typeof parsed !== 'object'
-      || !Array.isArray(parsed.projects)
-      || (parsed.blueprintVersions != null && !Array.isArray(parsed.blueprintVersions))
-    ) {
-      throw new Error('Project store is malformed');
-    }
-
-    parsed.blueprintVersions ??= [];
-
-    return parsed;
-  } catch (error) {
-    if (error.code === 'ENOENT') {
-      return { projects: [], blueprintVersions: [] };
-    }
-
-    throw error;
-  }
-}
-
-async function writeStore(store) {
-  await ensureStoreDir();
-  await writeFile(storePath, JSON.stringify(store, null, 2));
-}
-
-export async function listProjectsForUser(userId) {
-  const store = await readStore();
-
-  return store.projects
-    .filter((project) => project.userId === userId)
-    .sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)));
-}
-
-export async function createProject(project) {
-  const store = await readStore();
-  store.projects.push(project);
-  await writeStore(store);
-  return project;
-}
-
-export async function getProjectByIdForUser(projectId, userId) {
-  const store = await readStore();
-
-  return store.projects.find((project) => project.id === projectId && project.userId === userId) ?? null;
-}
-
-export async function createBlueprintVersionForProject(projectId, userId, sections) {
-  const store = await readStore();
-  const project = store.projects.find((item) => item.id === projectId && item.userId === userId);
-
-  if (!project) {
-    return null;
+function buildStore(env) {
+  if (env.persistenceDriver === 'postgres') {
+    return createPostgresProjectStore(env);
   }
 
-  const existingVersions = store.blueprintVersions.filter((item) => item.projectId === projectId);
-  const version = existingVersions.length + 1;
-  const now = new Date().toISOString();
-
-  const blueprint = {
-    id: randomUUID(),
-    projectId,
-    version,
-    status: 'ready',
-    sections,
-    meta: {
-      country: project.country,
-      region: project.region,
-      currencyCode: project.currencyCode,
-      generatedAt: now,
-    },
-    createdAt: now,
-  };
-
-  store.blueprintVersions.push(blueprint);
-
-  project.status = 'blueprint_ready';
-  project.latestBlueprintVersionNumber = version;
-  project.updatedAt = now;
-
-  await writeStore(store);
-
-  return blueprint;
+  return createJsonProjectStore(env);
 }
 
-export async function getLatestBlueprintForProject(projectId, userId) {
-  const store = await readStore();
-  const project = store.projects.find((item) => item.id === projectId && item.userId === userId);
+function getStore(env) {
+  const key = getStoreKey(env);
 
-  if (!project) {
-    return null;
+  if (!stores.has(key)) {
+    stores.set(key, buildStore(env));
   }
 
-  return store.blueprintVersions
-    .filter((item) => item.projectId === projectId)
-    .sort((a, b) => b.version - a.version)[0] ?? null;
+  return stores.get(key);
 }
 
-export async function listBlueprintVersionsForProject(projectId, userId) {
-  const store = await readStore();
-  const project = store.projects.find((item) => item.id === projectId && item.userId === userId);
+export async function listProjectsForUser(userId, env) {
+  return getStore(env).listProjectsForUser(userId);
+}
 
-  if (!project) {
-    return null;
-  }
+export async function createProject(project, env) {
+  return getStore(env).createProject(project);
+}
 
-  return store.blueprintVersions
-    .filter((item) => item.projectId === projectId)
-    .sort((a, b) => b.version - a.version)
-    .map((item) => ({
-      version: item.version,
-      generatedAt: item.meta.generatedAt,
-    }));
+export async function getProjectByIdForUser(projectId, userId, env) {
+  return getStore(env).getProjectByIdForUser(projectId, userId);
+}
+
+export async function createBlueprintVersionForProject(projectId, userId, sections, env) {
+  return getStore(env).createBlueprintVersionForProject(projectId, userId, sections);
+}
+
+export async function getLatestBlueprintForProject(projectId, userId, env) {
+  return getStore(env).getLatestBlueprintForProject(projectId, userId);
+}
+
+export async function listBlueprintVersionsForProject(projectId, userId, env) {
+  return getStore(env).listBlueprintVersionsForProject(projectId, userId);
 }
