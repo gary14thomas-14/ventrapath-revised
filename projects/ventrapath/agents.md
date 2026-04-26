@@ -44,6 +44,16 @@ VentraPath uses a **task-routed agent system**:
 - may reject or request a rewrite from any specialist
 - owns the 2-minute blueprint ceiling
 
+**Skills:**
+- task routing
+- synthesis
+- contradiction resolution
+- output structuring
+- latency budgeting
+- confidence weighting
+- anti-generic quality control
+- final editorial judgment
+
 ---
 
 ### 2. Blueprint Architect
@@ -69,6 +79,15 @@ VentraPath uses a **task-routed agent system**:
 - does not own legal specifics
 - does not own detailed revenue modelling
 - does not own execution planning
+
+**Skills:**
+- business model design
+- value proposition design
+- offer architecture
+- business clarity
+- structured business writing
+- concept framing
+- blueprint composition
 
 ---
 
@@ -96,6 +115,15 @@ VentraPath uses a **task-routed agent system**:
 - does not own legal/compliance
 - does not own execution tasks
 
+**Skills:**
+- strategic differentiation
+- positioning
+- originality generation
+- competitive contrast
+- anti-generic pressure testing
+- concept mutation
+- uniqueness scoring
+
 ---
 
 ### 4. Market Intelligence Agent
@@ -121,6 +149,15 @@ VentraPath uses a **task-routed agent system**:
 - does not define the legal structure
 - does not own final monetisation design
 - does not create execution plans
+
+**Skills:**
+- audience definition
+- demand analysis
+- competitor analysis
+- market segmentation
+- market opportunity spotting
+- regional market context
+- signal extraction from messy ideas
 
 ---
 
@@ -149,6 +186,15 @@ VentraPath uses a **task-routed agent system**:
 - does not own general market research
 - does not build detailed execution tasks
 
+**Skills:**
+- pricing strategy
+- revenue model design
+- subscription logic
+- commission / marketplace logic
+- unit-economics reasoning
+- scenario modelling
+- monetisation risk spotting
+
 ---
 
 ### 6. Legal & Compliance Agent
@@ -175,6 +221,15 @@ VentraPath uses a **task-routed agent system**:
 - does not own differentiation
 - does not own pricing or market positioning
 - does not own execution sequencing
+
+**Skills:**
+- jurisdiction-aware issue spotting
+- business structure guidance
+- licensing/compliance mapping
+- legal checklist generation
+- regulatory comparison
+- risk flagging
+- explicit uncertainty handling
 
 ---
 
@@ -203,6 +258,26 @@ VentraPath uses a **task-routed agent system**:
 - does not own legal judgments
 - does not own market research
 - does not own monetisation logic
+
+**Skills:**
+- milestone planning
+- task decomposition
+- sequence design
+- dependency mapping
+- weekly pacing
+- workload calibration by available hours
+- practical execution design
+
+## Shared platform skills
+
+These are not separate agents, but the system needs them across the council:
+- location adaptation
+- structured output formatting
+- persistence/progress awareness
+- confidence/uncertainty signaling
+- anti-fluff enforcement
+- consistency checking across sections and phases
+- graceful degradation under latency pressure
 
 ## Task ownership by blueprint section
 
