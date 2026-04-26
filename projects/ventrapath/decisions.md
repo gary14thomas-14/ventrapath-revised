@@ -12,4 +12,5 @@
 - Until told otherwise, treat the UI information architecture as canonical over any ChatGPT-authored definition.
 - Blueprint generation has a hard product constraint: target output must stay at or under 2 minutes.
 - Therefore, not all 7 core agents should run at full depth on every blueprint task; Bob must route only the required agents and protect latency.
+- Every VentraPath blueprint must contain a unique twist that clearly differentiates the user's business from competitors; a blueprint without this is not acceptable.
 - Do not start detailed build/design work from this capture alone until Gaz says to begin.

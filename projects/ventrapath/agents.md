@@ -98,6 +98,7 @@ VentraPath uses a **task-routed agent system**:
 - strategic differentiation
 - anti-generic pressure test
 - positioning sharpness
+- ensuring every blueprint contains a clear differentiator that makes the user's business stand out from competitors
 
 **Inputs:**
 - business concept from Blueprint Architect
@@ -123,6 +124,8 @@ VentraPath uses a **task-routed agent system**:
 - anti-generic pressure testing
 - concept mutation
 - uniqueness scoring
+- differentiated twist generation
+- competitor contrast framing
 
 ---
 
