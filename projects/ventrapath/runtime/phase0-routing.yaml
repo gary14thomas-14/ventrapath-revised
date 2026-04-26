@@ -1,0 +1,56 @@
+version: 1
+phase: 0
+name: blueprint
+
+sections:
+  - Business
+  - Market
+  - Monetisation
+  - Execution
+  - Legal
+  - Website
+  - Risks
+
+defaultHotPath:
+  - bob
+  - blueprint_architect
+  - differentiation_strategist
+  - market_intelligence
+  - monetisation_architect
+
+secondaryPath:
+  - legal_compliance
+  - execution_planner
+
+secondaryPathRules:
+  - Run Legal & Compliance in light mode when jurisdiction matters or regulated activity is visible.
+  - Run Execution Planner in light mode when fast milestone planning is needed.
+  - Compress Legal before dropping it entirely.
+  - Compress Execution before dropping it entirely.
+  - Never drop Differentiation Strategist.
+
+finalAssembly:
+  owner: bob
+  websiteDerivedFrom:
+    - blueprint_architect
+    - market_intelligence
+    - execution_planner
+  risksDerivedFrom:
+    - bob
+    - blueprint_architect
+    - differentiation_strategist
+    - market_intelligence
+    - monetisation_architect
+    - legal_compliance
+    - execution_planner
+
+degradationPolicy:
+  warnAtSeconds: 75
+  compressAtSeconds: 95
+  hardStopAtSeconds: 120
+  rules:
+    - Keep Business, Market, Monetisation intact.
+    - Keep the unique twist intact.
+    - Reduce Legal to top risks/checklist when needed.
+    - Reduce Execution to milestone-only mode when needed.
+

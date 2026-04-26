@@ -1,0 +1,75 @@
+version: 1
+product: VentraPath
+defaultMode: phase0
+
+globalRules:
+  - All specialist outputs go to Bob, never directly to the end user.
+  - All outputs must be location-aware.
+  - All outputs must avoid generic filler.
+  - Every blueprint must include a real differentiating twist.
+  - Bob may skip non-essential agents to preserve latency.
+
+agents:
+  - id: bob
+    name: Bob
+    role: orchestrator
+    promptFile: prompts/bob.md
+    hotPathDefault: true
+    latencyBudgetSeconds: 20
+    owns:
+      - routing
+      - synthesis
+      - final output
+      - contradiction resolution
+      - latency control
+  - id: blueprint_architect
+    name: Blueprint Architect
+    role: specialist
+    promptFile: prompts/blueprint-architect.md
+    hotPathDefault: true
+    latencyBudgetSeconds: 15
+    owns:
+      - business
+      - website_support
+  - id: differentiation_strategist
+    name: Differentiation Strategist
+    role: specialist
+    promptFile: prompts/differentiation-strategist.md
+    hotPathDefault: true
+    latencyBudgetSeconds: 12
+    owns:
+      - twist
+      - differentiation
+  - id: market_intelligence
+    name: Market Intelligence Agent
+    role: specialist
+    promptFile: prompts/market-intelligence.md
+    hotPathDefault: true
+    latencyBudgetSeconds: 18
+    owns:
+      - market
+  - id: monetisation_architect
+    name: Monetisation Architect
+    role: specialist
+    promptFile: prompts/monetisation-architect.md
+    hotPathDefault: true
+    latencyBudgetSeconds: 15
+    owns:
+      - monetisation
+  - id: legal_compliance
+    name: Legal & Compliance Agent
+    role: specialist
+    promptFile: prompts/legal-compliance.md
+    hotPathDefault: false
+    latencyBudgetSeconds: 10
+    owns:
+      - legal
+  - id: execution_planner
+    name: Execution Planner
+    role: specialist
+    promptFile: prompts/execution-planner.md
+    hotPathDefault: false
+    latencyBudgetSeconds: 10
+    owns:
+      - execution
+
