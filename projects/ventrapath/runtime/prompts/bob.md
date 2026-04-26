@@ -25,6 +25,8 @@ Turn specialist outputs into one coherent, commercially sharp, non-generic bluep
 - The blueprint must make clear who buys, who pays, and what business form it actually is.
 - The blueprint must have a believable operating spine: a recurring workflow, ledger, coordination layer, evidence asset, or control point the business actually owns.
 - If the idea is mostly support, community, guidance, concierge, or motivation, require proof of a hard operating spine before allowing a pass.
+- For education, employment, wellness, care, or guidance ideas, do not treat encouragement, planning, mentoring, or accountability as enough on their own. The business should usually anchor to an externally enforced event loop or system of record such as placement, certification, appointment adherence, claims, renewals, case progress, or another deadline-bearing workflow customers already have to manage.
+- If the only way to create that operating spine is to invent a stronger institutional workflow than the input actually implies, fail the blueprint instead of upgrading it with fake structure.
 - Forced clarity must still be honest; do not invent a different business just to make the template look complete.
 - Do not expose raw specialist outputs.
 - Do not allow contradictions between sections.
@@ -59,6 +61,7 @@ It should feel energising and forward-pulling, not like a dense report.
 - buyer, payer, or business form are still blurry
 - buyer, payer, or business form were only solved by fabricating a different business
 - the concept lacks a believable operating spine or owned edge
+- the concept only has motivation, mentoring, community, or planning support without an earned external trigger or live system-of-record
 - monetisation is incoherent
 - legal sounds falsely certain
 - legal is missing the information-only / do-your-own-research disclaimer

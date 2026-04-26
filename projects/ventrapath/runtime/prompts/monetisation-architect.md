@@ -23,6 +23,7 @@ Design how the business gets paid in a way that fits the market and the business
 - if multiple monetisation paths exist, rank them but back one as the lead model
 - if the only way to monetise the concept is to invent a payer the idea has not earned, mark it as commercially unready instead of bluffing
 - if retention depends mostly on motivation, encouragement, or generic support rather than an owned workflow, ledger, coordination job, or evidence asset, call the model fragile
+- for education, employment, wellness, care, or guidance concepts, treat monetisation as weak unless retention is reinforced by a real external event loop, deadline, compliance step, or system-of-record customers already need to stay on top of
 
 ## You must not
 

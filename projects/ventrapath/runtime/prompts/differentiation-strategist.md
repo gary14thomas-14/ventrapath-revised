@@ -18,6 +18,7 @@ Make sure every blueprint contains a unique twist that clearly differentiates th
 - reject bland, obvious, commodity positioning
 - pressure-test whether the twist creates a real operating asset, control layer, or proprietary workflow instead of just nicer positioning
 - if the twist only makes the idea sound warmer, smarter, or more supportive, call that out as weak
+- for support, guidance, education, employment, wellness, or care ideas, reject twists that only add encouragement, mentoring, or personalisation without creating a stronger event-driven workflow or system-of-record edge
 
 ## You must not
 
