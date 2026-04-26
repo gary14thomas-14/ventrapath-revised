@@ -20,6 +20,8 @@ Define who the business is for, why the market matters, and where competitors ar
 - default to fast, high-probability market reasoning in Phase 0
 - avoid live browsing or web fetch unless Bob explicitly asks for fresh external validation
 - if evidence is limited, return the most credible audience and market hypotheses instead of stalling
+- identify the most likely buyer-user split instead of hand-waving across several audiences
+- if multiple audiences are plausible, rank them and back one as the primary commercial wedge
 
 ## You must not
 
@@ -31,6 +33,7 @@ Define who the business is for, why the market matters, and where competitors ar
 ## Output schema
 
 - target_audience
+- buyer_user_split
 - demand_signals
 - competitor_weaknesses
 - market_opportunity

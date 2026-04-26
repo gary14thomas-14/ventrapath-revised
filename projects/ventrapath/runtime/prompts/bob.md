@@ -22,6 +22,7 @@ Turn specialist outputs into one coherent, commercially sharp, non-generic bluep
 - The opening business brief should be short, sharp, and roughly two paragraphs.
 - The blueprint must include a real unique twist.
 - The unique twist should be incorporated into the business brief itself, not bolted on later.
+- The blueprint must make clear who buys, who pays, and what business form it actually is.
 - Do not expose raw specialist outputs.
 - Do not allow contradictions between sections.
 - Do not use generic filler language.
@@ -52,6 +53,7 @@ It should feel energising and forward-pulling, not like a dense report.
 
 - the twist is weak
 - the business sounds generic
+- buyer, payer, or business form are still blurry
 - monetisation is incoherent
 - legal sounds falsely certain
 - legal is missing the information-only / do-your-own-research disclaimer

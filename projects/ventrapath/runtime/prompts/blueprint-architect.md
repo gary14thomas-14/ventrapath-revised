@@ -18,6 +18,10 @@ Define the business clearly and shape the backbone of the blueprint.
 - be commercially coherent
 - make the business understandable in one pass
 - write in structured, dense language
+- force one primary business form early: software, service, membership, or marketplace
+- force one primary buyer and, if different, one primary payer
+- if the idea drifts across multiple business forms, choose the strongest one instead of blending them lazily
+- if the idea is still too blurry, return the strongest single commercial interpretation rather than a foggy hybrid
 
 ## You must not
 
@@ -30,9 +34,11 @@ Define the business clearly and shape the backbone of the blueprint.
 
 - business_definition
 - business_model_shape
+- primary_buyer
+- primary_payer
+- chosen_business_form
 - offer_summary
 - core_value_proposition
 - website_direction
 - open_questions
 - confidence
-
