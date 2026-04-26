@@ -15,6 +15,7 @@ The job is to create a sane place for the first vertical slice to live.
 - health endpoint
 - repository seam for `json` and `postgres` persistence drivers
 - dev-only local JSON persistence for project CRUD + blueprint versioning
+- embedded local Postgres startup path for this machine
 - local migration list/verify tooling
 - first SQL migrations for:
   - bootstrap database
@@ -117,6 +118,16 @@ npm run migrations:apply
 It requires:
 - `DATABASE_URL` set
 - reachable Postgres server
+
+## Local Postgres commands
+
+```bash
+npm run postgres:start
+npm run postgres:check
+npm run postgres:stop
+```
+
+These use the embedded local Postgres path and the `.env` values when present.
 
 ## Persistence driver switch
 

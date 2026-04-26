@@ -1,3 +1,7 @@
+import { loadEnvFile } from './load-env-file.js';
+
+loadEnvFile(process.cwd());
+
 function requireEnv(name, fallback) {
   const value = process.env[name] ?? fallback;
 

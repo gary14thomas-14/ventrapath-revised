@@ -82,8 +82,27 @@ export function createPostgresProjectStore(env) {
     return result.rows[0] ?? null;
   }
 
+  async function ensureUserExists(userId) {
+    const pool = await getPool();
+    await pool.query(
+      `
+        insert into users (id, email, name, auth_provider, auth_provider_user_id)
+        values ($1, $2, $3, $4, $5)
+        on conflict (id) do nothing
+      `,
+      [
+        userId,
+        `dev+${userId}@ventrapath.local`,
+        'Dev User',
+        'dev',
+        userId,
+      ],
+    );
+  }
+
   return {
     async listProjectsForUser(userId) {
+      await ensureUserExists(userId);
       const pool = await getPool();
       const result = await pool.query(
         `
@@ -99,6 +118,7 @@ export function createPostgresProjectStore(env) {
     },
 
     async createProject(project) {
+      await ensureUserExists(project.userId);
       const pool = await getPool();
       const result = await pool.query(
         `
@@ -142,11 +162,13 @@ export function createPostgresProjectStore(env) {
     },
 
     async getProjectByIdForUser(projectId, userId) {
+      await ensureUserExists(userId);
       const row = await getOwnedProject(projectId, userId);
       return row ? mapProjectRow(row) : null;
     },
 
     async createBlueprintVersionForProject(projectId, userId, sections) {
+      await ensureUserExists(userId);
       const pool = await getPool();
       const client = await pool.connect();
 
@@ -242,6 +264,7 @@ export function createPostgresProjectStore(env) {
     },
 
     async getLatestBlueprintForProject(projectId, userId) {
+      await ensureUserExists(userId);
       const owned = await getOwnedProject(projectId, userId);
 
       if (!owned) {
@@ -264,6 +287,7 @@ export function createPostgresProjectStore(env) {
     },
 
     async listBlueprintVersionsForProject(projectId, userId) {
+      await ensureUserExists(userId);
       const owned = await getOwnedProject(projectId, userId);
 
       if (!owned) {

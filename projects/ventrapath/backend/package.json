@@ -9,12 +9,16 @@
   "scripts": {
     "dev": "node --watch src/server.js",
     "start": "node src/server.js",
-    "check": "node --check src/server.js && node --check src/app.js && node --check src/config/env.js && node --check src/lib/http.js && node --check src/lib/project-store.js && node --check src/lib/stores/json-project-store.js && node --check src/lib/stores/postgres-project-store.js && node --check src/routes/health.js && node --check src/routes/projects.js && node --check src/routes/blueprint.js && node --check scripts/migrations.js",
+    "check": "node --check src/server.js && node --check src/app.js && node --check src/config/env.js && node --check src/config/load-env-file.js && node --check src/lib/http.js && node --check src/lib/project-store.js && node --check src/lib/stores/json-project-store.js && node --check src/lib/stores/postgres-project-store.js && node --check src/routes/health.js && node --check src/routes/projects.js && node --check src/routes/blueprint.js && node --check scripts/migrations.js && node --check scripts/local-postgres.js",
     "migrations:list": "node scripts/migrations.js list",
     "migrations:verify": "node scripts/migrations.js verify",
-    "migrations:apply": "node scripts/migrations.js apply"
+    "migrations:apply": "node scripts/migrations.js apply",
+    "postgres:start": "node scripts/local-postgres.js start",
+    "postgres:check": "node scripts/local-postgres.js check",
+    "postgres:stop": "node scripts/local-postgres.js stop"
   },
   "dependencies": {
+    "embedded-postgres": "^18.3.0-beta.17",
     "pg": "^8.20.0"
   }
 }

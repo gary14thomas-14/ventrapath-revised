@@ -7,7 +7,8 @@ import {
 } from '../lib/project-store.js';
 import { fail, ok, parseJsonBody } from '../lib/http.js';
 
-const DEFAULT_DEV_USER_ID = 'dev-user-001';
+const DEFAULT_DEV_USER_ID = '11111111-1111-4111-8111-111111111111';
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function getRequestUserId(req, env) {
   const headerUserId = req.headers['x-user-id'];
@@ -18,6 +19,14 @@ function getRequestUserId(req, env) {
 
   if (env.nodeEnv === 'development') {
     return DEFAULT_DEV_USER_ID;
+  }
+
+  return null;
+}
+
+function validateUserId(userId, env) {
+  if (env.persistenceDriver === 'postgres' && !UUID_PATTERN.test(userId)) {
+    return 'User id must be a UUID when using postgres persistence';
   }
 
   return null;
@@ -44,6 +53,11 @@ export async function handleGenerateBlueprint(req, res, projectId, env) {
 
   if (!userId) {
     return fail(res, 401, 'UNAUTHENTICATED', 'Authenticated user is required');
+  }
+
+  const userIdError = validateUserId(userId, env);
+  if (userIdError) {
+    return fail(res, 400, 'INVALID_USER_ID', userIdError);
   }
 
   let body;
@@ -98,6 +112,11 @@ export async function handleGetBlueprint(req, res, projectId, env) {
     return fail(res, 401, 'UNAUTHENTICATED', 'Authenticated user is required');
   }
 
+  const userIdError = validateUserId(userId, env);
+  if (userIdError) {
+    return fail(res, 400, 'INVALID_USER_ID', userIdError);
+  }
+
   const blueprint = await getLatestBlueprintForProject(projectId, userId, env);
 
   if (!blueprint) {
@@ -112,6 +131,11 @@ export async function handleListBlueprintVersions(req, res, projectId, env) {
 
   if (!userId) {
     return fail(res, 401, 'UNAUTHENTICATED', 'Authenticated user is required');
+  }
+
+  const userIdError = validateUserId(userId, env);
+  if (userIdError) {
+    return fail(res, 400, 'INVALID_USER_ID', userIdError);
   }
 
   const versions = await listBlueprintVersionsForProject(projectId, userId, env);

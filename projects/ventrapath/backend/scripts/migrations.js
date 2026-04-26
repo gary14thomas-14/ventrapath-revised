@@ -1,9 +1,12 @@
 import { readdirSync, readFileSync, existsSync } from 'node:fs';
 import { join, resolve } from 'node:path';
+import { loadEnvFile } from '../src/config/load-env-file.js';
 
 const rootDir = resolve(process.cwd());
 const migrationsDir = join(rootDir, 'migrations');
 const MIGRATION_PATTERN = /^(\d{4})_[a-z0-9_]+\.sql$/;
+
+loadEnvFile(rootDir);
 
 function getMigrationFiles() {
   if (!existsSync(migrationsDir)) {
