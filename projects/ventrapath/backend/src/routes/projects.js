@@ -71,9 +71,11 @@ function toProjectListItem(project) {
 }
 
 function validateCreateProjectBody(body) {
+  const name = normaliseString(body?.name);
   const idea = normaliseString(body?.idea);
   const country = normaliseString(body?.country);
   const region = body?.region == null ? null : normaliseString(body.region) || null;
+  const currencyCode = normaliseString(body?.currencyCode).toUpperCase();
   const hoursPerWeek = body?.hoursPerWeek == null ? null : Number(body.hoursPerWeek);
 
   if (!idea || idea.length < 3) {
@@ -84,15 +86,25 @@ function validateCreateProjectBody(body) {
     return { error: ['INVALID_INPUT', 'country must be provided'] };
   }
 
+  if (name && name.length < 2) {
+    return { error: ['INVALID_INPUT', 'name must be at least 2 characters when provided'] };
+  }
+
+  if (currencyCode && !/^[A-Z]{3}$/.test(currencyCode)) {
+    return { error: ['INVALID_INPUT', 'currencyCode must be a 3-letter ISO code when provided'] };
+  }
+
   if (hoursPerWeek !== null && (!Number.isInteger(hoursPerWeek) || hoursPerWeek < 1 || hoursPerWeek > 168)) {
     return { error: ['INVALID_INPUT', 'hoursPerWeek must be an integer between 1 and 168'] };
   }
 
   return {
     value: {
+      name,
       idea,
       country,
       region,
+      currencyCode: currencyCode || deriveCurrencyCode(country),
       hoursPerWeek,
     },
   };
@@ -144,15 +156,15 @@ export async function handleCreateProject(req, res, env) {
   }
 
   const now = new Date().toISOString();
-  const { idea, country, region, hoursPerWeek } = validated.value;
+  const { name, idea, country, region, currencyCode, hoursPerWeek } = validated.value;
   const project = {
     id: randomUUID(),
     userId,
-    name: idea,
+    name: name || idea,
     rawIdea: idea,
     country,
     region,
-    currencyCode: deriveCurrencyCode(country),
+    currencyCode,
     hoursPerWeek,
     status: 'draft',
     currentPhaseNumber: 0,

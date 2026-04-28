@@ -41,6 +41,45 @@ function mapBlueprintRow(row) {
   };
 }
 
+function mapAgentOutputCacheRow(row) {
+  return {
+    id: row.id,
+    projectId: row.project_id,
+    phaseNumber: row.phase_number,
+    stepKey: row.step_key,
+    agentId: row.agent_id,
+    taskKind: row.task_kind,
+    cacheKey: row.cache_key,
+    model: row.model,
+    promptVersionHash: row.prompt_version_hash,
+    normalizedInputHash: row.normalized_input_hash,
+    dependencyHash: row.dependency_hash,
+    status: row.status,
+    outputJson: row.output_json,
+    sourceMetaJson: row.source_meta_json,
+    expiresAt: row.expires_at,
+    createdAt: row.created_at,
+    lastUsedAt: row.last_used_at,
+  };
+}
+
+function mapPhaseInstanceRow(row) {
+  return {
+    id: row.id,
+    projectId: row.project_id,
+    phaseNumber: row.phase_number,
+    title: row.title,
+    state: row.state,
+    summary: row.summary,
+    generatedContent: row.generated_content,
+    tasks: row.tasks,
+    latestRunId: row.latest_run_id,
+    generatedAt: row.generated_at,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
 export function createPostgresProjectStore(env) {
   if (!env.databaseUrl) {
     throw new Error('PERSISTENCE_DRIVER=postgres requires DATABASE_URL');
@@ -309,6 +348,194 @@ export function createPostgresProjectStore(env) {
         version: row.version_number,
         generatedAt: row.created_at,
       }));
+    },
+
+    async getAgentOutputCacheEntry(projectId, userId, cacheKey) {
+      await ensureUserExists(userId);
+      const owned = await getOwnedProject(projectId, userId);
+
+      if (!owned) {
+        return null;
+      }
+
+      const pool = await getPool();
+      const result = await pool.query(
+        `
+          update agent_output_cache
+          set last_used_at = now()
+          where project_id = $1
+            and cache_key = $2
+            and (expires_at is null or expires_at > now())
+          returning *
+        `,
+        [projectId, cacheKey],
+      );
+
+      return result.rows[0] ? mapAgentOutputCacheRow(result.rows[0]) : null;
+    },
+
+    async upsertAgentOutputCacheEntry(projectId, userId, entry) {
+      await ensureUserExists(userId);
+      const owned = await getOwnedProject(projectId, userId);
+
+      if (!owned) {
+        return null;
+      }
+
+      const pool = await getPool();
+      const result = await pool.query(
+        `
+          insert into agent_output_cache (
+            project_id,
+            phase_number,
+            step_key,
+            agent_id,
+            task_kind,
+            cache_key,
+            model,
+            prompt_version_hash,
+            normalized_input_hash,
+            dependency_hash,
+            status,
+            output_json,
+            source_meta_json,
+            expires_at
+          ) values (
+            $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12::jsonb, $13::jsonb, $14
+          )
+          on conflict (cache_key)
+          do update set
+            phase_number = excluded.phase_number,
+            step_key = excluded.step_key,
+            agent_id = excluded.agent_id,
+            task_kind = excluded.task_kind,
+            model = excluded.model,
+            prompt_version_hash = excluded.prompt_version_hash,
+            normalized_input_hash = excluded.normalized_input_hash,
+            dependency_hash = excluded.dependency_hash,
+            status = excluded.status,
+            output_json = excluded.output_json,
+            source_meta_json = excluded.source_meta_json,
+            expires_at = excluded.expires_at,
+            last_used_at = now()
+          returning *
+        `,
+        [
+          projectId,
+          entry.phaseNumber ?? null,
+          entry.stepKey ?? null,
+          entry.agentId,
+          entry.taskKind,
+          entry.cacheKey,
+          entry.model,
+          entry.promptVersionHash,
+          entry.normalizedInputHash,
+          entry.dependencyHash,
+          entry.status ?? 'ready',
+          JSON.stringify(entry.outputJson),
+          entry.sourceMetaJson == null ? null : JSON.stringify(entry.sourceMetaJson),
+          entry.expiresAt ?? null,
+        ],
+      );
+
+      return mapAgentOutputCacheRow(result.rows[0]);
+    },
+
+    async getPhaseInstanceForProject(projectId, userId, phaseNumber) {
+      await ensureUserExists(userId);
+      const owned = await getOwnedProject(projectId, userId);
+
+      if (!owned) {
+        return null;
+      }
+
+      const pool = await getPool();
+      const result = await pool.query(
+        `
+          select *
+          from phase_instances
+          where project_id = $1 and phase_number = $2
+          limit 1
+        `,
+        [projectId, phaseNumber],
+      );
+
+      return result.rows[0] ? mapPhaseInstanceRow(result.rows[0]) : null;
+    },
+
+    async upsertPhaseInstanceForProject(projectId, userId, phase) {
+      await ensureUserExists(userId);
+      const owned = await getOwnedProject(projectId, userId);
+
+      if (!owned) {
+        return null;
+      }
+
+      const pool = await getPool();
+      const client = await pool.connect();
+
+      try {
+        await client.query('begin');
+
+        const result = await client.query(
+          `
+            insert into phase_instances (
+              project_id,
+              phase_number,
+              title,
+              state,
+              summary,
+              generated_content,
+              tasks,
+              latest_run_id,
+              generated_at
+            ) values (
+              $1, $2, $3, $4, $5, $6::jsonb, $7::jsonb, $8, $9
+            )
+            on conflict (project_id, phase_number)
+            do update set
+              title = excluded.title,
+              state = excluded.state,
+              summary = excluded.summary,
+              generated_content = excluded.generated_content,
+              tasks = excluded.tasks,
+              latest_run_id = excluded.latest_run_id,
+              generated_at = excluded.generated_at,
+              updated_at = now()
+            returning *
+          `,
+          [
+            projectId,
+            phase.phaseNumber,
+            phase.title,
+            phase.state,
+            phase.summary,
+            JSON.stringify(phase.generatedContent),
+            JSON.stringify(phase.tasks ?? []),
+            phase.latestRunId ?? null,
+            phase.generatedAt ?? new Date().toISOString(),
+          ],
+        );
+
+        await client.query(
+          `
+            update projects
+            set status = 'in_progress',
+                current_phase_number = greatest(coalesce(current_phase_number, 0), $2),
+                updated_at = now()
+            where id = $1
+          `,
+          [projectId, phase.phaseNumber],
+        );
+
+        await client.query('commit');
+        return mapPhaseInstanceRow(result.rows[0]);
+      } catch (error) {
+        await client.query('rollback');
+        throw error;
+      } finally {
+        client.release();
+      }
     },
   };
 }

@@ -2,6 +2,7 @@ import { notFound } from './lib/http.js';
 import { handleHealth } from './routes/health.js';
 import { handleGenerateBlueprint, handleGetBlueprint, handleListBlueprintVersions } from './routes/blueprint.js';
 import { handleCreateProject, handleGetProject, handleListProjects } from './routes/projects.js';
+import { handleGeneratePhase, handleGetPhase, handleListPhases } from './routes/phases.js';
 
 function match(pathname, pattern) {
   return pathname.match(pattern);
@@ -44,6 +45,21 @@ export async function handleRequest(req, res, env) {
   const listBlueprintVersionsMatch = match(pathname, /^\/api\/projects\/([^/]+)\/blueprint\/versions$/);
   if (listBlueprintVersionsMatch && req.method === 'GET') {
     return handleListBlueprintVersions(req, res, listBlueprintVersionsMatch[1], env);
+  }
+
+  const listPhasesMatch = match(pathname, /^\/api\/projects\/([^/]+)\/phases$/);
+  if (listPhasesMatch && req.method === 'GET') {
+    return handleListPhases(req, res, listPhasesMatch[1], env);
+  }
+
+  const generatePhaseMatch = match(pathname, /^\/api\/projects\/([^/]+)\/phases\/([^/]+)\/generate$/);
+  if (generatePhaseMatch && req.method === 'POST') {
+    return handleGeneratePhase(req, res, generatePhaseMatch[1], generatePhaseMatch[2], env);
+  }
+
+  const getPhaseMatch = match(pathname, /^\/api\/projects\/([^/]+)\/phases\/([^/]+)$/);
+  if (getPhaseMatch && req.method === 'GET') {
+    return handleGetPhase(req, res, getPhaseMatch[1], getPhaseMatch[2], env);
   }
 
   return notFound(res);

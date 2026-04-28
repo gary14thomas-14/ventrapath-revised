@@ -14,6 +14,8 @@ agents:
     name: Bob
     role: orchestrator
     promptFile: prompts/bob.md
+    model: openai/gpt-5.4
+    escalationModel: openai/gpt-5.4
     hotPathDefault: true
     latencyBudgetSeconds: 20
     owns:
@@ -26,6 +28,8 @@ agents:
     name: Blueprint Architect
     role: specialist
     promptFile: prompts/blueprint-architect.md
+    model: openai/gpt-4.1
+    escalationModel: openai/gpt-5.4
     hotPathDefault: true
     latencyBudgetSeconds: 15
     owns:
@@ -35,6 +39,8 @@ agents:
     name: Differentiation Strategist
     role: specialist
     promptFile: prompts/differentiation-strategist.md
+    model: openai/gpt-4.1
+    escalationModel: openai/gpt-5.4
     hotPathDefault: true
     latencyBudgetSeconds: 12
     owns:
@@ -44,6 +50,8 @@ agents:
     name: Market Intelligence Agent
     role: specialist
     promptFile: prompts/market-intelligence.md
+    model: openai/gpt-4.1
+    escalationModel: openai/gpt-5.4
     hotPathDefault: true
     latencyBudgetSeconds: 18
     owns:
@@ -52,6 +60,8 @@ agents:
     name: Monetisation Architect
     role: specialist
     promptFile: prompts/monetisation-architect.md
+    model: openai/gpt-4.1
+    escalationModel: openai/gpt-5.4
     hotPathDefault: true
     latencyBudgetSeconds: 15
     owns:
@@ -60,6 +70,8 @@ agents:
     name: Legal & Compliance Agent
     role: specialist
     promptFile: prompts/legal-compliance.md
+    model: openai/gpt-4.1
+    escalationModel: openai/gpt-5.4
     hotPathDefault: false
     latencyBudgetSeconds: 10
     owns:
@@ -68,6 +80,8 @@ agents:
     name: Execution Planner
     role: specialist
     promptFile: prompts/execution-planner.md
+    model: openai/gpt-4.1-mini
+    escalationModel: openai/gpt-4.1
     hotPathDefault: false
     latencyBudgetSeconds: 10
     owns:

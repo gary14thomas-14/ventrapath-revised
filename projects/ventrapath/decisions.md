@@ -43,3 +43,5 @@
 - Benchmarking should now split into two lanes with different success criteria: (1) company blueprint generation and (2) messy idea rescue/rejection.
 - In the messy-idea lane, a clean commercially honest rejection counts as success; the goal is not to force every fuzzy input into a pass.
 - Do not start detailed build/design work from this capture alone until Gaz says to begin.
+- VentraPath model policy: keep premium usage narrow. Default Bob to `openai/gpt-5.4`, default most specialists to `openai/gpt-4.1`, use `openai/gpt-4.1-mini` for mechanical/utility work, and only escalate specialists to premium when the task genuinely needs stronger judgment.
+- VentraPath caching policy: keep final blueprint reuse, but add granular Postgres-backed specialist caching next. Cache structured agent outputs aggressively with keys that include model, prompt version, normalized input, jurisdiction, and dependency hash; treat legal/reference caches as perishable and do not blindly reuse final synthesis when upstream context changed.

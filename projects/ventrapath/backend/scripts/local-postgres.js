@@ -1,4 +1,4 @@
-import { mkdir } from 'node:fs/promises';
+import { mkdir, access } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import EmbeddedPostgres from 'embedded-postgres';
 import { Client } from 'pg';
@@ -68,6 +68,15 @@ function createEmbeddedPostgres() {
   });
 }
 
+async function isInitialisedDatabaseDir() {
+  try {
+    await access(resolve(databaseDir, 'PG_VERSION'));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 async function stopPostgres() {
   const postgres = createEmbeddedPostgres();
   await postgres.stop();
@@ -78,8 +87,12 @@ async function startPostgres() {
   await mkdir(databaseDir, { recursive: true });
 
   const postgres = createEmbeddedPostgres();
+  const alreadyInitialised = await isInitialisedDatabaseDir();
 
-  await postgres.initialise();
+  if (!alreadyInitialised) {
+    await postgres.initialise();
+  }
+
   await postgres.start();
   await ensureDatabaseExists();
 

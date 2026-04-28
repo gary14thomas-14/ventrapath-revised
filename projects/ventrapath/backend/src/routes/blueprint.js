@@ -1,10 +1,13 @@
 import { randomUUID } from 'node:crypto';
 import {
   createBlueprintVersionForProject,
+  getAgentOutputCacheEntry,
   getProjectByIdForUser,
   getLatestBlueprintForProject,
   listBlueprintVersionsForProject,
+  upsertAgentOutputCacheEntry,
 } from '../lib/project-store.js';
+import { buildBlueprintCacheIdentity } from '../lib/cache.js';
 import { fail, ok, parseJsonBody } from '../lib/http.js';
 
 const DEFAULT_DEV_USER_ID = '11111111-1111-4111-8111-111111111111';
@@ -89,7 +92,42 @@ export async function handleGenerateBlueprint(req, res, projectId, env) {
     return fail(res, 404, 'PROJECT_NOT_FOUND', `Project ${projectId} was not found`);
   }
 
-  const blueprint = await createBlueprintVersionForProject(projectId, userId, buildBlueprintSections(project), env);
+  const cacheIdentity = buildBlueprintCacheIdentity(project);
+  const cachedSections = await getAgentOutputCacheEntry(projectId, userId, cacheIdentity.cacheKey, env);
+
+  let sections;
+  let cacheHit = false;
+
+  if (cachedSections && !regenerate) {
+    sections = cachedSections.outputJson.sections;
+    cacheHit = true;
+  } else {
+    sections = buildBlueprintSections(project);
+
+    await upsertAgentOutputCacheEntry(
+      projectId,
+      userId,
+      {
+        phaseNumber: cacheIdentity.phaseNumber,
+        stepKey: cacheIdentity.stepKey,
+        agentId: cacheIdentity.agentId,
+        taskKind: cacheIdentity.taskKind,
+        cacheKey: cacheIdentity.cacheKey,
+        model: cacheIdentity.model,
+        promptVersionHash: cacheIdentity.promptVersionHash,
+        normalizedInputHash: cacheIdentity.normalizedInputHash,
+        dependencyHash: cacheIdentity.dependencyHash,
+        outputJson: { sections },
+        sourceMetaJson: {
+          ...cacheIdentity.sourceMeta,
+          jurisdictionKey: cacheIdentity.jurisdictionKey,
+        },
+      },
+      env,
+    );
+  }
+
+  const blueprint = await createBlueprintVersionForProject(projectId, userId, sections, env);
 
   if (!blueprint) {
     return fail(res, 404, 'PROJECT_NOT_FOUND', `Project ${projectId} was not found`);
@@ -102,6 +140,9 @@ export async function handleGenerateBlueprint(req, res, projectId, env) {
       status: 'completed',
     },
     blueprint,
+    cache: {
+      specialistSections: cacheHit ? 'hit' : 'miss',
+    },
   });
 }
 
