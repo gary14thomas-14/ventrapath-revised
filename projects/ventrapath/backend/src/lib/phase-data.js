@@ -1446,3 +1446,279 @@ export function buildInfrastructurePhase(project, blueprint, protectionPhase) {
     tasks: buildInfrastructureTasks(),
   }
 }
+
+function buildMarketingTasks() {
+  return [
+    {
+      title: 'Define the target audience',
+      whatToDo: 'Get specific about who the business is for and who it is not for.',
+      howToDoIt: 'Describe real buyer traits, pain points, and where they pay attention instead of saying “everyone”.',
+      executionReference: 'Use Step 1 as the filter for every future channel, offer, and message choice.',
+      isRequired: true,
+      stepNumber: 1,
+    },
+    {
+      title: 'Clarify the core message',
+      whatToDo: 'Write the simplest version of what the business does, for whom, and why it matters.',
+      howToDoIt: 'Make it repeatable and specific enough that a stranger can actually understand it.',
+      executionReference: 'Use Step 2 for homepage copy, intros, and sales messaging.',
+      isRequired: true,
+      stepNumber: 2,
+    },
+    {
+      title: 'Choose the main channels',
+      whatToDo: 'Pick the few channels worth consistent effort.',
+      howToDoIt: 'Prefer two or three channels you can actually maintain over spraying content everywhere.',
+      executionReference: 'Use Step 3 to stay focused instead of becoming a part-time content janitor.',
+      isRequired: true,
+      stepNumber: 3,
+    },
+    {
+      title: 'Set content pillars',
+      whatToDo: 'Choose repeatable themes that support trust, reach, and relevance.',
+      howToDoIt: 'Use a handful of pillars that make content easier to produce without sounding repetitive.',
+      executionReference: 'Use Step 4 to build a content rhythm that still sounds like the business.',
+      isRequired: true,
+      stepNumber: 4,
+    },
+    {
+      title: 'Create basic social proof and authority assets',
+      whatToDo: 'Make the business look credible before asking strangers to trust it.',
+      howToDoIt: 'Start with testimonials, case studies, proof points, and a few strong profile or website assets.',
+      executionReference: 'Use Step 5 to reduce “why should I believe you?” friction.',
+      isRequired: true,
+      stepNumber: 5,
+    },
+    {
+      title: 'Test paid ads only if ready',
+      whatToDo: 'Use paid reach carefully when the offer and tracking are already in place.',
+      howToDoIt: 'Start tiny, test the obvious variants, and do not set money on fire to compensate for weak messaging.',
+      executionReference: 'Use Step 6 as an optional accelerator, not as a crutch.',
+      isRequired: false,
+      stepNumber: 6,
+    },
+    {
+      title: 'Build a simple lead capture system',
+      whatToDo: 'Give interested people a clean way to opt in or enquire.',
+      howToDoIt: 'Use one lead magnet or offer, one landing page, and one basic email flow before making it fancier.',
+      executionReference: 'Use Step 7 to turn attention into contactable leads.',
+      isRequired: true,
+      stepNumber: 7,
+    },
+  ]
+}
+
+export function buildMarketingPhase(project, blueprint, infrastructurePhase) {
+  const businessName = project.name || 'Your Business'
+
+  const generated = {
+    steps: [
+      {
+        number: 1,
+        slug: 'target-audience',
+        title: 'Define Your Target Audience',
+        description: 'Clearly identify who the business is for and who you want to reach.',
+        helper: {
+          howToDoThis: 'Pick a real buyer type with real pain instead of pretending the offer is for everyone with a pulse.',
+          example: 'Small service-business owners in Australia is useful; “anyone who wants growth” is mush.',
+        },
+        whatToDo: [
+          'Describe the ideal customer in specific detail',
+          'Identify demographics like age, location, income, or role',
+          'Define pain points, values, and interests',
+          'Work out where they spend time online and offline',
+          'Create one to three usable personas',
+        ],
+        personaFields: [
+          { field: 'Demographics', examples: 'Age, location, income, job title, industry' },
+          { field: 'Goals', examples: 'What are they trying to achieve?' },
+          { field: 'Pain Points', examples: 'What problems frustrate them?' },
+          { field: 'Where They Hang Out', examples: 'Online platforms, communities, events' },
+          { field: 'How They Make Decisions', examples: 'Research style, who influences them' },
+        ],
+      },
+      {
+        number: 2,
+        slug: 'core-message',
+        title: 'Craft Your Core Message',
+        description: 'Create a clear value proposition and simple message the market can repeat.',
+        helper: {
+          howToDoThis: 'Write it plainly enough that someone could repeat it after one read.',
+          example: `“I help [audience] achieve [result] through [method]” is boring, but it works because it forces clarity.`,
+        },
+        whatToDo: [
+          'Write a clear one-line value proposition',
+          'Define the outcome you help people achieve',
+          'Explain what makes the approach different',
+          'List the proof points that support the claim',
+          'Use the same core message across site, profile, and pitch',
+        ],
+        messagePrompts: ['What makes you different?', 'What results do you deliver?', 'Why should they trust you?'],
+      },
+      {
+        number: 3,
+        slug: 'marketing-channels',
+        title: 'Choose Your Marketing Channels',
+        description: 'Pick the channels that match the audience and the way the business can realistically show up.',
+        helper: {
+          howToDoThis: 'Choose the smallest set of channels that gives you a real chance of consistency.',
+          example: 'Two channels done properly beats six neglected profiles collecting dust.',
+        },
+        whatToDo: [
+          'Choose two to three main channels',
+          'Match channel choice to the audience and offer',
+          'Be realistic about effort and content format',
+          'Document the reason each chosen channel matters',
+          'Ignore channels that only look trendy',
+        ],
+        marketingChannels: [
+          { name: 'LinkedIn', bestFor: 'B2B, professional services, consulting', effort: 'Medium' },
+          { name: 'Instagram', bestFor: 'Visual brands, lifestyle, younger B2C', effort: 'High' },
+          { name: 'TikTok', bestFor: 'Gen Z / Millennial, personality-led reach', effort: 'High' },
+          { name: 'Facebook', bestFor: 'Local business, older demographics, groups', effort: 'Medium' },
+          { name: 'Twitter / X', bestFor: 'Tech, news, networking, thought leadership', effort: 'Medium' },
+          { name: 'YouTube', bestFor: 'Education, tutorials, long-form value', effort: 'Very High' },
+          { name: 'Email Newsletter', bestFor: 'Owned audience and direct relationship', effort: 'Medium' },
+          { name: 'Blog / SEO', bestFor: 'Long-term traffic and authority', effort: 'High' },
+        ],
+      },
+      {
+        number: 4,
+        slug: 'content-pillars',
+        title: 'Set Your Content Pillars',
+        description: 'Choose the repeatable themes that make content easier to plan and publish.',
+        helper: {
+          howToDoThis: 'Pick three to five pillars that support trust, relevance, and reach without turning into generic sludge.',
+          example: 'Educational, behind-the-scenes, and social proof is a solid starting trio for a lot of businesses.',
+        },
+        whatToDo: [
+          'Choose three to five repeatable content themes',
+          'Map each pillar to a customer problem or trust trigger',
+          'Use the pillars to avoid random posting',
+          'Keep the topics broad enough for repetition but narrow enough to stay relevant',
+          'Review which pillars actually get traction',
+        ],
+        contentPillars: [
+          'Educational content (how-to, tips, tutorials)',
+          'Behind-the-scenes (process, daily work, build-in-public)',
+          'Social proof (testimonials, case studies, results)',
+          'Industry insights (trends, news, opinions)',
+          'Personal stories (journey, lessons learned)',
+          'Entertainment (humour, relatable content)',
+        ],
+      },
+      {
+        number: 5,
+        slug: 'social-proof-assets',
+        title: 'Build Basic Social Proof Assets',
+        description: 'Create the trust signals that make the business feel credible to strangers.',
+        helper: {
+          howToDoThis: 'Show proof early: testimonials, simple case studies, before/after examples, founder credibility, and visible results.',
+          example: 'A screenshot, testimonial, short case study, and clear founder bio often do more than a month of vague posting.',
+        },
+        whatToDo: [
+          'Collect at least a few testimonials or proof points',
+          'Create one simple case study or results post',
+          'Add trust signals to website, social profiles, and pitch materials',
+          'Use consistent visuals and tone so the business feels real',
+          'Keep a reusable bank of proof assets for future content',
+        ],
+        proofAssets: [
+          'Testimonials and reviews',
+          'Case study or client story',
+          'Results screenshot or before/after example',
+          'Founder credibility / bio block',
+          'Portfolio or sample work snapshot',
+        ],
+      },
+      {
+        number: 6,
+        slug: 'paid-advertising',
+        title: 'Set Up Basic Paid Advertising',
+        description: 'Optional: configure initial ads to accelerate reach once the basics are ready.',
+        helper: {
+          howToDoThis: 'Only run ads if the offer, landing page, and tracking are already good enough to deserve traffic.',
+          example: 'Throwing ads at a vague offer is just paying money to learn your messaging is weak.',
+        },
+        whatToDo: [
+          'Decide if paid ads make sense at this stage',
+          'Choose one platform to start with',
+          'Set up basic tracking',
+          'Use a small test budget',
+          'Test a few simple variations before scaling',
+        ],
+        adPlatforms: [
+          { platform: 'Meta Ads (FB/IG)', best: 'B2C, visual products, local', minBudget: '$5/day' },
+          { platform: 'Google Ads', best: 'High-intent searches, services', minBudget: '$10/day' },
+          { platform: 'LinkedIn Ads', best: 'B2B, professional services', minBudget: '$20/day' },
+          { platform: 'TikTok Ads', best: 'Gen Z / Millennial, short-form reach', minBudget: '$20/day' },
+        ],
+        tools: [
+          { name: 'Meta Ads Manager', url: 'https://business.facebook.com/adsmanager', description: 'Facebook and Instagram ads.' },
+          { name: 'Google Ads', url: 'https://ads.google.com', description: 'Search and display ads.' },
+          { name: 'TikTok Ads', url: 'https://ads.tiktok.com', description: 'Short-form video ads.' },
+          { name: 'LinkedIn Ads', url: 'https://linkedin.com/campaignmanager', description: 'B2B ads.' },
+        ],
+      },
+      {
+        number: 7,
+        slug: 'lead-capture-system',
+        title: 'Build a Simple Lead Capture System',
+        description: 'Collect leads through landing pages, forms, or a small lead magnet system.',
+        helper: {
+          howToDoThis: 'Use one compelling lead offer, one clear opt-in path, and one short welcome sequence.',
+          example: 'A checklist or template is often enough to start building a list without overcomplicating it.',
+        },
+        whatToDo: [
+          'Create one lead magnet or enquiry hook',
+          'Set up an email or newsletter platform',
+          'Build a simple landing page or form',
+          'Write a short welcome sequence',
+          'Add lead capture to website and social touchpoints',
+        ],
+        leadMagnetIdeas: [
+          { type: 'Checklist', example: '10-Point Website Launch Checklist', effort: 'Low' },
+          { type: 'Template', example: 'Social Media Content Calendar Template', effort: 'Low' },
+          { type: 'Guide / Ebook', example: 'The Complete Guide to [Topic]', effort: 'Medium' },
+          { type: 'Mini-Course', example: '5-Day Email Course on [Skill]', effort: 'Medium' },
+          { type: 'Quiz', example: 'What’s Your [Type]?', effort: 'Medium' },
+          { type: 'Free Consultation', example: '15-Minute Strategy Call', effort: 'Low' },
+        ],
+        tools: [
+          { name: 'ConvertKit', url: 'https://convertkit.com', description: 'Email marketing for creators and small businesses.' },
+          { name: 'Mailchimp', url: 'https://mailchimp.com', description: 'Email marketing platform.' },
+          { name: 'Beehiiv', url: 'https://beehiiv.com', description: 'Newsletter platform.' },
+          { name: 'Carrd', url: 'https://carrd.co', description: 'Simple landing pages.' },
+        ],
+      },
+    ],
+    marketingLayer: {
+      positioning: `${businessName} should market with clarity, focus, and repeatability instead of shouting into the void.`,
+      completionCallout: {
+        badge: 'Phase 6 Complete',
+        title: 'Ready for Sales',
+        description: 'Continue once the business has a clear audience, message, channels, and basic lead capture path.',
+      },
+    },
+  }
+
+  return {
+    number: 6,
+    title: 'Marketing',
+    summary: 'Define the audience, message, channels, content, and lead capture foundations for growth.',
+    progress: {
+      totalSteps: 7,
+      completedSteps: 0,
+    },
+    content: generated,
+    generated,
+    userState: {
+      completedStepIds: [],
+      selectedChannels: [],
+      selectedPillars: [],
+      selectedLeadMagnet: null,
+      checkedPersonaFields: [],
+    },
+    tasks: buildMarketingTasks(),
+  }
+}

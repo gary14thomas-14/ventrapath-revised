@@ -5,7 +5,7 @@ import {
   getProjectByIdForUser,
   upsertPhaseInstanceForProject,
 } from '../lib/project-store.js';
-import { buildBrandPhase, buildFinancePhase, buildInfrastructurePhase, buildLegalPhase, buildProtectionPhase } from '../lib/phase-data.js';
+import { buildBrandPhase, buildFinancePhase, buildInfrastructurePhase, buildLegalPhase, buildMarketingPhase, buildProtectionPhase } from '../lib/phase-data.js';
 import { fail, ok } from '../lib/http.js';
 
 const DEFAULT_DEV_USER_ID = '11111111-1111-4111-8111-111111111111';
@@ -29,6 +29,7 @@ const phaseSummaries = new Map([
   [3, 'Set up the financial foundations of the business with guided choices and tracking.'],
   [4, 'Protect the business with risk controls, insurance, contracts, privacy, and compliance habits.'],
   [5, 'Build the systems, tools, automation, and security stack the business runs on every day.'],
+  [6, 'Define the audience, message, channels, content rhythm, and lead capture foundation for growth.'],
 ])
 
 function getRequestUserId(req, env) {
@@ -101,16 +102,17 @@ export async function handleListPhases(req, res, projectId, env) {
     return fail(res, 404, 'PROJECT_NOT_FOUND', `Project ${projectId} was not found`);
   }
 
-  const [brandPhase, legalPhase, financePhase, protectionPhase, infrastructurePhase] = await Promise.all([
+  const [brandPhase, legalPhase, financePhase, protectionPhase, infrastructurePhase, marketingPhase] = await Promise.all([
     getPhaseInstanceForProject(projectId, userId, 1, env),
     getPhaseInstanceForProject(projectId, userId, 2, env),
     getPhaseInstanceForProject(projectId, userId, 3, env),
     getPhaseInstanceForProject(projectId, userId, 4, env),
     getPhaseInstanceForProject(projectId, userId, 5, env),
+    getPhaseInstanceForProject(projectId, userId, 6, env),
   ]);
 
   return ok(res, {
-    phases: toPhaseOverview(project, [brandPhase, legalPhase, financePhase, protectionPhase, infrastructurePhase].filter(Boolean)),
+    phases: toPhaseOverview(project, [brandPhase, legalPhase, financePhase, protectionPhase, infrastructurePhase, marketingPhase].filter(Boolean)),
   });
 }
 
@@ -128,8 +130,8 @@ export async function handleGeneratePhase(req, res, projectId, phaseNumber, env)
 
   const numericPhase = Number(phaseNumber);
 
-  if (![1, 2, 3, 4, 5].includes(numericPhase)) {
-    return fail(res, 400, 'PHASE_NOT_IMPLEMENTED', 'Only Phases 1, 2, 3, 4, and 5 are implemented right now');
+  if (![1, 2, 3, 4, 5, 6].includes(numericPhase)) {
+    return fail(res, 400, 'PHASE_NOT_IMPLEMENTED', 'Only Phases 1, 2, 3, 4, 5, and 6 are implemented right now');
   }
 
   const project = await getProjectByIdForUser(projectId, userId, env);
@@ -153,8 +155,11 @@ export async function handleGeneratePhase(req, res, projectId, phaseNumber, env)
   const financePhase = numericPhase >= 4
     ? await getPhaseInstanceForProject(projectId, userId, 3, env)
     : null;
-  const protectionPhase = numericPhase === 5
+  const protectionPhase = numericPhase >= 5
     ? await getPhaseInstanceForProject(projectId, userId, 4, env)
+    : null;
+  const infrastructurePhase = numericPhase === 6
+    ? await getPhaseInstanceForProject(projectId, userId, 5, env)
     : null;
 
   if (numericPhase >= 2 && !brandPhase) {
@@ -173,6 +178,10 @@ export async function handleGeneratePhase(req, res, projectId, phaseNumber, env)
     return fail(res, 400, 'PROTECTION_REQUIRED', 'Generate Phase 4 Protection before creating Phase 5 Infrastructure');
   }
 
+  if (numericPhase === 6 && !infrastructurePhase) {
+    return fail(res, 400, 'INFRASTRUCTURE_REQUIRED', 'Generate Phase 5 Infrastructure before creating Phase 6 Marketing');
+  }
+
   const phase = numericPhase === 1
     ? buildBrandPhase(project, blueprint)
     : numericPhase === 2
@@ -181,7 +190,9 @@ export async function handleGeneratePhase(req, res, projectId, phaseNumber, env)
         ? buildFinancePhase(project, blueprint, legalPhase)
         : numericPhase === 4
           ? buildProtectionPhase(project, blueprint, legalPhase, financePhase)
-          : buildInfrastructurePhase(project, blueprint, protectionPhase);
+          : numericPhase === 5
+            ? buildInfrastructurePhase(project, blueprint, protectionPhase)
+            : buildMarketingPhase(project, blueprint, infrastructurePhase);
   const generatedAt = new Date().toISOString();
 
   const storedPhase = await upsertPhaseInstanceForProject(

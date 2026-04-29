@@ -215,7 +215,7 @@ function ProjectForm({ formState, onChange, onSubmit, busy }) {
   )
 }
 
-function BlueprintViewer({ project, blueprint, selectedSection, onSelectSection, onRegenerate, onGenerateBrand, onGenerateLegal, onGenerateProtection, onGenerateInfrastructure, busy }) {
+function BlueprintViewer({ project, blueprint, selectedSection, onSelectSection, onRegenerate, onGenerateBrand, onGenerateLegal, onGenerateProtection, onGenerateInfrastructure, onGenerateMarketing, busy }) {
   if (!project) {
     return (
       <section className="panel empty-state">
@@ -246,6 +246,9 @@ function BlueprintViewer({ project, blueprint, selectedSection, onSelectSection,
           </button>
           <button className="ghost-button" onClick={onGenerateInfrastructure} disabled={busy || !blueprint} type="button">
             {busy ? 'Working…' : 'Generate Phase 5 Infrastructure'}
+          </button>
+          <button className="ghost-button" onClick={onGenerateMarketing} disabled={busy || !blueprint} type="button">
+            {busy ? 'Working…' : 'Generate Phase 6 Marketing'}
           </button>
           <button className="ghost-button" onClick={onRegenerate} disabled={busy || !blueprint} type="button">
             {busy ? 'Working…' : 'Regenerate blueprint'}
@@ -914,6 +917,172 @@ function InfrastructurePhaseViewer({ project, phase, onBack }) {
   )
 }
 
+function MarketingPhaseViewer({ project, phase, onBack }) {
+  if (!project || !phase) {
+    return null
+  }
+
+  return (
+    <section className="workspace">
+      <div className="panel project-summary">
+        <div>
+          <p className="eyebrow">Phase 6 of 10</p>
+          <h2>Marketing</h2>
+          <p>{phase.summary}</p>
+        </div>
+        <div className="project-summary__actions">
+          <span className="status-pill">{phase.state}</span>
+          <button className="ghost-button" onClick={onBack} type="button">
+            Back to blueprint
+          </button>
+        </div>
+      </div>
+
+      <div className="panel phase-header-card">
+        <div>
+          <p className="eyebrow">0/{phase.progress?.totalSteps ?? phase.generatedContent.steps.length} steps complete</p>
+          <h3>{phase.generatedContent.marketingLayer.completionCallout.title}</h3>
+        </div>
+        <p>{phase.generatedContent.marketingLayer.positioning}</p>
+      </div>
+
+      <div className="phase-steps">
+        {phase.generatedContent.steps.map((step) => (
+          <section key={step.slug} className="panel phase-step-card">
+            <div className="phase-step-card__header">
+              <div className="phase-step-card__title">
+                <span className="phase-step-card__number">{step.number}</span>
+                <div>
+                  <h3>{step.title}</h3>
+                  <p>{step.description}</p>
+                </div>
+              </div>
+              <div className="phase-step-card__actions">
+                <span>How to do this</span>
+                <span>Example</span>
+              </div>
+            </div>
+
+            <div className="helper-grid">
+              <div className="helper-card">
+                <strong>How to do this</strong>
+                <p>{step.helper.howToDoThis}</p>
+              </div>
+              <div className="helper-card">
+                <strong>Example</strong>
+                <p>{step.helper.example}</p>
+              </div>
+            </div>
+
+            {step.whatToDo ? (
+              <div className="content-grid two-up">
+                {step.whatToDo.map((item) => (
+                  <div key={item} className="content-card">
+                    <strong>What to do</strong>
+                    <p>{item}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.personaFields ? (
+              <div className="content-grid two-up">
+                {step.personaFields.map((item) => (
+                  <div key={item.field} className="content-card">
+                    <strong>{item.field}</strong>
+                    <p>{item.examples}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.messagePrompts ? (
+              <div className="content-grid three-up">
+                {step.messagePrompts.map((item) => (
+                  <div key={item} className="content-card">
+                    <strong>Prompt</strong>
+                    <p>{item}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.marketingChannels ? (
+              <div className="content-grid two-up">
+                {step.marketingChannels.map((channel) => (
+                  <div key={channel.name} className="content-card">
+                    <strong>{channel.name}</strong>
+                    <p>{channel.bestFor}</p>
+                    <p>{channel.effort} effort</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.contentPillars ? (
+              <div className="content-grid two-up">
+                {step.contentPillars.map((pillar) => (
+                  <div key={pillar} className="content-card">
+                    <strong>Content pillar</strong>
+                    <p>{pillar}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.proofAssets ? (
+              <div className="content-grid two-up">
+                {step.proofAssets.map((asset) => (
+                  <div key={asset} className="content-card">
+                    <strong>Proof asset</strong>
+                    <p>{asset}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.adPlatforms ? (
+              <div className="content-grid two-up">
+                {step.adPlatforms.map((ad) => (
+                  <div key={ad.platform} className="content-card">
+                    <strong>{ad.platform}</strong>
+                    <p>Best for: {ad.best}</p>
+                    <p>Min budget: {ad.minBudget}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.leadMagnetIdeas ? (
+              <div className="content-grid two-up">
+                {step.leadMagnetIdeas.map((idea) => (
+                  <div key={idea.type} className="content-card">
+                    <strong>{idea.type}</strong>
+                    <p>{idea.example}</p>
+                    <p>{idea.effort} effort</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.tools ? (
+              <div className="content-grid two-up">
+                {step.tools.map((tool) => (
+                  <div key={tool.name} className="content-card">
+                    <strong>{tool.name}</strong>
+                    <p>{tool.description}</p>
+                    <p>{tool.url}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </section>
+        ))}
+      </div>
+    </section>
+  )
+}
+
 function App() {
   const [projects, setProjects] = useState([])
   const [activeProjectId, setActiveProjectId] = useState(null)
@@ -923,6 +1092,7 @@ function App() {
   const [legalPhase, setLegalPhase] = useState(null)
   const [protectionPhase, setProtectionPhase] = useState(null)
   const [infrastructurePhase, setInfrastructurePhase] = useState(null)
+  const [marketingPhase, setMarketingPhase] = useState(null)
   const [selectedSection, setSelectedSection] = useState('business')
   const [currentView, setCurrentView] = useState('blueprint')
   const [busy, setBusy] = useState(false)
@@ -964,6 +1134,7 @@ function App() {
         setLegalPhase(null)
         setProtectionPhase(null)
         setInfrastructurePhase(null)
+        setMarketingPhase(null)
         setPhases(defaultPhaseCards)
         return
       }
@@ -1013,12 +1184,20 @@ function App() {
         } catch {
           setInfrastructurePhase(null)
         }
+
+        try {
+          const marketingPayload = await apiRequest(`/projects/${activeProjectId}/phases/6`)
+          setMarketingPhase(marketingPayload.phase)
+        } catch {
+          setMarketingPhase(null)
+        }
       } catch {
         setBlueprint(null)
         setBrandPhase(null)
         setLegalPhase(null)
         setProtectionPhase(null)
         setInfrastructurePhase(null)
+        setMarketingPhase(null)
         setPhases(defaultPhaseCards)
       }
     }
@@ -1085,6 +1264,7 @@ function App() {
       setLegalPhase(null)
       setProtectionPhase(null)
       setInfrastructurePhase(null)
+      setMarketingPhase(null)
       setPhases(defaultPhaseCards)
       setSelectedSection('business')
       setCurrentView('blueprint')
@@ -1222,6 +1402,32 @@ function App() {
     }
   }
 
+  async function handleGenerateMarketing() {
+    if (!activeProjectId) {
+      return
+    }
+
+    setBusy(true)
+    setError('')
+
+    try {
+      const payload = await apiRequest(`/projects/${activeProjectId}/phases/6/generate`, {
+        method: 'POST',
+        body: JSON.stringify({}),
+      })
+
+      setMarketingPhase(payload.phase)
+      const phasesPayload = await apiRequest(`/projects/${activeProjectId}/phases`)
+      setPhases(phasesPayload.phases ?? defaultPhaseCards)
+      setCurrentView('marketing')
+      await refreshProjects(activeProjectId)
+    } catch (phaseError) {
+      setError(phaseError.message)
+    } finally {
+      setBusy(false)
+    }
+  }
+
   return (
     <div className="app-shell">
       <Sidebar
@@ -1238,6 +1444,7 @@ function App() {
           setLegalPhase(null)
           setProtectionPhase(null)
           setInfrastructurePhase(null)
+          setMarketingPhase(null)
           setCurrentView('blueprint')
         }}
         phases={phases}
@@ -1256,6 +1463,10 @@ function App() {
 
           if (phaseNumber === 5 && infrastructurePhase) {
             setCurrentView('infrastructure')
+          }
+
+          if (phaseNumber === 6 && marketingPhase) {
+            setCurrentView('marketing')
           }
         }}
       />
@@ -1278,6 +1489,8 @@ function App() {
           <ProtectionPhaseViewer project={activeProject} phase={protectionPhase} onBack={() => setCurrentView('blueprint')} />
         ) : currentView === 'infrastructure' && infrastructurePhase ? (
           <InfrastructurePhaseViewer project={activeProject} phase={infrastructurePhase} onBack={() => setCurrentView('blueprint')} />
+        ) : currentView === 'marketing' && marketingPhase ? (
+          <MarketingPhaseViewer project={activeProject} phase={marketingPhase} onBack={() => setCurrentView('blueprint')} />
         ) : (
           <BlueprintViewer
             project={activeProject}
@@ -1289,6 +1502,7 @@ function App() {
             onGenerateLegal={handleGenerateLegal}
             onGenerateProtection={handleGenerateProtection}
             onGenerateInfrastructure={handleGenerateInfrastructure}
+            onGenerateMarketing={handleGenerateMarketing}
             busy={busy}
           />
         )}
