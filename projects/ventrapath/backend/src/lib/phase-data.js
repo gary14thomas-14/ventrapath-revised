@@ -160,16 +160,8 @@ export function buildBrandPhase(project, blueprint) {
   const domain = buildDomainSection(project)
   const social = buildSocialSection(project)
 
-  return {
-    number: 1,
-    title: 'Brand',
-    summary: 'Turn the blueprint into a usable external identity with a name, positioning, visual direction, domain path, and social handle set.',
-    progress: {
-      totalSteps: 5,
-      completedSteps: 0,
-    },
-    content: {
-      steps: [
+  const generated = {
+    steps: [
         {
           number: 1,
           slug: 'business-name',
@@ -278,6 +270,34 @@ export function buildBrandPhase(project, blueprint) {
           'If the name drifts too far from the actual offer, the business becomes harder to trust quickly.',
         ],
       },
+    }
+
+  return {
+    number: 1,
+    title: 'Brand',
+    summary: 'Turn the blueprint into a usable external identity with a name, positioning, visual direction, domain path, and social handle set.',
+    progress: {
+      totalSteps: 5,
+      completedSteps: 0,
+    },
+    content: generated,
+    generated,
+    userState: {
+      businessName: project.name ?? '',
+      positioning: {
+        whatDoesBusinessDo: '',
+        whoIsItFor: '',
+        whatMakesItDifferent: '',
+      },
+      socialHandles: {
+        instagram: '',
+        tiktok: '',
+        twitter: '',
+        linkedin: '',
+      },
+      selectedFont: null,
+      selectedColors: [],
+      completedStepIds: [],
     },
     tasks: buildBrandTasks(),
   }
@@ -340,7 +360,8 @@ function buildLegalTasks(project) {
 
 export function buildLegalPhase(project, blueprint, brandPhase) {
   const jurisdiction = project.region ? `${project.region}, ${project.country}` : project.country
-  const businessName = brandPhase?.generatedContent?.steps?.[0]?.suggestions?.recommendedName?.name ?? project.name
+  const brandGenerated = brandPhase?.generated ?? brandPhase?.generatedContent
+  const businessName = brandGenerated?.steps?.[0]?.suggestions?.recommendedName?.name ?? project.name
   const identifierLabel = project.country.toLowerCase() === 'australia'
     ? 'Get Your ABN (Australian Business Number)'
     : 'Get Your Business / Tax Identifier'
@@ -359,20 +380,14 @@ export function buildLegalPhase(project, blueprint, brandPhase) {
         url: 'https://www.usa.gov/register-business',
       }
 
-  return {
-    number: 2,
-    title: 'Legal',
-    summary: 'Translate the business into a practical legal setup path for the user\'s location.',
-    progress: {
-      totalSteps: 6,
-      completedSteps: 0,
-    },
-    content: {
+  const generated = {
       jurisdiction: {
         country: project.country,
         region: project.region,
         tailoredBanner: `All guidance on this page is tailored to ${jurisdiction}.`,
-        disclaimer: 'Information only, not legal advice. Verify local requirements yourself before acting.',
+        disclaimer: 'Information only — not legal advice, not a substitute for a lawyer, accountant, or local authority, and not something to rely on without checking it yourself.',
+        warningTitle: 'Important legal disclaimer',
+        warningBody: `Use this page as a guided starting point for ${jurisdiction} only. Before registering, filing, publishing claims, collecting customer data, or launching, verify the current rules with the relevant official authority and get professional advice where needed.`,
       },
       steps: [
         {
@@ -509,7 +524,7 @@ export function buildLegalPhase(project, blueprint, brandPhase) {
             howToDoThis: 'Generate only the documents that match the business model and website data flows.',
             example: 'A service or digital business usually needs terms, privacy coverage, and a service agreement before scaling.',
           },
-          disclaimer: 'Templates are informational starting points only and must be reviewed for local legal suitability.',
+          disclaimer: 'Templates are informational starting points only. They are not legal advice, may be incomplete for your jurisdiction, and must be reviewed for local legal suitability before use.',
           documents: [
             {
               name: 'Terms & Conditions',
@@ -535,6 +550,8 @@ export function buildLegalPhase(project, blueprint, brandPhase) {
         },
       ],
       legalLayer: {
+        pageDisclaimer: `This Legal phase is guidance only for ${jurisdiction}. It does not replace jurisdiction-specific legal, tax, licensing, privacy, or regulatory advice.`,
+        authorityReminder: `Always prefer the relevant official ${project.country} authority or regulator over third-party summaries when registration, tax, permits, privacy, or compliance rules matter.`,
         licensingChecks: [
           {
             area: 'Licences, permits, and local approvals',
@@ -578,7 +595,305 @@ export function buildLegalPhase(project, blueprint, brandPhase) {
           },
         ],
       },
+    }
+
+  return {
+    number: 2,
+    title: 'Legal',
+    summary: 'Translate the business into a practical legal setup path for the user\'s location.',
+    progress: {
+      totalSteps: 6,
+      completedSteps: 0,
+    },
+    content: generated,
+    generated,
+    userState: {
+      selectedStructure: null,
+      businessName: businessName ?? '',
+      taxId: '',
+      selectedBank: null,
+      legalChecklist: {
+        termsCreated: false,
+        privacyCreated: false,
+        serviceAgreementReady: false,
+      },
+      completedStepIds: [],
     },
     tasks: buildLegalTasks(project),
+  }
+}
+
+function buildFinanceTasks() {
+  return [
+    {
+      title: 'Choose a payment provider',
+      whatToDo: 'Pick the payment processor that best matches how customers will actually pay.',
+      howToDoIt: 'Start with the recommended provider unless the business model clearly needs something else.',
+      executionReference: 'Use Step 1 to avoid overcomplicating payments before real demand exists.',
+      isRequired: true,
+      stepNumber: 1,
+    },
+    {
+      title: 'Choose accounting software',
+      whatToDo: 'Settle on a simple accounting tool that keeps the books readable from the start.',
+      howToDoIt: 'Prefer the easiest tool that matches the market and reporting needs instead of enterprise overkill.',
+      executionReference: 'Use Step 2 to make weekly and monthly reviews realistic, not aspirational nonsense.',
+      isRequired: true,
+      stepNumber: 2,
+    },
+    {
+      title: 'Set bookkeeping categories',
+      whatToDo: 'Create a sane structure for income and expense tracking.',
+      howToDoIt: 'Keep categories broad enough to be usable and specific enough to spot obvious money leaks.',
+      executionReference: 'Use Step 3 as the baseline for how transactions get categorized going forward.',
+      isRequired: true,
+      stepNumber: 3,
+    },
+    {
+      title: 'Confirm tax registrations',
+      whatToDo: 'Work out which tax registrations apply now versus later.',
+      howToDoIt: 'Use the official authority links and do not wing this from vibes or forum posts.',
+      executionReference: 'Use Step 4 as the starting checklist, then verify with the relevant authority or accountant.',
+      isRequired: true,
+      stepNumber: 4,
+    },
+    {
+      title: 'Turn pricing into something customers can buy',
+      whatToDo: 'Translate pricing logic into clear tiers or packages.',
+      howToDoIt: 'Keep deliverables explicit so the price feels anchored instead of arbitrary.',
+      executionReference: 'Use Step 5 to move from pricing theory to something that can actually sell.',
+      isRequired: true,
+      stepNumber: 5,
+    },
+    {
+      title: 'Start a weekly finance ritual',
+      whatToDo: 'Create a repeatable check-in for revenue, expenses, and cash position.',
+      howToDoIt: 'Keep it lightweight enough to happen every week without drama.',
+      executionReference: 'Use Step 6 to build the first real operating rhythm around money.',
+      isRequired: true,
+      stepNumber: 6,
+    },
+  ]
+}
+
+export function buildFinancePhase(project, blueprint, legalPhase) {
+  const jurisdiction = project.region ? `${project.region}, ${project.country}` : project.country
+  const legalGenerated = legalPhase?.generated ?? legalPhase?.generatedContent
+  const taxType = project.country.toLowerCase() === 'australia' ? 'GST' : 'Sales / VAT / GST'
+  const taxThreshold = project.country.toLowerCase() === 'australia' ? '$75,000 annual turnover' : 'Check local threshold'
+  const taxRate = project.country.toLowerCase() === 'australia' ? '10%' : 'Varies by jurisdiction'
+
+  const generated = {
+    steps: [
+      {
+        number: 1,
+        slug: 'payment-processing',
+        title: 'Payment Processing',
+        description: 'Set up how the business will receive customer payments.',
+        contentType: 'providers',
+        helper: {
+          howToDoThis: 'Choose the provider that best matches how money will actually flow through the business.',
+          example: 'A service business can often move fast with Stripe invoicing before building anything fancy.',
+        },
+        providers: [
+          {
+            name: 'Stripe',
+            logo: '💳',
+            bestFor: 'Online businesses, service invoicing, SaaS, and e-commerce',
+            fees: '1.75% + 30c per transaction',
+            features: ['Instant setup', 'Subscriptions', 'Invoicing', 'Strong ecosystem'],
+            recommended: true,
+          },
+          {
+            name: 'PayPal',
+            logo: '🅿️',
+            bestFor: 'International payments and customers who already trust PayPal',
+            fees: '2.6% + 30c per transaction',
+            features: ['Trusted brand', 'Easy invoices', 'Buyer protection', 'Fast familiar checkout'],
+            recommended: false,
+          },
+          {
+            name: 'Square',
+            logo: '⬛',
+            bestFor: 'In-person sales, local services, and simple POS needs',
+            fees: '1.6% per transaction',
+            features: ['POS support', 'Hardware options', 'Invoicing', 'Straightforward setup'],
+            recommended: false,
+          },
+        ],
+      },
+      {
+        number: 2,
+        slug: 'accounting-software',
+        title: 'Accounting Software',
+        description: 'Choose a simple finance tool that keeps the books legible from day one.',
+        contentType: 'accounting',
+        helper: {
+          howToDoThis: 'Pick the tool the founder will actually use weekly, not the one that sounds most sophisticated.',
+          example: project.country.toLowerCase() === 'australia'
+            ? 'Xero is often the clean default for Australian businesses because the local tax fit is already strong.'
+            : 'Choose the simplest accounting stack that still covers invoicing, reconciliation, and reporting.',
+        },
+        accountingOptions: [
+          {
+            name: 'Xero',
+            bestFor: 'Australian and NZ businesses, service-led operators',
+            price: 'From $29/month',
+            features: ['Bank feeds', 'Invoicing', 'GST/BAS ready', 'Mobile app'],
+            recommended: project.country.toLowerCase() === 'australia',
+          },
+          {
+            name: 'QuickBooks',
+            bestFor: 'US-heavy businesses and broader SMB bookkeeping',
+            price: 'From $30/month',
+            features: ['Receipt capture', 'Reporting', 'Payroll add-ons', 'Tax prep'],
+            recommended: false,
+          },
+          {
+            name: 'Wave',
+            bestFor: 'Very small businesses and freelancers who want the simplest starting point',
+            price: 'Free (paid payroll extras)',
+            features: ['Free accounting', 'Invoicing', 'Basic reports', 'Receipt scanning'],
+            recommended: false,
+          },
+        ],
+      },
+      {
+        number: 3,
+        slug: 'basic-bookkeeping-structure',
+        title: 'Basic Bookkeeping Structure',
+        description: 'Create clear income and expense categories so the numbers mean something later.',
+        contentType: 'bookkeeping',
+        helper: {
+          howToDoThis: 'Do not drown the business in category clutter. Build a structure you can maintain every single week.',
+          example: 'Keep income buckets simple and make expense categories useful enough to spot marketing, software, and contractor spend fast.',
+        },
+        incomeCategories: ['Client Services', 'Product Sales', 'Consulting Fees', 'Recurring Revenue', 'Other Income'],
+        expenseCategories: ['Software & Tools', 'Marketing & Ads', 'Professional Services', 'Office Supplies', 'Travel & Transport', 'Education & Training', 'Insurance', 'Bank Fees'],
+      },
+      {
+        number: 4,
+        slug: 'tax-setup',
+        title: 'Tax Setup',
+        description: 'Understand the registrations and thresholds that affect the business before money starts moving seriously.',
+        contentType: 'tax',
+        helper: {
+          howToDoThis: 'Use the official threshold and authority rules, then keep an accountant in the loop if the business model gets more complex.',
+          example: `${taxType} obligations can change quickly once turnover moves, so this is not a set-and-forget step.`,
+        },
+        disclaimer: `Tax requirements vary by location. Use this as guidance for ${jurisdiction} only and verify with the relevant authority or a qualified accountant.`,
+        taxRegistrations: [
+          {
+            name: project.country.toLowerCase() === 'australia' ? 'ABN (Australian Business Number)' : 'Business / Tax Identifier',
+            required: true,
+            link: project.country.toLowerCase() === 'australia' ? 'https://www.abr.gov.au/' : 'https://www.irs.gov/businesses',
+            description: 'Required to operate cleanly, invoice properly, and interact with the formal business/tax system.',
+          },
+          {
+            name: `${taxType} Registration`,
+            required: false,
+            link: project.country.toLowerCase() === 'australia' ? 'https://www.ato.gov.au/' : 'https://www.irs.gov/businesses',
+            description: `Usually required once turnover crosses ${taxThreshold}.`,
+          },
+          {
+            name: 'Employer / withholding registration',
+            required: false,
+            link: project.country.toLowerCase() === 'australia' ? 'https://www.ato.gov.au/' : 'https://www.irs.gov/businesses/small-businesses-self-employed/employment-taxes',
+            description: 'Only required if the business starts paying staff or contractors in ways that trigger withholding rules.',
+          },
+        ],
+        taxSummary: {
+          taxType,
+          threshold: taxThreshold,
+          rate: taxRate,
+          legalReminder: legalGenerated?.legalLayer?.pageDisclaimer ?? null,
+        },
+      },
+      {
+        number: 5,
+        slug: 'pricing-structure-implementation',
+        title: 'Pricing Structure Implementation',
+        description: 'Turn the pricing logic into something customers can understand and buy.',
+        contentType: 'pricing',
+        helper: {
+          howToDoThis: 'Make the pricing look intentional. If customers cannot tell why one tier costs more, the structure is still weak.',
+          example: 'A three-tier model gives the buyer a clear anchor, a most-popular option, and a premium path without making the offer chaotic.',
+        },
+        tiers: [
+          {
+            name: 'Basic',
+            price: 500,
+            billingUnit: '/project',
+            highlighted: false,
+            features: ['Feature 1', 'Feature 2', 'Feature 3'],
+          },
+          {
+            name: 'Pro',
+            price: 1000,
+            billingUnit: '/project',
+            highlighted: true,
+            features: ['Feature 1', 'Feature 2', 'Feature 3'],
+          },
+          {
+            name: 'Premium',
+            price: 1500,
+            billingUnit: '/project',
+            highlighted: false,
+            features: ['Feature 1', 'Feature 2', 'Feature 3'],
+          },
+        ],
+      },
+      {
+        number: 6,
+        slug: 'financial-tracking',
+        title: 'Financial Tracking',
+        description: 'Create a simple weekly money rhythm so the business does not run blind.',
+        contentType: 'tracking',
+        helper: {
+          howToDoThis: 'Keep the dashboard simple enough that it gets used. Fancy finance theatre is useless if nobody checks it.',
+          example: 'A 15-minute weekly review beats a giant spreadsheet nobody opens until tax panic season.',
+        },
+        dashboard: {
+          revenue: 0,
+          expenses: 0,
+          profit: 0,
+          periodLabel: 'This month',
+        },
+        weeklyTrackingTasks: ['Check bank balance', 'Record new income', 'Log expenses', 'Categorize transactions'],
+      },
+    ],
+    financeLayer: {
+      financialPosture: 'Simple, legible, and good enough to make decisions without drowning in admin.',
+      keyRisks: [
+        'If payment setup stays vague, early sales friction will rise immediately.',
+        'If bookkeeping categories are sloppy, pricing and profitability decisions will get distorted fast.',
+        'If tax thresholds are ignored, the business can accidentally walk into avoidable compliance pain.',
+      ],
+      completionCallout: {
+        badge: 'Phase 3 Complete',
+        title: 'Ready for Operations',
+        description: 'Continue to the next build phase once the financial foundation is clear enough to support real execution.',
+      },
+    },
+  }
+
+  return {
+    number: 3,
+    title: 'Finance',
+    summary: 'Set up the financial foundations of the business with payments, accounting, tax awareness, pricing structure, and tracking habits.',
+    progress: {
+      totalSteps: 6,
+      completedSteps: 0,
+    },
+    content: generated,
+    generated,
+    userState: {
+      selectedProvider: null,
+      selectedAccounting: null,
+      checkedCategories: [],
+      checkedTax: [],
+      completedStepIds: [],
+    },
+    tasks: buildFinanceTasks(),
   }
 }

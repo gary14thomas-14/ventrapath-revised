@@ -226,6 +226,8 @@ export function createJsonProjectStore() {
         state: phase.state,
         summary: phase.summary,
         generatedContent: phase.generatedContent,
+        userState: phase.userState ?? {},
+        progress: phase.progress ?? {},
         tasks: phase.tasks,
         generatedAt: phase.generatedAt ?? now,
         createdAt: existingIndex >= 0 ? store.phaseInstances[existingIndex].createdAt : now,

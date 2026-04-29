@@ -72,6 +72,8 @@ function mapPhaseInstanceRow(row) {
     state: row.state,
     summary: row.summary,
     generatedContent: row.generated_content,
+    userState: row.user_state ?? {},
+    progress: row.progress ?? {},
     tasks: row.tasks,
     latestRunId: row.latest_run_id,
     generatedAt: row.generated_at,
@@ -486,11 +488,13 @@ export function createPostgresProjectStore(env) {
               state,
               summary,
               generated_content,
+              user_state,
+              progress,
               tasks,
               latest_run_id,
               generated_at
             ) values (
-              $1, $2, $3, $4, $5, $6::jsonb, $7::jsonb, $8, $9
+              $1, $2, $3, $4, $5, $6::jsonb, $7::jsonb, $8::jsonb, $9::jsonb, $10, $11
             )
             on conflict (project_id, phase_number)
             do update set
@@ -498,6 +502,8 @@ export function createPostgresProjectStore(env) {
               state = excluded.state,
               summary = excluded.summary,
               generated_content = excluded.generated_content,
+              user_state = excluded.user_state,
+              progress = excluded.progress,
               tasks = excluded.tasks,
               latest_run_id = excluded.latest_run_id,
               generated_at = excluded.generated_at,
@@ -511,6 +517,8 @@ export function createPostgresProjectStore(env) {
             phase.state,
             phase.summary,
             JSON.stringify(phase.generatedContent),
+            JSON.stringify(phase.userState ?? {}),
+            JSON.stringify(phase.progress ?? {}),
             JSON.stringify(phase.tasks ?? []),
             phase.latestRunId ?? null,
             phase.generatedAt ?? new Date().toISOString(),

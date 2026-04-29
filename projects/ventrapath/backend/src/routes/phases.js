@@ -5,7 +5,7 @@ import {
   getProjectByIdForUser,
   upsertPhaseInstanceForProject,
 } from '../lib/project-store.js';
-import { buildBrandPhase, buildLegalPhase } from '../lib/phase-data.js';
+import { buildBrandPhase, buildFinancePhase, buildLegalPhase } from '../lib/phase-data.js';
 import { fail, ok } from '../lib/http.js';
 
 const DEFAULT_DEV_USER_ID = '11111111-1111-4111-8111-111111111111';
@@ -26,6 +26,7 @@ const phaseDefinitions = [
 const phaseSummaries = new Map([
   [1, 'Turn the blueprint into a usable external identity.'],
   [2, 'Translate the business into a practical legal setup path for the user\'s location.'],
+  [3, 'Set up the financial foundations of the business with guided choices and tracking.'],
 ])
 
 function getRequestUserId(req, env) {
@@ -60,13 +61,13 @@ function toPhaseOverview(project, storedPhases) {
         title: stored.title,
         state: stored.state,
         summary: stored.summary,
-        progress: stored.generatedContent?.progress ?? null,
+        progress: stored.progress ?? stored.generatedContent?.progress ?? null,
         taskCount: stored.tasks?.length ?? 0,
       };
     }
 
     const state = project.latestBlueprintVersionNumber
-      ? (phase.number <= 2 ? 'available' : 'locked')
+      ? (phase.number <= 3 ? 'available' : 'locked')
       : 'locked';
 
     return {
@@ -98,13 +99,14 @@ export async function handleListPhases(req, res, projectId, env) {
     return fail(res, 404, 'PROJECT_NOT_FOUND', `Project ${projectId} was not found`);
   }
 
-  const [brandPhase, legalPhase] = await Promise.all([
+  const [brandPhase, legalPhase, financePhase] = await Promise.all([
     getPhaseInstanceForProject(projectId, userId, 1, env),
     getPhaseInstanceForProject(projectId, userId, 2, env),
+    getPhaseInstanceForProject(projectId, userId, 3, env),
   ]);
 
   return ok(res, {
-    phases: toPhaseOverview(project, [brandPhase, legalPhase].filter(Boolean)),
+    phases: toPhaseOverview(project, [brandPhase, legalPhase, financePhase].filter(Boolean)),
   });
 }
 
@@ -122,8 +124,8 @@ export async function handleGeneratePhase(req, res, projectId, phaseNumber, env)
 
   const numericPhase = Number(phaseNumber);
 
-  if (![1, 2].includes(numericPhase)) {
-    return fail(res, 400, 'PHASE_NOT_IMPLEMENTED', 'Only Phases 1 and 2 are implemented right now');
+  if (![1, 2, 3].includes(numericPhase)) {
+    return fail(res, 400, 'PHASE_NOT_IMPLEMENTED', 'Only Phases 1, 2, and 3 are implemented right now');
   }
 
   const project = await getProjectByIdForUser(projectId, userId, env);
@@ -138,17 +140,26 @@ export async function handleGeneratePhase(req, res, projectId, phaseNumber, env)
     return fail(res, 400, 'BLUEPRINT_REQUIRED', 'Generate a blueprint before creating Phase 1 Brand');
   }
 
-  const brandPhase = numericPhase === 2
+  const brandPhase = numericPhase >= 2
     ? await getPhaseInstanceForProject(projectId, userId, 1, env)
     : null;
+  const legalPhase = numericPhase === 3
+    ? await getPhaseInstanceForProject(projectId, userId, 2, env)
+    : null;
 
-  if (numericPhase === 2 && !brandPhase) {
-    return fail(res, 400, 'BRAND_REQUIRED', 'Generate Phase 1 Brand before creating Phase 2 Legal');
+  if (numericPhase >= 2 && !brandPhase) {
+    return fail(res, 400, 'BRAND_REQUIRED', 'Generate Phase 1 Brand before creating this phase');
+  }
+
+  if (numericPhase === 3 && !legalPhase) {
+    return fail(res, 400, 'LEGAL_REQUIRED', 'Generate Phase 2 Legal before creating Phase 3 Finance');
   }
 
   const phase = numericPhase === 1
     ? buildBrandPhase(project, blueprint)
-    : buildLegalPhase(project, blueprint, brandPhase);
+    : numericPhase === 2
+      ? buildLegalPhase(project, blueprint, brandPhase)
+      : buildFinancePhase(project, blueprint, legalPhase);
   const generatedAt = new Date().toISOString();
 
   const storedPhase = await upsertPhaseInstanceForProject(
@@ -160,6 +171,8 @@ export async function handleGeneratePhase(req, res, projectId, phaseNumber, env)
       state: 'ready',
       summary: phase.summary,
       generatedContent: phase.content,
+      userState: phase.userState ?? {},
+      progress: phase.progress ?? {},
       tasks: phase.tasks,
       generatedAt,
       latestRunId: randomUUID(),

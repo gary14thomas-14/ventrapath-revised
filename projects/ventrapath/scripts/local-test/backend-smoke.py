@@ -74,14 +74,24 @@ def main():
     legal_fetched = request(f'/projects/{project_id}/phases/2')['phase']
     assert_true(legal_fetched['id'] == legal['id'], 'fetched legal phase should match generated legal phase')
 
+    finance = request(f'/projects/{project_id}/phases/3/generate', 'POST', {})['phase']
+    assert_true(finance['phaseNumber'] == 3, 'finance phase number should be 3')
+    assert_true(finance['state'] == 'ready', 'finance phase should be ready')
+    assert_true('steps' in finance['generatedContent'], 'finance payload should expose generated workflow steps')
+    assert_true('userState' in finance, 'finance payload should expose user workflow state at phase level')
+
+    finance_fetched = request(f'/projects/{project_id}/phases/3')['phase']
+    assert_true(finance_fetched['id'] == finance['id'], 'fetched finance phase should match generated finance phase')
+
     phases = request(f'/projects/{project_id}/phases')['phases']
     phase_map = {item['number']: item for item in phases}
     assert_true(phase_map[1]['state'] == 'ready', 'phase 1 should be ready after generation')
     assert_true(phase_map[2]['state'] == 'ready', 'phase 2 should be ready after generation')
-    assert_true(phase_map[3]['state'] == 'locked', 'phase 3 should remain locked')
+    assert_true(phase_map[3]['state'] == 'ready', 'phase 3 should be ready after generation')
+    assert_true(phase_map[4]['state'] == 'locked', 'phase 4 should remain locked')
 
     refreshed_project = request(f'/projects/{project_id}')['project']
-    assert_true(refreshed_project['currentPhaseNumber'] == 2, 'project currentPhaseNumber should advance to 2')
+    assert_true(refreshed_project['currentPhaseNumber'] == 3, 'project currentPhaseNumber should advance to 3')
     assert_true(refreshed_project['status'] == 'in_progress', 'project status should be in_progress after phase generation')
 
     print(json.dumps({
@@ -93,6 +103,7 @@ def main():
             'blueprint': True,
             'brandPhase': True,
             'legalPhase': True,
+            'financePhase': True,
             'phaseLadder': True,
             'projectProgress': True,
         }
