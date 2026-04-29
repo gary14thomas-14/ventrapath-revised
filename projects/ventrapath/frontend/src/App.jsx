@@ -450,6 +450,29 @@ function LegalPhaseViewer({ project, phase, onBack }) {
         <p>{phase.generatedContent.jurisdiction.disclaimer}</p>
       </div>
 
+      <section className="panel phase-step-card">
+        <div className="phase-step-card__header">
+          <div>
+            <p className="eyebrow">Legal safety</p>
+            <h3>{phase.generatedContent.jurisdiction.warningTitle}</h3>
+          </div>
+        </div>
+        <div className="helper-grid">
+          <div className="helper-card">
+            <strong>Read this first</strong>
+            <p>{phase.generatedContent.jurisdiction.warningBody}</p>
+          </div>
+          <div className="helper-card">
+            <strong>Authority rule</strong>
+            <p>{phase.generatedContent.legalLayer.authorityReminder}</p>
+          </div>
+        </div>
+        <div className="helper-card">
+          <strong>Bottom line</strong>
+          <p>{phase.generatedContent.legalLayer.pageDisclaimer}</p>
+        </div>
+      </section>
+
       <div className="phase-steps">
         {phase.generatedContent.steps.map((step) => (
           <section key={step.slug} className="panel phase-step-card">
@@ -725,6 +748,7 @@ function App() {
         idea: formState.rawIdea.trim(),
         country: formState.country.trim(),
         region: formState.region.trim() || null,
+        currencyCode: formState.currencyCode.trim() || undefined,
         hoursPerWeek: Number(formState.hoursPerWeek || 0),
       }
 

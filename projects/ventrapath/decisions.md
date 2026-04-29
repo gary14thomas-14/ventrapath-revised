@@ -23,6 +23,7 @@
 - Blueprint generation has a hard product constraint: target output must stay at or under 2 minutes.
 - Therefore, not all 7 core agents should run at full depth on every blueprint task; Bob must route only the required agents and protect latency.
 - Every VentraPath blueprint must contain a unique twist that clearly differentiates the user's business from competitors; a blueprint without this is not acceptable.
+- The unique twist is not optional polish; it is the emotional ignition point of Phase 0 and must appear in the first section when describing the company so the user feels the excitement early.
 - The twist bar is high: it should feel exciting and one-of-a-kind, not just "better than current tools" or "AI + support" dressed up as differentiation.
 - "Lighter than incumbents", "more convenient", or "more supportive" does not count as a sufficient twist unless it sits on top of a real owned edge such as a queue, ledger, control layer, event loop, or workflow asset.
 - The system should explore bold twist candidates before converging; safer wording is not the goal if a stronger believable edge exists.

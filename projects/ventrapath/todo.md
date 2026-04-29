@@ -14,6 +14,7 @@
 - [ ] Split benchmarking into blueprint-generation lane vs messy rescue/rejection lane
 - [ ] Define lane-specific pass criteria and scorecards
 - [ ] Run a clean reround for both lanes and compare separately
+- [ ] Reflect the unique twist explicitly in the first company-description section of the Phase 0 frontend-derived schema and backend output.
 
 ## Later
 
