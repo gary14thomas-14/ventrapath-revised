@@ -215,7 +215,7 @@ function ProjectForm({ formState, onChange, onSubmit, busy }) {
   )
 }
 
-function BlueprintViewer({ project, blueprint, selectedSection, onSelectSection, onRegenerate, onGenerateBrand, onGenerateLegal, onGenerateProtection, busy }) {
+function BlueprintViewer({ project, blueprint, selectedSection, onSelectSection, onRegenerate, onGenerateBrand, onGenerateLegal, onGenerateProtection, onGenerateInfrastructure, busy }) {
   if (!project) {
     return (
       <section className="panel empty-state">
@@ -243,6 +243,9 @@ function BlueprintViewer({ project, blueprint, selectedSection, onSelectSection,
           </button>
           <button className="ghost-button" onClick={onGenerateProtection} disabled={busy || !blueprint} type="button">
             {busy ? 'Working…' : 'Generate Phase 4 Protection'}
+          </button>
+          <button className="ghost-button" onClick={onGenerateInfrastructure} disabled={busy || !blueprint} type="button">
+            {busy ? 'Working…' : 'Generate Phase 5 Infrastructure'}
           </button>
           <button className="ghost-button" onClick={onRegenerate} disabled={busy || !blueprint} type="button">
             {busy ? 'Working…' : 'Regenerate blueprint'}
@@ -782,6 +785,135 @@ function ProtectionPhaseViewer({ project, phase, onBack }) {
   )
 }
 
+function InfrastructurePhaseViewer({ project, phase, onBack }) {
+  if (!project || !phase) {
+    return null
+  }
+
+  return (
+    <section className="workspace">
+      <div className="panel project-summary">
+        <div>
+          <p className="eyebrow">Phase 5 of 10</p>
+          <h2>Infrastructure</h2>
+          <p>{phase.summary}</p>
+        </div>
+        <div className="project-summary__actions">
+          <span className="status-pill">{phase.state}</span>
+          <button className="ghost-button" onClick={onBack} type="button">
+            Back to blueprint
+          </button>
+        </div>
+      </div>
+
+      <div className="panel phase-header-card">
+        <div>
+          <p className="eyebrow">0/{phase.progress?.totalSteps ?? phase.generatedContent.steps.length} steps complete</p>
+          <h3>{phase.generatedContent.infrastructureLayer.completionCallout.title}</h3>
+        </div>
+        <p>{phase.generatedContent.infrastructureLayer.operatingPosture}</p>
+      </div>
+
+      <div className="phase-steps">
+        {phase.generatedContent.steps.map((step) => (
+          <section key={step.slug} className="panel phase-step-card">
+            <div className="phase-step-card__header">
+              <div className="phase-step-card__title">
+                <span className="phase-step-card__number">{step.number}</span>
+                <div>
+                  <h3>{step.title}</h3>
+                  <p>{step.description}</p>
+                </div>
+              </div>
+              <div className="phase-step-card__actions">
+                <span>How to do this</span>
+                <span>What to do</span>
+              </div>
+            </div>
+
+            <div className="helper-grid">
+              <div className="helper-card">
+                <strong>How to do this</strong>
+                <p>{step.helper.howToDoThis}</p>
+              </div>
+              <div className="helper-card">
+                <strong>Example</strong>
+                <p>{step.helper.example}</p>
+              </div>
+            </div>
+
+            {step.whatToDo ? (
+              <div className="content-grid two-up">
+                {step.whatToDo.map((item) => (
+                  <div key={item} className="content-card">
+                    <strong>What to do</strong>
+                    <p>{item}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.softwareCategories ? (
+              <div className="content-grid two-up">
+                {step.softwareCategories.map((category) => (
+                  <div key={category.category} className="content-card">
+                    <strong>{category.category}</strong>
+                    <p>{category.examples.join(', ')}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.folderStructure ? (
+              <div className="content-grid two-up">
+                {step.folderStructure.map((folder) => (
+                  <div key={folder.name} className="content-card">
+                    <strong>{folder.name}</strong>
+                    <p>{folder.description}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.crmFields ? (
+              <div className="content-grid two-up">
+                {step.crmFields.map((field) => (
+                  <div key={field.field} className="content-card">
+                    <strong>{field.field}{field.required ? ' · Required' : ''}</strong>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.securityChecklist ? (
+              <div className="content-grid two-up">
+                {step.securityChecklist.map((item) => (
+                  <div key={item.item} className="content-card">
+                    <strong>{item.item}</strong>
+                    <p>{item.priority}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.tools ? (
+              <div className="content-grid two-up">
+                {step.tools.map((tool) => (
+                  <div key={tool.name} className="content-card">
+                    <strong>{tool.name}</strong>
+                    <p>{tool.description}</p>
+                    <p>{tool.url}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </section>
+        ))}
+      </div>
+    </section>
+  )
+}
+
 function App() {
   const [projects, setProjects] = useState([])
   const [activeProjectId, setActiveProjectId] = useState(null)
@@ -790,6 +922,7 @@ function App() {
   const [brandPhase, setBrandPhase] = useState(null)
   const [legalPhase, setLegalPhase] = useState(null)
   const [protectionPhase, setProtectionPhase] = useState(null)
+  const [infrastructurePhase, setInfrastructurePhase] = useState(null)
   const [selectedSection, setSelectedSection] = useState('business')
   const [currentView, setCurrentView] = useState('blueprint')
   const [busy, setBusy] = useState(false)
@@ -830,6 +963,7 @@ function App() {
         setBrandPhase(null)
         setLegalPhase(null)
         setProtectionPhase(null)
+        setInfrastructurePhase(null)
         setPhases(defaultPhaseCards)
         return
       }
@@ -872,11 +1006,19 @@ function App() {
         } catch {
           setProtectionPhase(null)
         }
+
+        try {
+          const infrastructurePayload = await apiRequest(`/projects/${activeProjectId}/phases/5`)
+          setInfrastructurePhase(infrastructurePayload.phase)
+        } catch {
+          setInfrastructurePhase(null)
+        }
       } catch {
         setBlueprint(null)
         setBrandPhase(null)
         setLegalPhase(null)
         setProtectionPhase(null)
+        setInfrastructurePhase(null)
         setPhases(defaultPhaseCards)
       }
     }
@@ -942,6 +1084,7 @@ function App() {
       setBrandPhase(null)
       setLegalPhase(null)
       setProtectionPhase(null)
+      setInfrastructurePhase(null)
       setPhases(defaultPhaseCards)
       setSelectedSection('business')
       setCurrentView('blueprint')
@@ -1053,6 +1196,32 @@ function App() {
     }
   }
 
+  async function handleGenerateInfrastructure() {
+    if (!activeProjectId) {
+      return
+    }
+
+    setBusy(true)
+    setError('')
+
+    try {
+      const payload = await apiRequest(`/projects/${activeProjectId}/phases/5/generate`, {
+        method: 'POST',
+        body: JSON.stringify({}),
+      })
+
+      setInfrastructurePhase(payload.phase)
+      const phasesPayload = await apiRequest(`/projects/${activeProjectId}/phases`)
+      setPhases(phasesPayload.phases ?? defaultPhaseCards)
+      setCurrentView('infrastructure')
+      await refreshProjects(activeProjectId)
+    } catch (phaseError) {
+      setError(phaseError.message)
+    } finally {
+      setBusy(false)
+    }
+  }
+
   return (
     <div className="app-shell">
       <Sidebar
@@ -1068,6 +1237,7 @@ function App() {
           setBrandPhase(null)
           setLegalPhase(null)
           setProtectionPhase(null)
+          setInfrastructurePhase(null)
           setCurrentView('blueprint')
         }}
         phases={phases}
@@ -1082,6 +1252,10 @@ function App() {
 
           if (phaseNumber === 4 && protectionPhase) {
             setCurrentView('protection')
+          }
+
+          if (phaseNumber === 5 && infrastructurePhase) {
+            setCurrentView('infrastructure')
           }
         }}
       />
@@ -1102,6 +1276,8 @@ function App() {
           <LegalPhaseViewer project={activeProject} phase={legalPhase} onBack={() => setCurrentView('blueprint')} />
         ) : currentView === 'protection' && protectionPhase ? (
           <ProtectionPhaseViewer project={activeProject} phase={protectionPhase} onBack={() => setCurrentView('blueprint')} />
+        ) : currentView === 'infrastructure' && infrastructurePhase ? (
+          <InfrastructurePhaseViewer project={activeProject} phase={infrastructurePhase} onBack={() => setCurrentView('blueprint')} />
         ) : (
           <BlueprintViewer
             project={activeProject}
@@ -1112,6 +1288,7 @@ function App() {
             onGenerateBrand={handleGenerateBrand}
             onGenerateLegal={handleGenerateLegal}
             onGenerateProtection={handleGenerateProtection}
+            onGenerateInfrastructure={handleGenerateInfrastructure}
             busy={busy}
           />
         )}

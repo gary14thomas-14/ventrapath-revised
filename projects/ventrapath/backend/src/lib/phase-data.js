@@ -1151,3 +1151,298 @@ export function buildProtectionPhase(project, blueprint, legalPhase, financePhas
     tasks: buildProtectionTasks(),
   }
 }
+
+function buildInfrastructureTasks() {
+  return [
+    {
+      title: 'Set up business email and communication',
+      whatToDo: 'Get the business onto a proper domain email and simple comms stack.',
+      howToDoIt: 'Use one provider you will actually manage, create the core inboxes, and avoid a scattered mess of random accounts.',
+      executionReference: 'Use Step 1 to lock the business email path before more tools pile on.',
+      isRequired: true,
+      stepNumber: 1,
+    },
+    {
+      title: 'Secure the domain and web setup',
+      whatToDo: 'Make sure the domain, DNS, SSL, and basic web presence are under control.',
+      howToDoIt: 'Use modern hosting, verify DNS access, and test the site properly before announcing it.',
+      executionReference: 'Use Step 2 to keep the public-facing infrastructure clean and recoverable.',
+      isRequired: true,
+      stepNumber: 2,
+    },
+    {
+      title: 'Choose the core software stack',
+      whatToDo: 'Pick the few tools the business really runs on each week.',
+      howToDoIt: 'Choose one per category, prefer integration over novelty, and do not buy a pile of SaaS because it looks productive.',
+      executionReference: 'Use Step 3 to avoid overlapping tools and workflow sludge.',
+      isRequired: true,
+      stepNumber: 3,
+    },
+    {
+      title: 'Create the internal file system',
+      whatToDo: 'Build a folder and document structure that does not collapse as the business grows.',
+      howToDoIt: 'Use a stable top-level structure and sensible naming conventions from day one.',
+      executionReference: 'Use Step 4 so files, templates, and operational docs stay findable.',
+      isRequired: true,
+      stepNumber: 4,
+    },
+    {
+      title: 'Set up customer management',
+      whatToDo: 'Track leads and customers in one sane place.',
+      howToDoIt: 'Keep the CRM fields simple enough that they get updated instead of ignored.',
+      executionReference: 'Use Step 5 to stop leads disappearing into chat history and inbox fog.',
+      isRequired: true,
+      stepNumber: 5,
+    },
+    {
+      title: 'Automate the obvious repetitive work',
+      whatToDo: 'Connect tools where repetition is wasting time.',
+      howToDoIt: 'Start with basic automation flows and test them before trusting them.',
+      executionReference: 'Use Step 6 to remove boring admin without creating silent breakage.',
+      isRequired: false,
+      stepNumber: 6,
+    },
+    {
+      title: 'Lock down security and access',
+      whatToDo: 'Protect the business accounts, files, and recovery paths.',
+      howToDoIt: 'Use a password manager, 2FA, backups, and an access list instead of winging it.',
+      executionReference: 'Use Step 7 to stop dumb avoidable failures becoming expensive ones.',
+      isRequired: true,
+      stepNumber: 7,
+    },
+  ]
+}
+
+export function buildInfrastructurePhase(project, blueprint, protectionPhase) {
+  const businessName = project.name || 'Your Business'
+
+  const generated = {
+    steps: [
+      {
+        number: 1,
+        slug: 'business-email-and-communication',
+        title: 'Set Up Business Email & Communication',
+        description: 'Professional email with your domain and simple communication tools.',
+        helper: {
+          howToDoThis: 'Pick one email suite, connect the domain properly, and create the obvious inboxes first.',
+          example: `Use hello@${businessName.toLowerCase().replace(/[^a-z0-9]+/g, '') || 'yourbusiness'}.com as the main front door instead of a personal Gmail if you want the business to look real.`,
+        },
+        whatToDo: [
+          'Set up a professional email address using your domain',
+          'Choose an email provider that fits the business and budget',
+          'Create essential addresses like hello@, support@, and admin@',
+          'Set up branded email signatures',
+          'Choose a simple communication tool if the team needs internal chat',
+        ],
+        tools: [
+          { name: 'Google Workspace', url: 'https://workspace.google.com', description: 'Professional email and productivity suite.' },
+          { name: 'Microsoft 365', url: 'https://www.microsoft.com/microsoft-365/business', description: 'Email plus Office apps.' },
+          { name: 'Slack', url: 'https://slack.com', description: 'Team messaging and channels.' },
+          { name: 'Zoho Mail', url: 'https://www.zoho.com/mail', description: 'Budget-friendly business email.' },
+        ],
+      },
+      {
+        number: 2,
+        slug: 'domain-and-website-setup',
+        title: 'Secure Your Domain & Website Setup',
+        description: 'Connect your domain, set up hosting, and lock basic website infrastructure.',
+        helper: {
+          howToDoThis: 'Make sure you control DNS, verify SSL, and keep hosting boring and reliable.',
+          example: 'A simple landing page on Vercel with the domain and SSL working is infinitely better than an unfinished website graveyard.',
+        },
+        whatToDo: [
+          'Confirm the domain is registered and DNS access is available',
+          'Choose hosting that matches the actual website needs',
+          'Set up SSL so the site loads over HTTPS',
+          'Publish at least a basic landing page',
+          'Configure domain and email DNS records correctly',
+        ],
+        tools: [
+          { name: 'Vercel', url: 'https://vercel.com', description: 'Modern web hosting with a good free tier.' },
+          { name: 'Namecheap', url: 'https://namecheap.com', description: 'Affordable domains.' },
+          { name: 'Cloudflare', url: 'https://cloudflare.com', description: 'DNS, security, and performance.' },
+          { name: 'Framer', url: 'https://framer.com', description: 'Fast no-code site building.' },
+        ],
+      },
+      {
+        number: 3,
+        slug: 'core-software-stack',
+        title: 'Set Up Core Software Stack',
+        description: 'Pick the essential operational tools without creating tool overlap.',
+        helper: {
+          howToDoThis: 'Choose one tool per category and bias toward integration, not shiny clutter.',
+          example: 'A lean stack beats SaaS hoarding every single time.',
+        },
+        whatToDo: [
+          'Identify the daily operational needs of the business',
+          'Choose tools that integrate cleanly together',
+          'Start with free tiers where possible',
+          'Document the chosen tools and why they were picked',
+          'Set up accounts and basic settings properly',
+        ],
+        softwareCategories: [
+          { category: 'Project Management', examples: ['Notion', 'Asana', 'Trello', 'Linear'] },
+          { category: 'Time Tracking', examples: ['Toggl', 'Harvest', 'Clockify'] },
+          { category: 'Accounting', examples: ['Xero', 'QuickBooks', 'Wave'] },
+          { category: 'Scheduling', examples: ['Calendly', 'Cal.com', 'Acuity'] },
+          { category: 'Communication', examples: ['Slack', 'Discord', 'Teams'] },
+          { category: 'Design', examples: ['Figma', 'Canva', 'Adobe CC'] },
+        ],
+        tools: [
+          { name: 'Notion', url: 'https://notion.so', description: 'All-in-one workspace.' },
+          { name: 'Linear', url: 'https://linear.app', description: 'Issue tracking and projects.' },
+          { name: 'Toggl', url: 'https://toggl.com', description: 'Time tracking.' },
+          { name: 'Calendly', url: 'https://calendly.com', description: 'Scheduling.' },
+        ],
+      },
+      {
+        number: 4,
+        slug: 'file-and-document-system',
+        title: 'Create Internal File & Document System',
+        description: 'Organize files, templates, and internal documentation so the business can scale sanely.',
+        helper: {
+          howToDoThis: 'Build the structure once, keep naming consistent, and stop future-you from digging through chaos.',
+          example: 'Simple numbered root folders make the whole business feel less feral.',
+        },
+        whatToDo: [
+          'Choose cloud storage for business files',
+          'Create a logical folder structure',
+          'Set naming conventions for important files',
+          'Create templates for common documents',
+          'Set up backup and versioning practices',
+        ],
+        folderStructure: [
+          { name: '01_Clients', description: 'Client subfolders with briefs, deliverables, and contracts.' },
+          { name: '02_Finance', description: 'Invoices, receipts, tax docs, and reports.' },
+          { name: '03_Marketing', description: 'Brand assets, content, and website files.' },
+          { name: '04_Operations', description: 'Processes, SOPs, and internal docs.' },
+          { name: '05_Templates', description: 'Reusable contracts, proposals, and email templates.' },
+        ],
+        tools: [
+          { name: 'Google Drive', url: 'https://drive.google.com', description: 'Cloud storage.' },
+          { name: 'Notion', url: 'https://notion.so', description: 'Knowledge base and docs.' },
+          { name: 'Dropbox', url: 'https://dropbox.com', description: 'File sync and sharing.' },
+          { name: 'Backblaze', url: 'https://backblaze.com', description: 'Automatic backup.' },
+        ],
+      },
+      {
+        number: 5,
+        slug: 'customer-management-system',
+        title: 'Set Up Customer Management System',
+        description: 'Track leads, customers, and follow-ups in one place.',
+        helper: {
+          howToDoThis: 'Track the few fields you will actually maintain, then review them on a real cadence.',
+          example: 'If leads are not in the system, they do not exist. Inbox archaeology is not a CRM.',
+        },
+        whatToDo: [
+          'Decide what customer information needs tracking',
+          'Choose a CRM or simple tracking system',
+          'Define pipeline stages',
+          'Create a lead capture and update process',
+          'Review customer data weekly',
+        ],
+        crmFields: [
+          { field: 'Contact Name', required: true },
+          { field: 'Email', required: true },
+          { field: 'Company', required: false },
+          { field: 'Lead Source', required: true },
+          { field: 'Status', required: true },
+          { field: 'Estimated Value', required: false },
+          { field: 'Last Contact Date', required: true },
+          { field: 'Next Action', required: true },
+          { field: 'Notes', required: false },
+        ],
+        tools: [
+          { name: 'HubSpot CRM', url: 'https://hubspot.com/crm', description: 'Free CRM with email tracking.' },
+          { name: 'Pipedrive', url: 'https://pipedrive.com', description: 'Visual sales pipeline.' },
+          { name: 'Notion', url: 'https://notion.so', description: 'Custom CRM databases.' },
+          { name: 'Airtable', url: 'https://airtable.com', description: 'Flexible database-style CRM.' },
+        ],
+      },
+      {
+        number: 6,
+        slug: 'workflow-automation',
+        title: 'Build Basic Workflow Automation',
+        description: 'Connect tools and automate repetitive tasks.',
+        helper: {
+          howToDoThis: 'Automate the obvious repetitive bits first and document what each automation is supposed to do.',
+          example: 'Lead form → CRM → confirmation email → follow-up task is a good first automation; an Rube Goldberg machine is not.',
+        },
+        whatToDo: [
+          'Identify repetitive tasks worth automating',
+          'Map the tools that need to talk to each other',
+          'Start with simple automations first',
+          'Document the automations clearly',
+          'Test them before relying on them',
+        ],
+        tools: [
+          { name: 'Zapier', url: 'https://zapier.com', description: 'Connects thousands of apps.' },
+          { name: 'Make', url: 'https://make.com', description: 'Visual automation builder.' },
+          { name: 'n8n', url: 'https://n8n.io', description: 'Open-source automation.' },
+          { name: 'IFTTT', url: 'https://ifttt.com', description: 'Simple app connections.' },
+        ],
+      },
+      {
+        number: 7,
+        slug: 'security-and-access-control',
+        title: 'Set Up Security & Access Control',
+        description: 'Protect the business with passwords, backups, and access management.',
+        helper: {
+          howToDoThis: 'Treat security as boring infrastructure, not as something to panic about only after a screw-up.',
+          example: 'Password manager plus 2FA plus backups is the baseline, not the advanced version.',
+        },
+        whatToDo: [
+          'Set up a password manager',
+          'Enable 2FA on all important accounts',
+          'Create a backup strategy for critical data',
+          'Document who has access to which systems',
+          'Plan for account recovery',
+        ],
+        securityChecklist: [
+          { item: 'Password manager set up', priority: 'Critical' },
+          { item: '2FA enabled on email', priority: 'Critical' },
+          { item: '2FA enabled on financial accounts', priority: 'Critical' },
+          { item: '2FA enabled on all other business tools', priority: 'High' },
+          { item: 'Automatic file backup configured', priority: 'High' },
+          { item: 'Recovery codes stored securely', priority: 'High' },
+          { item: 'Access list documented', priority: 'Medium' },
+          { item: 'Regular password rotation scheduled', priority: 'Medium' },
+        ],
+        tools: [
+          { name: '1Password', url: 'https://1password.com', description: 'Password manager.' },
+          { name: 'Bitwarden', url: 'https://bitwarden.com', description: 'Open-source password manager.' },
+          { name: 'Authy', url: 'https://authy.com', description: 'Authenticator app.' },
+          { name: 'Backblaze', url: 'https://backblaze.com', description: 'Automatic cloud backup.' },
+        ],
+      },
+    ],
+    infrastructureLayer: {
+      operatingPosture: `${businessName} should run on a lean, recoverable infrastructure stack instead of scattered accounts and tool chaos.`,
+      completionCallout: {
+        badge: 'Phase 5 Complete',
+        title: 'Ready for Product & Service',
+        description: 'Continue once the business has a usable operating stack, basic automation, and sane security coverage.',
+      },
+    },
+  }
+
+  return {
+    number: 5,
+    title: 'Infrastructure',
+    summary: 'Build the systems and tools the business runs on every day.',
+    progress: {
+      totalSteps: 7,
+      completedSteps: 0,
+    },
+    content: generated,
+    generated,
+    userState: {
+      completedStepIds: [],
+      selectedSoftware: {},
+      checkedFolders: [],
+      checkedCrmFields: [],
+      checkedSecurity: [],
+    },
+    tasks: buildInfrastructureTasks(),
+  }
+}
