@@ -19,8 +19,11 @@ This spec decides what the backend actually guarantees right now, what is scaffo
 - generate a versioned Phase 0 blueprint with seven sections
 - retrieve the latest blueprint and version history
 - expose a phase ladder overview for a project
-- generate and retrieve Phase 1 Brand
-- generate and retrieve Phase 2 Legal
+- generate and retrieve implemented guided phases
+- currently implemented guided phases in frontend scope:
+  - Phase 1 Brand
+  - Phase 2 Legal
+  - Phase 3 Finance
 - reuse cached specialist-style outputs for blueprint generation
 - support both local JSON persistence and Postgres persistence
 
@@ -30,9 +33,24 @@ This spec decides what the backend actually guarantees right now, what is scaffo
 - payments/paywall enforcement
 - production-grade Bob orchestration
 - specialist agent execution through `agent_runs`
-- phases 3 through 9 generation
+- phases 4 through 9 generation
 - background queue workers
-- external integrations beyond static provider links inside generated content
+- external integrations beyond static provider/provider-template links inside generated content
+
+## Frontend-derived architecture rule
+
+The current implemented frontend is the authoritative source of shape for the implemented product surface.
+
+Within the currently confirmed scope:
+- Blueprint is a conversion-first structured presentation layer
+- Brand, Legal, and Finance are workflow-backed phases
+
+That means the backend should evolve toward supporting three layers per implemented phase:
+1. generated/reference content
+2. user-owned workflow state
+3. progress/completion state
+
+Until later frontend phases exist, Phase 4+ contracts must stay explicitly provisional.
 
 ## Core actors
 
@@ -134,12 +152,34 @@ Rules:
 - one project can have many blueprint versions
 - version numbering is 1-based and increasing per project
 - current implementation stores markdown/text strings per section
+- frontend-derived direction is moving toward structured presentation-ready objects, starting with the confirmed Business page schema
 - storing a new blueprint updates the project to `status = blueprint_ready`
 
-### Phase instance
-Purpose: stored generated output for a numbered guided build phase.
+Confirmed frontend-derived Business page direction:
 
-Required fields:
+```ts
+type BlueprintBusinessPage = {
+  businessName: string
+  tagline: string
+  summary: string
+  what: string
+  how: string
+  why: string
+  targetAudience: string[]
+  uniqueValue: string[]
+}
+```
+
+Content rule:
+- the unique twist must be surfaced in the first company-description section, not buried later
+
+### Phase instance
+Purpose: stored backend record for a numbered guided build phase.
+
+Current implementation shape is still scaffold-level and generated-content-heavy.
+The frontend-derived direction now shows phase records should evolve toward workflow-backed state.
+
+Current required persisted fields:
 - `id`
 - `projectId`
 - `phaseNumber`
@@ -152,12 +192,40 @@ Required fields:
 - `createdAt` or equivalent
 - `updatedAt` in stores that track it
 
+Recommended evolving conceptual shape:
+
+```ts
+type PhaseRecord<TGenerated = unknown, TUserState = unknown> = {
+  id: string
+  projectId: string
+  phaseNumber: number
+  title: string
+  state: string
+  summary: string
+  generatedContent: TGenerated
+  userState?: TUserState
+  progress?: {
+    completedStepIds?: number[]
+    currentStepId?: number | null
+  }
+  tasks?: unknown[]
+  generatedAt: string
+  createdAt?: string
+  updatedAt?: string
+}
+```
+
 Rules:
-- current implementation supports Phase 1 Brand and Phase 2 Legal only
+- current backend implementation supports generation for Phase 1 Brand and Phase 2 Legal only
+- current frontend implemented scope confirms Phase 3 Finance also exists as a workflow page, even if backend generation is not implemented yet
 - one stored record per project per phase number
 - upsert behaviour replaces the existing phase instance for that phase
 - generating a phase updates project status to `in_progress`
 - generating a phase bumps `currentPhaseNumber` to at least that phase number
+- phase records should evolve to separate:
+  - generated/reference content
+  - user-owned workflow state
+  - progress/completion state
 
 ### Agent output cache
 Purpose: reusable structured output cache for blueprint/specialist work.
@@ -344,13 +412,15 @@ Trigger: `GET /api/projects/:projectId/phases`
 Backend steps:
 1. authenticate user
 2. fetch project
-3. fetch current stored Phase 1 and Phase 2 instances if present
+3. fetch current stored phase instances that exist for implemented phases
 4. build a 9-phase overview response
 
 Current state rules:
 - if no blueprint exists, all phases are effectively locked
-- if a blueprint exists, Phase 1 and Phase 2 become `available`
-- phases 3 through 9 are currently locked
+- if a blueprint exists, implemented guided phases should be treated as the available next workflow surface
+- current frontend-confirmed implemented guided phases are 1 through 3
+- backend generation is currently implemented only for Phases 1 and 2
+- phases 4 through 9 remain unimplemented and should stay provisional/locked
 - stored phase instances override default title/state/summary/taskCount/progress
 
 ### 8. Generate Phase 1 Brand
@@ -394,7 +464,18 @@ Failure cases:
 - `400 BRAND_REQUIRED`
 - `404 PROJECT_NOT_FOUND`
 
-### 10. Fetch phase instance
+### 10. Generate Phase 3 Finance
+Trigger: future backend route, not implemented yet
+
+Frontend-derived status:
+- Finance is already implemented in the current frontend as a workflow-backed phase page
+- it should not be treated as speculative product scope anymore
+- however, backend generation/persistence support for Finance is not yet implemented in current routes
+
+Expected direction:
+- Finance should follow the same phase-record split of generated/reference content + userState + progress
+
+### 11. Fetch phase instance
 Trigger: `GET /api/projects/:projectId/phases/:phaseNumber`
 
 Current contract:
@@ -468,6 +549,7 @@ Error payloads are JSON with route-level error codes/messages via the shared HTT
 - `projects`
 - `blueprint_versions`
 - `agent_output_cache`
+- `phase_instances`
 
 ### Postgres-backed tables present but not yet actively used by routes
 - `agent_runs`
@@ -478,9 +560,13 @@ Error payloads are JSON with route-level error codes/messages via the shared HTT
 - `agentOutputCache`
 - `phaseInstances`
 
-### Important mismatch to resolve
-The JSON store already supports `phaseInstances`.
-The current Postgres store implementation shown in code does not yet implement `getPhaseInstanceForProject` or `upsertPhaseInstanceForProject`, which means Postgres parity for Phase 1/2 persistence is incomplete and needs closing before this contract can be called stable.
+### Persistence direction to close
+The current stores now support persisted phase instances, but the contract is still too narrow if the frontend shape is the goal.
+
+Parity work still needed for stability:
+- represent `userState` cleanly for workflow-backed phases
+- represent progress/completion state cleanly
+- keep JSON and Postgres contract-compatible as phase records evolve
 
 ## Background processing
 
@@ -516,7 +602,7 @@ Future expectation:
 
 ## Current frontend expectations this spec must satisfy
 
-The current frontend assumes:
+The current implemented frontend assumes:
 - project creation immediately followed by blueprint generation
 - a seven-section Phase 0 blueprint workspace:
   - business
@@ -526,14 +612,21 @@ The current frontend assumes:
   - legal
   - website
   - risks
-- sidebar project list with summary status
+- Blueprint is a high-polish conversion surface, not just a plain report
+- the Business section should move toward structured fields rather than a single text blob
+- the unique twist must be surfaced early in the company-description flow
 - a phase ladder UI fed by `/phases`
-- direct buttons for:
-  - regenerate blueprint
-  - generate Phase 1 Brand
-  - generate Phase 2 Legal
-- rich structured `generatedContent` payloads for Brand and Legal rendering
-- locked future phases that still appear in the UI ladder
+- implemented workflow phases currently include:
+  - Phase 1 Brand
+  - Phase 2 Legal
+  - Phase 3 Finance
+- Brand, Legal, and Finance each expect some combination of:
+  - reference/config/options data
+  - instructional/generated content
+  - user-owned workflow state
+  - progress/completion state
+- current backend routes directly support generation for Phase 1 and Phase 2 only
+- future phases that do not exist yet should remain provisional in the spec
 
 ## Testing expectations
 
@@ -551,13 +644,15 @@ Minimum meaningful checks for this contract:
 ## Open questions
 
 - Should blueprint generation create durable `agent_runs` now or only after real orchestration lands?
-- How should phase instances be represented in Postgres so parity with JSON mode is clean?
+- How should phase instances be represented in Postgres so parity with JSON mode is clean once userState/progress are added?
 - When the real Bob/specialist runtime lands, does the cache stay at the section level or become agent-output granular by phase step?
 - What exact auth model replaces `x-user-id` for production?
 - When does the post-blueprint paywall enter the API contract?
-- Which additional phases should be implemented next after Brand and Legal?
+- Should Finance be implemented next as the first backend phase to use an explicit `generated + userState + progress` record shape?
+- Should Blueprint sections be stored as mixed structured objects rather than all-string markdown blocks?
 
 ## Change log
 
 - 2026-04-29: initial skeleton created to support repo-first build flow
 - 2026-04-29: expanded into a concrete contract based on current frontend, routes, stores, and migrations
+- 2026-04-29: updated to reflect frontend-derived architecture across Blueprint, Brand, Legal, and Finance; clarified that current frontend scope ends at Phase 3 and that workflow phases need generated/reference content plus userState plus progress
