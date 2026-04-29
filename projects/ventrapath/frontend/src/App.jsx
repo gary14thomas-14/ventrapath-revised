@@ -18,7 +18,7 @@ const defaultPhaseCards = [
   { number: 1, title: 'Brand', state: 'available', summary: 'Turn the blueprint into a sharp external identity.' },
   { number: 2, title: 'Legal', state: 'locked', summary: 'Jurisdiction-aware setup, filing, tax, and protection.' },
   { number: 3, title: 'Finance', state: 'locked', summary: 'Pricing, banking, tax, and financial foundations.' },
-  { number: 4, title: 'Protection', state: 'locked', summary: 'Risk controls, policies, and core safeguards.' },
+  { number: 4, title: 'Protection', state: 'locked', summary: 'Risk controls, policies, contracts, privacy, and core safeguards.' },
   { number: 5, title: 'Infrastructure', state: 'locked', summary: 'Tools, systems, and operating stack.' },
   { number: 6, title: 'Marketing', state: 'locked', summary: 'Audience reach, positioning, and growth channels.' },
 ]
@@ -215,7 +215,7 @@ function ProjectForm({ formState, onChange, onSubmit, busy }) {
   )
 }
 
-function BlueprintViewer({ project, blueprint, selectedSection, onSelectSection, onRegenerate, onGenerateBrand, onGenerateLegal, busy }) {
+function BlueprintViewer({ project, blueprint, selectedSection, onSelectSection, onRegenerate, onGenerateBrand, onGenerateLegal, onGenerateProtection, busy }) {
   if (!project) {
     return (
       <section className="panel empty-state">
@@ -240,6 +240,9 @@ function BlueprintViewer({ project, blueprint, selectedSection, onSelectSection,
           </button>
           <button className="ghost-button" onClick={onGenerateLegal} disabled={busy || !blueprint} type="button">
             {busy ? 'Working…' : 'Generate Phase 2 Legal'}
+          </button>
+          <button className="ghost-button" onClick={onGenerateProtection} disabled={busy || !blueprint} type="button">
+            {busy ? 'Working…' : 'Generate Phase 4 Protection'}
           </button>
           <button className="ghost-button" onClick={onRegenerate} disabled={busy || !blueprint} type="button">
             {busy ? 'Working…' : 'Regenerate blueprint'}
@@ -318,7 +321,7 @@ function BrandPhaseViewer({ project, phase, onBack }) {
 
       <div className="panel phase-header-card">
         <div>
-          <p className="eyebrow">0/{phase.generatedContent.progress.totalSteps} steps complete</p>
+          <p className="eyebrow">0/{phase.progress?.totalSteps ?? phase.generatedContent.steps.length} steps complete</p>
           <h3>{phase.summary}</h3>
         </div>
         <p>{phase.generatedContent.brandLayer.corePromise}</p>
@@ -444,7 +447,7 @@ function LegalPhaseViewer({ project, phase, onBack }) {
 
       <div className="panel phase-header-card">
         <div>
-          <p className="eyebrow">0/{phase.generatedContent.progress.totalSteps} steps complete</p>
+          <p className="eyebrow">0/{phase.progress?.totalSteps ?? phase.generatedContent.steps.length} steps complete</p>
           <h3>{phase.summary}</h3>
         </div>
         <p>{phase.generatedContent.jurisdiction.disclaimer}</p>
@@ -626,6 +629,159 @@ function LegalPhaseViewer({ project, phase, onBack }) {
   )
 }
 
+function ProtectionPhaseViewer({ project, phase, onBack }) {
+  if (!project || !phase) {
+    return null
+  }
+
+  return (
+    <section className="workspace">
+      <div className="panel project-summary">
+        <div>
+          <p className="eyebrow">Phase 4 of 10</p>
+          <h2>Protection</h2>
+          <p>{phase.summary}</p>
+        </div>
+        <div className="project-summary__actions">
+          <span className="status-pill">{phase.state}</span>
+          <button className="ghost-button" onClick={onBack} type="button">
+            Back to blueprint
+          </button>
+        </div>
+      </div>
+
+      <div className="panel phase-header-card">
+        <div>
+          <p className="eyebrow">0/{phase.progress?.totalSteps ?? phase.generatedContent.steps.length} steps complete</p>
+          <h3>{phase.generatedContent.protectionLayer.completionCallout.title}</h3>
+        </div>
+        <p>{phase.generatedContent.protectionLayer.protectionPosture}</p>
+      </div>
+
+      <div className="phase-steps">
+        {phase.generatedContent.steps.map((step) => (
+          <section key={step.slug} className="panel phase-step-card">
+            <div className="phase-step-card__header">
+              <div className="phase-step-card__title">
+                <span className="phase-step-card__number">{step.number}</span>
+                <div>
+                  <h3>{step.title}</h3>
+                  <p>{step.description}</p>
+                </div>
+              </div>
+              <div className="phase-step-card__actions">
+                <span>How to do this</span>
+                <span>Example</span>
+              </div>
+            </div>
+
+            <div className="helper-grid">
+              <div className="helper-card">
+                <strong>How to do this</strong>
+                <p>{step.helper.howToDoThis}</p>
+              </div>
+              <div className="helper-card">
+                <strong>Example</strong>
+                <p>{step.helper.example}</p>
+              </div>
+            </div>
+
+            {step.riskCategories ? (
+              <div className="content-grid two-up">
+                {step.riskCategories.map((group) => (
+                  <div key={group.category} className="content-card">
+                    <strong>{group.category}</strong>
+                    <ul className="bullet-list">
+                      {group.risks.map((risk) => (
+                        <li key={risk}>{risk}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.insuranceTypes ? (
+              <div className="content-grid two-up">
+                {step.insuranceTypes.map((insurance) => (
+                  <div key={insurance.name} className="content-card">
+                    <strong>{insurance.name}{insurance.recommended ? ' · Recommended' : ''}</strong>
+                    <p>{insurance.description}</p>
+                    <p><strong>Who needs it:</strong> {insurance.whoNeeds}</p>
+                    <p><strong>Typical cost:</strong> {insurance.typicalCost}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.checklist ? (
+              <div className="content-grid two-up">
+                {step.checklist.map((item) => (
+                  <div key={item} className="content-card">
+                    <strong>Checklist</strong>
+                    <p>{item}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.privacyNotice ? (
+              <div className="helper-card">
+                <strong>Privacy note</strong>
+                <p>{step.privacyNotice}</p>
+              </div>
+            ) : null}
+
+            {step.privacyItems ? (
+              <div className="content-grid two-up">
+                {step.privacyItems.map((item) => (
+                  <div key={item} className="content-card">
+                    <strong>Privacy essential</strong>
+                    <p>{item}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.contractItems ? (
+              <div className="content-grid two-up">
+                {step.contractItems.map((item) => (
+                  <div key={item} className="content-card">
+                    <strong>Contract element</strong>
+                    <p>{item}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.disclaimerTypes ? (
+              <div className="content-grid two-up">
+                {step.disclaimerTypes.map((item) => (
+                  <div key={item} className="content-card">
+                    <strong>Disclaimer type</strong>
+                    <p>{item}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.complianceItems ? (
+              <div className="content-grid two-up">
+                {step.complianceItems.map((item) => (
+                  <div key={item.name} className="content-card">
+                    <strong>{item.name}</strong>
+                    <p>{item.frequency}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </section>
+        ))}
+      </div>
+    </section>
+  )
+}
+
 function App() {
   const [projects, setProjects] = useState([])
   const [activeProjectId, setActiveProjectId] = useState(null)
@@ -633,6 +789,7 @@ function App() {
   const [phases, setPhases] = useState(defaultPhaseCards)
   const [brandPhase, setBrandPhase] = useState(null)
   const [legalPhase, setLegalPhase] = useState(null)
+  const [protectionPhase, setProtectionPhase] = useState(null)
   const [selectedSection, setSelectedSection] = useState('business')
   const [currentView, setCurrentView] = useState('blueprint')
   const [busy, setBusy] = useState(false)
@@ -672,6 +829,7 @@ function App() {
         setBlueprint(null)
         setBrandPhase(null)
         setLegalPhase(null)
+        setProtectionPhase(null)
         setPhases(defaultPhaseCards)
         return
       }
@@ -707,10 +865,18 @@ function App() {
         } catch {
           setLegalPhase(null)
         }
+
+        try {
+          const protectionPayload = await apiRequest(`/projects/${activeProjectId}/phases/4`)
+          setProtectionPhase(protectionPayload.phase)
+        } catch {
+          setProtectionPhase(null)
+        }
       } catch {
         setBlueprint(null)
         setBrandPhase(null)
         setLegalPhase(null)
+        setProtectionPhase(null)
         setPhases(defaultPhaseCards)
       }
     }
@@ -775,6 +941,7 @@ function App() {
       setBlueprint(blueprintResponse.blueprint)
       setBrandPhase(null)
       setLegalPhase(null)
+      setProtectionPhase(null)
       setPhases(defaultPhaseCards)
       setSelectedSection('business')
       setCurrentView('blueprint')
@@ -860,6 +1027,32 @@ function App() {
     }
   }
 
+  async function handleGenerateProtection() {
+    if (!activeProjectId) {
+      return
+    }
+
+    setBusy(true)
+    setError('')
+
+    try {
+      const payload = await apiRequest(`/projects/${activeProjectId}/phases/4/generate`, {
+        method: 'POST',
+        body: JSON.stringify({}),
+      })
+
+      setProtectionPhase(payload.phase)
+      const phasesPayload = await apiRequest(`/projects/${activeProjectId}/phases`)
+      setPhases(phasesPayload.phases ?? defaultPhaseCards)
+      setCurrentView('protection')
+      await refreshProjects(activeProjectId)
+    } catch (phaseError) {
+      setError(phaseError.message)
+    } finally {
+      setBusy(false)
+    }
+  }
+
   return (
     <div className="app-shell">
       <Sidebar
@@ -874,6 +1067,7 @@ function App() {
           setBlueprint(null)
           setBrandPhase(null)
           setLegalPhase(null)
+          setProtectionPhase(null)
           setCurrentView('blueprint')
         }}
         phases={phases}
@@ -884,6 +1078,10 @@ function App() {
 
           if (phaseNumber === 2 && legalPhase) {
             setCurrentView('legal')
+          }
+
+          if (phaseNumber === 4 && protectionPhase) {
+            setCurrentView('protection')
           }
         }}
       />
@@ -902,6 +1100,8 @@ function App() {
           <BrandPhaseViewer project={activeProject} phase={brandPhase} onBack={() => setCurrentView('blueprint')} />
         ) : currentView === 'legal' && legalPhase ? (
           <LegalPhaseViewer project={activeProject} phase={legalPhase} onBack={() => setCurrentView('blueprint')} />
+        ) : currentView === 'protection' && protectionPhase ? (
+          <ProtectionPhaseViewer project={activeProject} phase={protectionPhase} onBack={() => setCurrentView('blueprint')} />
         ) : (
           <BlueprintViewer
             project={activeProject}
@@ -911,6 +1111,7 @@ function App() {
             onRegenerate={handleRegenerateBlueprint}
             onGenerateBrand={handleGenerateBrand}
             onGenerateLegal={handleGenerateLegal}
+            onGenerateProtection={handleGenerateProtection}
             busy={busy}
           />
         )}

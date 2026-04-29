@@ -897,3 +897,257 @@ export function buildFinancePhase(project, blueprint, legalPhase) {
     tasks: buildFinanceTasks(),
   }
 }
+
+function buildProtectionTasks() {
+  return [
+    {
+      title: 'Identify business risks',
+      whatToDo: 'Work out the legal, financial, and operational risks that could actually hurt the business.',
+      howToDoIt: 'List the obvious failure points first, then rank them by likelihood and impact instead of pretending everything matters equally.',
+      executionReference: 'Use Step 1 to decide what deserves contracts, insurance, or tighter process first.',
+      isRequired: true,
+      stepNumber: 1,
+    },
+    {
+      title: 'Choose the right insurance',
+      whatToDo: 'Set a baseline insurance stack that matches the way the business operates.',
+      howToDoIt: 'Start with the recommended covers and ignore fancy extras unless the business model genuinely needs them.',
+      executionReference: 'Use Step 2 to get quotes and compare exclusions before buying anything.',
+      isRequired: true,
+      stepNumber: 2,
+    },
+    {
+      title: 'Draft core terms and conditions',
+      whatToDo: 'Set the commercial rules customers agree to before money or delivery gets messy.',
+      howToDoIt: 'Keep payment, delivery, cancellation, and dispute terms plain enough to enforce and explain.',
+      executionReference: 'Use Step 3 as the minimum baseline for transactions and customer expectations.',
+      isRequired: true,
+      stepNumber: 3,
+    },
+    {
+      title: 'Handle privacy properly',
+      whatToDo: 'Document how customer data is collected, stored, and deleted.',
+      howToDoIt: 'Map the actual data flow and write the privacy layer around that, not around fantasy compliance theatre.',
+      executionReference: 'Use Step 4 before launching forms, payments, or customer accounts.',
+      isRequired: true,
+      stepNumber: 4,
+    },
+    {
+      title: 'Create customer agreements',
+      whatToDo: 'Define scope, payment, revisions, and exit terms clearly enough that disputes have less room to grow.',
+      howToDoIt: 'Spell out inclusions, exclusions, and change handling before work starts.',
+      executionReference: 'Use Step 5 as the contract skeleton for service delivery.',
+      isRequired: true,
+      stepNumber: 5,
+    },
+    {
+      title: 'Add disclaimers and liability limits',
+      whatToDo: 'Put sane boundaries around advice, claims, and exposure.',
+      howToDoIt: 'Only disclaim what makes sense, and do not use disclaimers to cover bullshit promises or bad delivery.',
+      executionReference: 'Use Step 6 to tighten website, proposal, and contract language.',
+      isRequired: true,
+      stepNumber: 6,
+    },
+    {
+      title: 'Build a compliance rhythm',
+      whatToDo: 'Track renewals, registrations, and review dates so protection does not quietly expire.',
+      howToDoIt: 'Create a simple recurring checklist with reminders before anything lapses.',
+      executionReference: 'Use Step 7 to keep the business out of lazy admin trouble.',
+      isRequired: true,
+      stepNumber: 7,
+    },
+  ]
+}
+
+export function buildProtectionPhase(project, blueprint, legalPhase, financePhase) {
+  const jurisdiction = project.region ? `${project.region}, ${project.country}` : project.country
+
+  const generated = {
+    steps: [
+      {
+        number: 1,
+        slug: 'identify-business-risks',
+        title: 'Identify Business Risks',
+        description: 'Understand legal, financial, and operational risks specific to your business.',
+        helper: {
+          howToDoThis: 'Write down what could go wrong in reality, then sort by likelihood and damage instead of vague paranoia.',
+          example: 'Client non-payment and scope creep usually matter earlier than rare edge-case disasters.',
+        },
+        riskCategories: [
+          {
+            category: 'Client / Customer Risks',
+            risks: ['Non-payment or late payment', 'Scope creep', 'Contract disputes', 'Reputation damage from bad reviews'],
+          },
+          {
+            category: 'Operational Risks',
+            risks: ['Data loss or breach', 'Equipment failure', 'Key person dependency', 'Supplier failure'],
+          },
+          {
+            category: 'Financial Risks',
+            risks: ['Cash flow gaps', 'Bad debt', 'Unexpected costs', 'Currency fluctuations'],
+          },
+          {
+            category: 'Legal / Compliance Risks',
+            risks: ['License expiry', 'Regulatory changes', 'IP infringement claims', 'Privacy violations'],
+          },
+        ],
+      },
+      {
+        number: 2,
+        slug: 'business-insurance',
+        title: 'Set Up Business Insurance',
+        description: 'Get coverage for public liability, professional indemnity, and relevant policies.',
+        helper: {
+          howToDoThis: 'Use the business model to decide what needs covering, then compare exclusions before price.',
+          example: 'A consultant usually starts with professional indemnity and public liability before adding niche cover.',
+        },
+        insuranceTypes: [
+          {
+            name: 'Public Liability',
+            description: 'Covers claims if someone is injured or their property is damaged because of your business.',
+            whoNeeds: 'Any business that interacts with the public, visits client sites, or has a physical location.',
+            typicalCost: '$300-800/year',
+            recommended: true,
+          },
+          {
+            name: 'Professional Indemnity',
+            description: 'Covers claims arising from your professional advice, services, or recommendations.',
+            whoNeeds: 'Consultants, coaches, designers, developers, accountants, and advice-based businesses.',
+            typicalCost: '$400-1,500/year',
+            recommended: true,
+          },
+          {
+            name: 'Product Liability',
+            description: 'Covers claims if a product you sell causes injury or damage.',
+            whoNeeds: 'Anyone selling physical products, including imported goods.',
+            typicalCost: '$400-1,200/year',
+            recommended: false,
+          },
+          {
+            name: 'Cyber Liability',
+            description: 'Covers data breaches, cyber attacks, and related recovery costs.',
+            whoNeeds: 'Any business storing customer data, especially online businesses.',
+            typicalCost: '$500-2,000/year',
+            recommended: false,
+          },
+        ],
+      },
+      {
+        number: 3,
+        slug: 'terms-and-conditions',
+        title: 'Create Basic Terms & Conditions',
+        description: 'Protect transactions and clarify responsibilities with customers.',
+        helper: {
+          howToDoThis: 'Keep the terms commercially clear, not stuffed with lawyer cosplay nobody can follow.',
+          example: 'Payment timing, delivery timing, cancellation, and dispute handling should be obvious immediately.',
+        },
+        checklist: [
+          'Payment terms',
+          'Delivery or service terms',
+          'Cancellation policy',
+          'Intellectual property rules',
+          'Dispute resolution process',
+        ],
+      },
+      {
+        number: 4,
+        slug: 'privacy-and-data-protection',
+        title: 'Implement Privacy & Data Protection',
+        description: 'Create a privacy policy and handle customer data properly.',
+        helper: {
+          howToDoThis: 'Map the data you actually collect, where it lives, who touches it, and how users can get it deleted.',
+          example: 'If Stripe handles card data, say that clearly and do not pretend you store everything yourself.',
+        },
+        privacyItems: [
+          'What data you collect',
+          'How you use the data',
+          'How you protect data',
+          'Third-party sharing',
+          'User rights',
+        ],
+        privacyNotice: project.country.toLowerCase() === 'australia'
+          ? 'If your business has annual turnover of $3 million+ or handles health information, Privacy Act obligations can apply.'
+          : `Check the privacy rules that apply in ${jurisdiction} before launch.`,
+      },
+      {
+        number: 5,
+        slug: 'customer-agreements',
+        title: 'Add Customer Agreements or Contracts',
+        description: 'Create service agreements, scope of work, and clear expectations.',
+        helper: {
+          howToDoThis: 'Define what is included, what is not, how revisions work, and how either side can end the deal.',
+          example: 'A proper scope-of-work section kills a lot of future bullshit before it starts.',
+        },
+        contractItems: [
+          'Scope of work',
+          'Timeline and milestones',
+          'Payment schedule',
+          'Revision process',
+          'Change requests',
+          'Termination clause',
+        ],
+      },
+      {
+        number: 6,
+        slug: 'disclaimers-and-liability',
+        title: 'Set Up Disclaimers & Liability Limits',
+        description: 'Reduce exposure to claims with appropriate disclaimers.',
+        helper: {
+          howToDoThis: 'Use disclaimers to create sane boundaries, not to excuse nonsense or promises you cannot back up.',
+          example: 'Cap liability sensibly and avoid guaranteeing outcomes unless the business can genuinely prove them.',
+        },
+        disclaimerTypes: [
+          'General disclaimer',
+          'No guarantee language',
+          'Liability cap',
+          'External link disclaimer',
+        ],
+      },
+      {
+        number: 7,
+        slug: 'ongoing-compliance',
+        title: 'Ensure Ongoing Compliance',
+        description: 'Stay on top of industry regulations, licenses, renewals, and standards.',
+        helper: {
+          howToDoThis: 'Put the boring recurring admin on a calendar now so it does not bite you later.',
+          example: 'Insurance renewals and registration expiry are exactly the kind of stupid failure that should never be a surprise.',
+        },
+        complianceItems: [
+          { name: 'Business registration current', frequency: 'Annual' },
+          { name: 'Insurance policies renewed', frequency: 'Annual' },
+          { name: 'Professional licenses valid', frequency: 'Varies' },
+          { name: 'Privacy policy up to date', frequency: 'Annual review' },
+          { name: 'Terms & conditions current', frequency: 'Annual review' },
+          { name: 'Tax obligations met', frequency: 'Quarterly / Annual' },
+        ],
+      },
+    ],
+    protectionLayer: {
+      protectionPosture: `Protection guidance tailored to ${jurisdiction}.`,
+      completionCallout: {
+        badge: 'Phase 4 Complete',
+        title: 'Ready for Product & Service',
+        description: 'Continue once the business has a workable risk, insurance, privacy, and compliance baseline.',
+      },
+    },
+  }
+
+  return {
+    number: 4,
+    title: 'Protection',
+    summary: 'Protect the business with risk controls, insurance choices, contracts, privacy coverage, and compliance habits.',
+    progress: {
+      totalSteps: 7,
+      completedSteps: 0,
+    },
+    content: generated,
+    generated,
+    userState: {
+      completedStepIds: [],
+      selectedInsurance: [],
+      checkedRisks: [],
+      checkedCompliance: [],
+    },
+    tasks: buildProtectionTasks(),
+  }
+}
