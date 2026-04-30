@@ -241,7 +241,7 @@ export async function handleGeneratePhase(req, res, projectId, phaseNumber, env)
       progress: phase.progress ?? {},
       tasks: phase.tasks,
       generatedAt,
-      latestRunId: randomUUID(),
+      latestRunId: null,
     },
     env,
   );
