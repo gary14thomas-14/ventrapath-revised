@@ -45,9 +45,13 @@ export default function GeneratingPage() {
       let stageIndex = 0
       const advance = () => {
         if (cancelled || stageIndex >= stages.length) return
-        setCurrentStage(stageIndex)
-        setProgress(((stageIndex + 1) / stages.length) * 100)
-        setCompletedStages((prev) => Array.from(new Set([...prev, stages[stageIndex].id])))
+
+        const currentStageIndex = stageIndex
+        const currentStageDef = stages[currentStageIndex]
+
+        setCurrentStage(currentStageIndex)
+        setProgress(((currentStageIndex + 1) / stages.length) * 100)
+        setCompletedStages((prev) => Array.from(new Set([...prev, currentStageDef.id])))
         stageIndex += 1
       }
 
