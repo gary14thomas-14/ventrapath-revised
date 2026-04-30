@@ -28,7 +28,6 @@ const proofPoints = [
 ]
 
 export default function LandingPage() {
-  // Tiny source touch to verify GitHub -> Vercel auto-deploy is firing from the connected repo.
   const [projectName, setProjectName] = useState<string | null>(null)
 
   useEffect(() => {
