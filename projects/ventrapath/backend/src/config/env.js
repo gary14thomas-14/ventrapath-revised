@@ -3,10 +3,10 @@ import { loadEnvFile } from './load-env-file.js';
 loadEnvFile(process.cwd());
 
 function resolveDatabaseUrl() {
-  return process.env.DATABASE_URL
-    ?? process.env.database_DATABASE_URL
-    ?? process.env.POSTGRES_URL
+  return process.env.database_DATABASE_URL
     ?? process.env.database_POSTGRES_URL
+    ?? process.env.DATABASE_URL
+    ?? process.env.POSTGRES_URL
     ?? null;
 }
 
