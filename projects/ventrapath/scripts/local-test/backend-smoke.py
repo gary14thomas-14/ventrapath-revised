@@ -1,9 +1,10 @@
 import json
+import os
 import sys
 import urllib.error
 import urllib.request
 
-BASE = 'http://127.0.0.1:4000/api'
+BASE = os.environ.get('VENTRAPATH_BASE', 'http://127.0.0.1:4000/api')
 USER_ID = '11111111-1111-4111-8111-111111111111'
 HEADERS = {
     'Content-Type': 'application/json',
@@ -83,15 +84,68 @@ def main():
     finance_fetched = request(f'/projects/{project_id}/phases/3')['phase']
     assert_true(finance_fetched['id'] == finance['id'], 'fetched finance phase should match generated finance phase')
 
+    protection = request(f'/projects/{project_id}/phases/4/generate', 'POST', {})['phase']
+    assert_true(protection['phaseNumber'] == 4, 'protection phase number should be 4')
+    assert_true(protection['state'] == 'ready', 'protection phase should be ready')
+    assert_true('steps' in protection['generatedContent'], 'protection payload should expose generated workflow steps')
+
+    protection_fetched = request(f'/projects/{project_id}/phases/4')['phase']
+    assert_true(protection_fetched['id'] == protection['id'], 'fetched protection phase should match generated protection phase')
+
+    infrastructure = request(f'/projects/{project_id}/phases/5/generate', 'POST', {})['phase']
+    assert_true(infrastructure['phaseNumber'] == 5, 'infrastructure phase number should be 5')
+    assert_true(infrastructure['state'] == 'ready', 'infrastructure phase should be ready')
+    assert_true('steps' in infrastructure['generatedContent'], 'infrastructure payload should expose generated workflow steps')
+
+    infrastructure_fetched = request(f'/projects/{project_id}/phases/5')['phase']
+    assert_true(infrastructure_fetched['id'] == infrastructure['id'], 'fetched infrastructure phase should match generated infrastructure phase')
+
+    marketing = request(f'/projects/{project_id}/phases/6/generate', 'POST', {})['phase']
+    assert_true(marketing['phaseNumber'] == 6, 'marketing phase number should be 6')
+    assert_true(marketing['state'] == 'ready', 'marketing phase should be ready')
+    assert_true('steps' in marketing['generatedContent'], 'marketing payload should expose generated workflow steps')
+
+    marketing_fetched = request(f'/projects/{project_id}/phases/6')['phase']
+    assert_true(marketing_fetched['id'] == marketing['id'], 'fetched marketing phase should match generated marketing phase')
+
+    operations = request(f'/projects/{project_id}/phases/7/generate', 'POST', {})['phase']
+    assert_true(operations['phaseNumber'] == 7, 'operations phase number should be 7')
+    assert_true(operations['state'] == 'ready', 'operations phase should be ready')
+    assert_true('steps' in operations['generatedContent'], 'operations payload should expose generated workflow steps')
+
+    operations_fetched = request(f'/projects/{project_id}/phases/7')['phase']
+    assert_true(operations_fetched['id'] == operations['id'], 'fetched operations phase should match generated operations phase')
+
+    sales = request(f'/projects/{project_id}/phases/8/generate', 'POST', {})['phase']
+    assert_true(sales['phaseNumber'] == 8, 'sales phase number should be 8')
+    assert_true(sales['state'] == 'ready', 'sales phase should be ready')
+    assert_true('steps' in sales['generatedContent'], 'sales payload should expose generated workflow steps')
+
+    sales_fetched = request(f'/projects/{project_id}/phases/8')['phase']
+    assert_true(sales_fetched['id'] == sales['id'], 'fetched sales phase should match generated sales phase')
+
+    launch_scale = request(f'/projects/{project_id}/phases/9/generate', 'POST', {})['phase']
+    assert_true(launch_scale['phaseNumber'] == 9, 'launch & scale phase number should be 9')
+    assert_true(launch_scale['state'] == 'ready', 'launch & scale phase should be ready')
+    assert_true('steps' in launch_scale['generatedContent'], 'launch & scale payload should expose generated workflow steps')
+
+    launch_scale_fetched = request(f'/projects/{project_id}/phases/9')['phase']
+    assert_true(launch_scale_fetched['id'] == launch_scale['id'], 'fetched launch & scale phase should match generated launch & scale phase')
+
     phases = request(f'/projects/{project_id}/phases')['phases']
     phase_map = {item['number']: item for item in phases}
     assert_true(phase_map[1]['state'] == 'ready', 'phase 1 should be ready after generation')
     assert_true(phase_map[2]['state'] == 'ready', 'phase 2 should be ready after generation')
     assert_true(phase_map[3]['state'] == 'ready', 'phase 3 should be ready after generation')
-    assert_true(phase_map[4]['state'] == 'locked', 'phase 4 should remain locked')
+    assert_true(phase_map[4]['state'] == 'ready', 'phase 4 should be ready after generation')
+    assert_true(phase_map[5]['state'] == 'ready', 'phase 5 should be ready after generation')
+    assert_true(phase_map[6]['state'] == 'ready', 'phase 6 should be ready after generation')
+    assert_true(phase_map[7]['state'] == 'ready', 'phase 7 should be ready after generation')
+    assert_true(phase_map[8]['state'] == 'ready', 'phase 8 should be ready after generation')
+    assert_true(phase_map[9]['state'] == 'ready', 'phase 9 should be ready after generation')
 
     refreshed_project = request(f'/projects/{project_id}')['project']
-    assert_true(refreshed_project['currentPhaseNumber'] == 3, 'project currentPhaseNumber should advance to 3')
+    assert_true(refreshed_project['currentPhaseNumber'] == 9, 'project currentPhaseNumber should advance to 9')
     assert_true(refreshed_project['status'] == 'in_progress', 'project status should be in_progress after phase generation')
 
     print(json.dumps({
@@ -104,6 +158,12 @@ def main():
             'brandPhase': True,
             'legalPhase': True,
             'financePhase': True,
+            'protectionPhase': True,
+            'infrastructurePhase': True,
+            'marketingPhase': True,
+            'operationsPhase': True,
+            'salesPhase': True,
+            'launchScalePhase': True,
             'phaseLadder': True,
             'projectProgress': True,
         }

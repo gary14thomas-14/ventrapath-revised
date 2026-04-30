@@ -1722,3 +1722,959 @@ export function buildMarketingPhase(project, blueprint, infrastructurePhase) {
     tasks: buildMarketingTasks(),
   }
 }
+
+function buildOperationsTasks() {
+  return [
+    {
+      title: 'Define the delivery process',
+      whatToDo: 'Map the step-by-step path from purchase to delivery.',
+      howToDoIt: 'Use the last few real jobs as the baseline so the process reflects reality, not fantasy workflow theatre.',
+      executionReference: 'Use Step 1 to make delivery easier to explain, repeat, and hand off.',
+      isRequired: true,
+      stepNumber: 1,
+    },
+    {
+      title: 'Set up the job workflow',
+      whatToDo: 'Decide how work moves from new request to completion.',
+      howToDoIt: 'Keep the stages simple, visible, and tied to clear move-forward criteria.',
+      executionReference: 'Use Step 2 to stop work vanishing into inboxes and vague status updates.',
+      isRequired: true,
+      stepNumber: 2,
+    },
+    {
+      title: 'Create SOPs for repeatable tasks',
+      whatToDo: 'Document the repeated work so it can be done consistently.',
+      howToDoIt: 'Start with the tasks that cause the most mistakes, delays, or re-explaining.',
+      executionReference: 'Use Step 3 to reduce avoidable operational slop as volume grows.',
+      isRequired: true,
+      stepNumber: 3,
+    },
+    {
+      title: 'Organise suppliers or fulfilment partners',
+      whatToDo: 'Document who helps deliver the offer and how they are managed.',
+      howToDoIt: 'Track lead times, contacts, backup options, and escalation paths before something breaks.',
+      executionReference: 'Use Step 4 to make external dependencies less fragile.',
+      isRequired: false,
+      stepNumber: 4,
+    },
+    {
+      title: 'Define the customer communication flow',
+      whatToDo: 'Map the updates customers should receive throughout delivery.',
+      howToDoIt: 'Template the obvious messages so customers are informed without needing manual chasing every time.',
+      executionReference: 'Use Step 5 to reduce support noise and build trust during delivery.',
+      isRequired: true,
+      stepNumber: 5,
+    },
+    {
+      title: 'Track performance and efficiency',
+      whatToDo: 'Measure the few operational metrics that actually matter.',
+      howToDoIt: 'Start with simple tracking and review trends regularly instead of drowning in dashboard cosplay.',
+      executionReference: 'Use Step 6 to spot where delivery, cost, or quality is drifting.',
+      isRequired: true,
+      stepNumber: 6,
+    },
+    {
+      title: 'Prepare to scale operations',
+      whatToDo: 'Work out what breaks first as volume grows and design around it.',
+      howToDoIt: 'Separate founder-only work from what can be delegated or automated, then set triggers for when to act.',
+      executionReference: 'Use Step 7 to scale deliberately instead of waiting for chaos to force the issue.',
+      isRequired: true,
+      stepNumber: 7,
+    },
+  ]
+}
+
+export function buildOperationsPhase(project, blueprint, marketingPhase) {
+  const businessName = project.name || 'Your Business'
+
+  const generated = {
+    steps: [
+      {
+        number: 1,
+        slug: 'define-service-or-delivery-process',
+        title: 'Define Your Service or Delivery Process',
+        description: 'Create a clear step-by-step process for delivering your product or service.',
+        helper: {
+          howToDoThis: 'Start with how delivery actually works today, then tighten it into something another person could follow without guessing.',
+          example: 'A clean delivery path makes timelines easier to quote, manage, and repeat without reinventing the wheel for every client.',
+        },
+        whatToDo: [
+          'Map out every step from customer purchase to final delivery',
+          'Identify who is responsible for each step',
+          'Estimate time required for each stage',
+          'Document inputs needed and outputs produced at each step',
+          'Identify potential bottlenecks or failure points',
+        ],
+        howToDoIt: [
+          'Start by describing your last 3 successful deliveries step by step',
+          'Use a simple flowchart or numbered list to visualize the process',
+          'Time yourself on each step to get realistic estimates',
+          'Ask whether someone else could follow this process tomorrow',
+          'Include quality checkpoints so errors get caught before handover',
+        ],
+        example: {
+          title: 'Web Designer Delivery Process',
+          content: 'A freelance web designer documents the flow from onboarding call to asset collection, homepage mockup, feedback, revisions, build, testing, training, launch, and handover. Total delivery time becomes far easier to communicate and repeat.',
+        },
+        tools: [
+          { name: 'Miro', url: 'https://miro.com', description: 'Visual process mapping.' },
+          { name: 'Whimsical', url: 'https://whimsical.com', description: 'Simple flowcharts and diagrams.' },
+          { name: 'Notion', url: 'https://notion.so', description: 'Process documentation and internal wiki.' },
+          { name: 'Loom', url: 'https://loom.com', description: 'Record process walkthroughs.' },
+        ],
+      },
+      {
+        number: 2,
+        slug: 'order-or-job-workflow',
+        title: 'Set Up Order or Job Workflow',
+        description: 'Define how customer requests and orders move through your system.',
+        helper: {
+          howToDoThis: 'Use a simple kanban-style flow with clear stage rules so work is visible and nothing gets stuck quietly.',
+          example: 'A coaching business can move leads from inquiry to discovery call, proposal, enrolled, onboarding, active client, and complete with each stage tied to a checklist.',
+        },
+        whatToDo: [
+          'Define workflow stages such as New, In Progress, Review, and Complete',
+          'Set up a system to track where each job or order is',
+          'Create triggers for moving between stages',
+          'Assign ownership at each stage',
+          'Build in notifications so nothing falls through cracks',
+        ],
+        workflowStages: [
+          { stage: 'New Request', description: 'Initial inquiry or order received.', action: 'Acknowledge within 24 hours' },
+          { stage: 'Qualified', description: 'Confirmed fit and details collected.', action: 'Send proposal or confirm order' },
+          { stage: 'In Progress', description: 'Work actively being done.', action: 'Provide progress updates' },
+          { stage: 'Review', description: 'Awaiting client feedback or approval.', action: 'Follow up if no response in 3 days' },
+          { stage: 'Complete', description: 'Delivered and accepted.', action: 'Send invoice and request feedback' },
+        ],
+        tools: [
+          { name: 'Trello', url: 'https://trello.com', description: 'Simple kanban boards.' },
+          { name: 'Notion', url: 'https://notion.so', description: 'Custom workflow databases.' },
+          { name: 'Monday.com', url: 'https://monday.com', description: 'Work management platform.' },
+          { name: 'Linear', url: 'https://linear.app', description: 'Project and issue tracking.' },
+        ],
+      },
+      {
+        number: 3,
+        slug: 'standard-operating-procedures',
+        title: 'Create Standard Operating Procedures (SOPs)',
+        description: 'Document repeatable tasks so they are done consistently every time.',
+        helper: {
+          howToDoThis: 'Start with the tasks you repeat most often or screw up most often, then document them plainly enough that someone else could follow them.',
+          example: 'A client onboarding SOP covering welcome email, folder setup, kickoff scheduling, and questionnaire sending stops the same small misses happening over and over.',
+        },
+        whatToDo: [
+          'Identify your most repeated tasks',
+          'Document step-by-step instructions anyone could follow',
+          'Include screenshots, templates, and examples',
+          'Store SOPs in an accessible location',
+          'Review them regularly so they stay current',
+        ],
+        sopCategories: [
+          { category: 'Client Onboarding', examples: 'Welcome email, folder setup, kickoff call agenda' },
+          { category: 'Service Delivery', examples: 'Step-by-step for each service you offer' },
+          { category: 'Quality Assurance', examples: 'Checklists before sending deliverables' },
+          { category: 'Client Communication', examples: 'Update templates and feedback request process' },
+          { category: 'Project Closeout', examples: 'Final delivery, invoice, feedback collection' },
+          { category: 'Admin & Operations', examples: 'Invoicing, bookkeeping, tool maintenance' },
+        ],
+        tools: [
+          { name: 'Notion', url: 'https://notion.so', description: 'SOP documentation and wiki.' },
+          { name: 'Scribe', url: 'https://scribehow.com', description: 'Auto-generate SOPs from screen recordings.' },
+          { name: 'Loom', url: 'https://loom.com', description: 'Video walkthroughs.' },
+          { name: 'Process Street', url: 'https://process.st', description: 'Checklist-based SOPs.' },
+        ],
+      },
+      {
+        number: 4,
+        slug: 'supplier-or-fulfilment-systems',
+        title: 'Set Up Supplier or Fulfilment Systems',
+        description: 'Organize sourcing, production, or delivery partners if applicable.',
+        helper: {
+          howToDoThis: 'Track supplier details, lead times, and fallback options before they become a problem instead of after.',
+          example: 'An e-commerce business that documents its primary printer, backup printer, packaging supplier, and shipping arrangement can handle fulfilment issues without panic.',
+        },
+        whatToDo: [
+          'List all external parties involved in delivery',
+          'Document contact info, lead times, and terms',
+          'Set up ordering and communication processes',
+          'Create backup options for critical suppliers',
+          'Establish quality standards and issue handling',
+        ],
+        tools: [
+          { name: 'Notion', url: 'https://notion.so', description: 'Supplier database and operating notes.' },
+          { name: 'Airtable', url: 'https://airtable.com', description: 'Inventory and supplier tracking.' },
+          { name: 'ShipStation', url: 'https://shipstation.com', description: 'Shipping automation.' },
+          { name: 'Printful', url: 'https://printful.com', description: 'Print-on-demand fulfilment.' },
+        ],
+      },
+      {
+        number: 5,
+        slug: 'customer-communication-flow',
+        title: 'Implement Customer Communication Flow',
+        description: 'Define how you update customers throughout the delivery process.',
+        helper: {
+          howToDoThis: 'Map the obvious communication triggers, template them, and automate the ones that should not need manual effort.',
+          example: 'A photographer can automate booking confirmation, prep reminders, progress updates, delivery, and follow-up so clients always know what is happening.',
+        },
+        whatToDo: [
+          'Map every touchpoint where customers need communication',
+          'Create templates for each standard message',
+          'Set up automated notifications where possible',
+          'Define response time expectations',
+          'Establish escalation paths for urgent issues',
+        ],
+        touchpoints: [
+          { touchpoint: 'Order or Booking Confirmed', timing: 'Immediately', message: 'Thank you, here is what happens next' },
+          { touchpoint: 'Work Started', timing: 'Day 1', message: 'We have begun and the expected completion date is X' },
+          { touchpoint: 'Milestone Reached', timing: 'Mid-project', message: 'Progress update plus request for any early feedback' },
+          { touchpoint: 'Ready for Review', timing: 'Pre-delivery', message: 'Please review by X date' },
+          { touchpoint: 'Delivered', timing: 'Completion', message: 'Here is your deliverable, how to use it, and next steps' },
+          { touchpoint: 'Follow-up', timing: '1 week later', message: 'How is everything going and can you share feedback?' },
+        ],
+        tools: [
+          { name: 'Dubsado', url: 'https://dubsado.com', description: 'Client workflow automation.' },
+          { name: 'HoneyBook', url: 'https://honeybook.com', description: 'Client management and automation.' },
+          { name: 'Intercom', url: 'https://intercom.com', description: 'Customer messaging platform.' },
+          { name: 'Help Scout', url: 'https://helpscout.com', description: 'Customer support and docs.' },
+        ],
+      },
+      {
+        number: 6,
+        slug: 'performance-and-efficiency',
+        title: 'Track Performance & Efficiency',
+        description: 'Measure time, cost, output, and delivery quality.',
+        helper: {
+          howToDoThis: 'Pick a few metrics that actually help you improve delivery and profitability, then review them on a real cadence.',
+          example: 'A freelancer tracking completion time, revenue per hour, revisions, and client satisfaction can spot where margin is leaking before it becomes normal.',
+        },
+        whatToDo: [
+          'Identify 3 to 5 key metrics that matter for operations',
+          'Set up simple tracking for each metric',
+          'Establish baselines and targets',
+          'Schedule regular reviews',
+          'Use data to identify improvement opportunities',
+        ],
+        metrics: [
+          { metric: 'Delivery Time', description: 'Average days from start to completion', target: 'Reduce by 20%' },
+          { metric: 'Cost Per Job', description: 'Total cost including time and expenses per delivery', target: 'Track and optimize' },
+          { metric: 'Client Satisfaction', description: 'Post-project rating or NPS score', target: '9+ out of 10' },
+          { metric: 'Revision Rate', description: 'Average revision rounds per project', target: 'Less than 2' },
+          { metric: 'Capacity Utilization', description: 'Percentage of available time that is billable', target: '70-80%' },
+        ],
+        tools: [
+          { name: 'Toggl', url: 'https://toggl.com', description: 'Time tracking and reports.' },
+          { name: 'Notion', url: 'https://notion.so', description: 'Custom dashboards.' },
+          { name: 'Google Sheets', url: 'https://sheets.google.com', description: 'Simple metric tracking.' },
+          { name: 'Databox', url: 'https://databox.com', description: 'Business dashboards.' },
+        ],
+      },
+      {
+        number: 7,
+        slug: 'prepare-for-scaling-operations',
+        title: 'Prepare for Scaling Operations',
+        description: 'Ensure processes can handle more customers without breaking.',
+        helper: {
+          howToDoThis: 'Run the 10x thought experiment, then document what only you can do versus what can be delegated or automated.',
+          example: 'An agency that defines hiring triggers and documents founder-dependent work before growth hits can scale with far less chaos.',
+        },
+        whatToDo: [
+          'Identify what breaks first when volume increases',
+          'Document which tasks only you can do versus what can be delegated',
+          'Create systems that do not require constant founder involvement',
+          'Plan capacity and workload limits',
+          'Set hiring, outsourcing, or automation triggers',
+        ],
+        scalingChecklist: [
+          { task: 'Delivery process documented and repeatable', status: 'Foundation' },
+          { task: 'Key tasks identified for delegation', status: 'Planning' },
+          { task: 'SOPs created for delegatable tasks', status: 'Preparation' },
+          { task: 'Capacity limits defined', status: 'Awareness' },
+          { task: 'Hiring triggers set to revenue or volume milestones', status: 'Growth' },
+          { task: 'Automation implemented for repetitive tasks', status: 'Efficiency' },
+        ],
+        tools: [
+          { name: 'Notion', url: 'https://notion.so', description: 'Planning and documentation.' },
+          { name: 'Loom', url: 'https://loom.com', description: 'Training videos for delegation.' },
+          { name: 'Zapier', url: 'https://zapier.com', description: 'Automation for scale.' },
+          { name: 'Upwork', url: 'https://upwork.com', description: 'Freelance talent for delegation.' },
+        ],
+      },
+    ],
+    operationsLayer: {
+      operatingPosture: `${businessName} should deliver through a clear, documented, and scalable operating system instead of founder memory and improvised admin.`,
+      completionCallout: {
+        badge: 'Phase 7 Complete',
+        title: 'Ready for Sales',
+        description: 'Continue once the business has a repeatable delivery process, clear customer communication, and basic operational metrics.',
+      },
+    },
+  }
+
+  return {
+    number: 7,
+    title: 'Operations',
+    summary: 'Set up how the business delivers its product or service reliably and at scale.',
+    progress: {
+      totalSteps: 7,
+      completedSteps: 0,
+    },
+    content: generated,
+    generated,
+    userState: {
+      completedStepIds: [],
+      checkedWorkflowStages: [],
+      checkedSopCategories: [],
+      checkedMetrics: [],
+      checkedTouchpoints: [],
+    },
+    tasks: buildOperationsTasks(),
+  }
+}
+
+function buildSalesTasks() {
+  return [
+    {
+      title: 'Define the sales process',
+      whatToDo: 'Map the journey from first contact to payment received.',
+      howToDoIt: 'Keep the stages explicit so you can see where deals move, stall, or die instead of guessing.',
+      executionReference: 'Use Step 1 to create a sales pipeline that is simple enough to run and measure.',
+      isRequired: true,
+      stepNumber: 1,
+    },
+    {
+      title: 'Set up lead qualification',
+      whatToDo: 'Filter good-fit leads from time-wasting enquiries early.',
+      howToDoIt: 'Use a few sharp qualification questions so attention goes to the leads that can actually close.',
+      executionReference: 'Use Step 2 to protect time, improve close rate, and reduce pointless back-and-forth.',
+      isRequired: true,
+      stepNumber: 2,
+    },
+    {
+      title: 'Build the sales conversation framework',
+      whatToDo: 'Create a consistent structure for discovery, pitching, objection handling, and closing.',
+      howToDoIt: 'Script the bones, not every breath, so conversations stay natural without turning into chaos.',
+      executionReference: 'Use Step 3 to make sales calls tighter, calmer, and more repeatable.',
+      isRequired: true,
+      stepNumber: 3,
+    },
+    {
+      title: 'Install a follow-up system',
+      whatToDo: 'Create follow-up touchpoints so proposals and leads do not rot quietly.',
+      howToDoIt: 'Use reminders or automation, and make each follow-up add value rather than begging for attention.',
+      executionReference: 'Use Step 4 to recover deals that would otherwise fade out for stupid reasons.',
+      isRequired: true,
+      stepNumber: 4,
+    },
+    {
+      title: 'Track conversion performance',
+      whatToDo: 'Measure the funnel so you know where sales are breaking.',
+      howToDoIt: 'Track stage conversion, deal value, and cycle length before you start making random optimisation moves.',
+      executionReference: 'Use Step 5 to turn sales from vibes into numbers.',
+      isRequired: true,
+      stepNumber: 5,
+    },
+    {
+      title: 'Optimise the offer',
+      whatToDo: 'Improve pricing, packaging, risk reversal, and perceived value.',
+      howToDoIt: 'Tune the offer around what buyers hesitate over, not what sounds clever in your own head.',
+      executionReference: 'Use Step 6 to make the offer easier to say yes to without racing to the bottom.',
+      isRequired: true,
+      stepNumber: 6,
+    },
+    {
+      title: 'Test and improve conversion rates',
+      whatToDo: 'Run controlled tests on the weakest points in the sales funnel.',
+      howToDoIt: 'Change one thing at a time and document results so improvement compounds instead of getting muddier.',
+      executionReference: 'Use Step 7 to build a conversion playbook instead of repeating the same sales mistakes forever.',
+      isRequired: true,
+      stepNumber: 7,
+    },
+  ]
+}
+
+export function buildSalesPhase(project, blueprint, operationsPhase) {
+  const businessName = project.name || 'Your Business'
+
+  const generated = {
+    steps: [
+      {
+        number: 1,
+        slug: 'define-sales-process',
+        title: 'Define Your Sales Process',
+        description: 'Clear steps from first contact to completed sale.',
+        helper: {
+          howToDoThis: 'Start with the actual path your last few sales took, then clean it up into a repeatable pipeline with clear stage rules.',
+          example: 'A consultant can move from inquiry to qualification, discovery, proposal, negotiation, and close with clear handoffs and target timing.',
+        },
+        whatToDo: [
+          'Map every stage from initial contact to payment received',
+          'Define what happens at each stage and who is responsible',
+          'Set timeframes for each stage',
+          'Identify decision points and likely drop-off points',
+          'Create a visual pipeline you can track and measure',
+        ],
+        howToDoIt: [
+          'Start simple with inquiry, qualification, proposal, negotiation, and close',
+          'For each stage define entry criteria, required actions, and exit criteria',
+          'Map your last 5 sales and note where deals stall most often',
+          'Use a CRM or a simple tracker to keep deals moving through stages',
+          'Review pipeline bottlenecks weekly instead of waiting for revenue anxiety to do it for you',
+        ],
+        example: {
+          title: 'Consultant Sales Process',
+          content: 'A business consultant tracks inquiry response, discovery scheduling, proposal turnaround, follow-up, negotiation, signed contract, and invoicing. Average time from inquiry to close becomes visible and improvable.',
+        },
+        salesProcessStages: [
+          { stage: 'Inquiry', description: 'New lead comes in via form, email, or referral.', timing: 'Respond within 24 hours' },
+          { stage: 'Qualification', description: 'Determine if the lead is a good fit.', timing: '1-2 days' },
+          { stage: 'Discovery', description: 'Understand needs, goals, and constraints.', timing: '30-60 min call' },
+          { stage: 'Proposal', description: 'Present the tailored solution and pricing.', timing: 'Within 48 hours of discovery' },
+          { stage: 'Negotiation', description: 'Handle concerns and adjust terms if needed.', timing: 'As needed' },
+          { stage: 'Close', description: 'Contract signed and payment received.', timing: 'Target within 14 days of inquiry' },
+        ],
+        tools: [
+          { name: 'Pipedrive', url: 'https://pipedrive.com', description: 'Visual sales pipeline CRM.' },
+          { name: 'HubSpot CRM', url: 'https://hubspot.com/crm', description: 'Free CRM with pipeline tracking.' },
+          { name: 'Notion', url: 'https://notion.so', description: 'Custom sales tracking.' },
+          { name: 'Close', url: 'https://close.com', description: 'CRM built for closing.' },
+        ],
+      },
+      {
+        number: 2,
+        slug: 'lead-qualification',
+        title: 'Set Up Lead Qualification',
+        description: 'Identify which leads are worth pursuing.',
+        helper: {
+          howToDoThis: 'Use a short qualification system early so the wrong leads disqualify themselves before they eat your week.',
+          example: 'A freelancer asking about budget, timeline, and decision-maker status can quickly separate viable projects from time sinks.',
+        },
+        whatToDo: [
+          'Define your ideal customer criteria',
+          'Create qualifying questions to ask early',
+          'Set up a scoring or prioritisation system',
+          'Know your disqualifying red flags',
+          'Build a fast process to filter enquiries',
+        ],
+        qualificationCriteria: [
+          { criteria: 'Budget', question: 'Do they have budget allocated for this?', importance: 'Critical' },
+          { criteria: 'Authority', question: 'Can they make or influence the buying decision?', importance: 'Critical' },
+          { criteria: 'Need', question: 'Do they have a clear problem you can solve?', importance: 'Critical' },
+          { criteria: 'Timeline', question: 'Do they have urgency or a deadline?', importance: 'Important' },
+          { criteria: 'Fit', question: 'Are they the right type of customer for you?', importance: 'Important' },
+        ],
+        tools: [
+          { name: 'Typeform', url: 'https://typeform.com', description: 'Interactive intake forms.' },
+          { name: 'Calendly', url: 'https://calendly.com', description: 'Booking with screening questions.' },
+          { name: 'Tally', url: 'https://tally.so', description: 'Free form builder.' },
+          { name: 'HubSpot', url: 'https://hubspot.com', description: 'Lead scoring automation.' },
+        ],
+      },
+      {
+        number: 3,
+        slug: 'sales-script-or-framework',
+        title: 'Create Your Sales Script or Framework',
+        description: 'How you communicate, pitch, and handle objections.',
+        helper: {
+          howToDoThis: 'Structure the conversation so discovery comes before pitching, and objections become a prepared part of the process instead of a surprise every time.',
+          example: 'A discovery call works better when it starts with agenda, explores the problem properly, then ties the offer back to what the buyer actually said.',
+        },
+        whatToDo: [
+          'Develop a consistent way to open sales conversations',
+          'Create a framework for discovery',
+          'Build your pitch structure around problem, solution, proof, and offer',
+          'Prepare responses to common objections',
+          'Define your closing techniques and calls to action',
+        ],
+        commonObjections: [
+          { objection: 'Too expensive', response: 'What is the cost of not solving this problem?' },
+          { objection: 'Need to think about it', response: 'What specifically do you need to think through?' },
+          { objection: 'Need to talk to partner or team', response: 'Great, shall we schedule a call with them included?' },
+          { objection: 'Not the right time', response: 'When would be the right time, and shall we book that now?' },
+          { objection: 'Using a competitor', response: 'What would need to change for you to consider switching?' },
+        ],
+        tools: [
+          { name: 'Notion', url: 'https://notion.so', description: 'Script and objection library.' },
+          { name: 'Otter.ai', url: 'https://otter.ai', description: 'Record and review sales calls.' },
+          { name: 'Gong', url: 'https://gong.io', description: 'Sales call analysis.' },
+          { name: 'Loom', url: 'https://loom.com', description: 'Video sales messages.' },
+        ],
+      },
+      {
+        number: 4,
+        slug: 'follow-up-system',
+        title: 'Set Up Follow-Up System',
+        description: 'Automated or manual follow-ups to close deals.',
+        helper: {
+          howToDoThis: 'Create a follow-up rhythm before you need it, and make each touch useful instead of needy.',
+          example: 'Proposal follow-up works better when the sequence includes clarification, proof, timing, and a clean close-the-loop message.',
+        },
+        whatToDo: [
+          'Define your follow-up sequence',
+          'Create templates for each follow-up touchpoint',
+          'Set up reminders or automation',
+          'Know when to stop following up and how to do it gracefully',
+          'Track which sequences actually recover deals',
+        ],
+        followUpSequence: [
+          { day: 'Day 1', action: 'Send proposal with a personalised video walkthrough', channel: 'Email + Loom' },
+          { day: 'Day 3', action: 'Check if they have questions and offer clarification', channel: 'Email' },
+          { day: 'Day 7', action: 'Share a relevant case study or testimonial', channel: 'Email' },
+          { day: 'Day 14', action: 'Mention upcoming availability or timing changes', channel: 'Email or call' },
+          { day: 'Day 21', action: 'Final follow-up to close the loop', channel: 'Email' },
+        ],
+        tools: [
+          { name: 'Pipedrive', url: 'https://pipedrive.com', description: 'Activity reminders and sequences.' },
+          { name: 'Mailchimp', url: 'https://mailchimp.com', description: 'Automated email sequences.' },
+          { name: 'Streak', url: 'https://streak.com', description: 'CRM inside Gmail.' },
+          { name: 'Boomerang', url: 'https://boomeranggmail.com', description: 'Email follow-up reminders.' },
+        ],
+      },
+      {
+        number: 5,
+        slug: 'conversion-tracking',
+        title: 'Configure Conversion Tracking',
+        description: 'Track leads, conversions, and performance.',
+        helper: {
+          howToDoThis: 'Track stage movement, win rate, and deal value so you know which part of the funnel needs attention first.',
+          example: 'A weekly dashboard showing leads, calls, proposals, wins, and revenue makes weak conversion points obvious fast.',
+        },
+        whatToDo: [
+          'Define what counts as a conversion for your business',
+          'Track each stage of the funnel',
+          'Calculate core sales metrics',
+          'Build a simple dashboard',
+          'Review metrics weekly and identify trends',
+        ],
+        salesMetrics: [
+          { metric: 'Lead-to-Close Rate', description: 'Percentage of leads that become customers', benchmark: '15-30%' },
+          { metric: 'Average Deal Value', description: 'Mean revenue per closed deal', benchmark: 'Track trend' },
+          { metric: 'Sales Cycle Length', description: 'Days from first contact to close', benchmark: '7-30 days' },
+          { metric: 'Proposal Win Rate', description: 'Proposals that convert to sales', benchmark: '25-50%' },
+          { metric: 'Revenue per Lead', description: 'Total revenue divided by total leads', benchmark: 'Track trend' },
+        ],
+        tools: [
+          { name: 'HubSpot', url: 'https://hubspot.com', description: 'Full funnel analytics.' },
+          { name: 'Google Sheets', url: 'https://sheets.google.com', description: 'Simple tracking dashboard.' },
+          { name: 'Databox', url: 'https://databox.com', description: 'Sales dashboards.' },
+          { name: 'Geckoboard', url: 'https://geckoboard.com', description: 'Real-time KPI dashboards.' },
+        ],
+      },
+      {
+        number: 6,
+        slug: 'optimise-your-offer',
+        title: 'Optimise Your Offer',
+        description: 'Refine pricing, packaging, and value proposition to increase conversions.',
+        helper: {
+          howToDoThis: 'Look at what nearly stops buyers, then improve pricing structure, packaging, bonuses, and guarantees around that friction.',
+          example: 'Three tiers, payment options, and a believable guarantee can lift conversions without discounting the soul out of the offer.',
+        },
+        whatToDo: [
+          'Review what is included in your current offer',
+          'Test different pricing structures',
+          'Add or remove elements to improve perceived value',
+          'Create tiers or packages where it makes sense',
+          'Strengthen the guarantee or risk reversal',
+        ],
+        offerChecklist: [
+          { item: 'Clear outcome or transformation promised', tip: 'What result do they actually get?' },
+          { item: 'Price anchoring in place', tip: 'Higher option first can make the standard option feel sane' },
+          { item: 'Bonuses increase perceived value', tip: 'Low cost to you, high value to them' },
+          { item: 'Risk reversal or guarantee', tip: 'Remove fear of making the wrong choice' },
+          { item: 'Payment options available', tip: 'Reduce the barrier to entry' },
+          { item: 'Urgency or scarcity only if genuine', tip: 'No fake countdown clown show' },
+        ],
+        tools: [
+          { name: 'Stripe', url: 'https://stripe.com', description: 'Payment and pricing flexibility.' },
+          { name: 'Gumroad', url: 'https://gumroad.com', description: 'Simple product sales.' },
+          { name: 'ThriveCart', url: 'https://thrivecart.com', description: 'High-converting checkout.' },
+          { name: 'Hotjar', url: 'https://hotjar.com', description: 'See how people interact with offers.' },
+        ],
+      },
+      {
+        number: 7,
+        slug: 'test-and-improve-conversion-rates',
+        title: 'Test and Improve Conversion Rates',
+        description: 'Run simple tests and adjust based on results.',
+        helper: {
+          howToDoThis: 'Start with the weakest point in the funnel, test one variable at a time, and record the result like a grown-up.',
+          example: 'Specific outcome-driven headlines usually beat vague generic ones, and testing proves it instead of guessing.',
+        },
+        whatToDo: [
+          'Identify the weakest point in your sales funnel',
+          'Form a hypothesis about what might improve it',
+          'Run a simple A/B test or controlled change',
+          'Measure results over enough volume',
+          'Keep the winners, discard the losers, and repeat',
+        ],
+        testIdeas: [
+          'Headline or value proposition',
+          'Pricing amount or structure',
+          'Call-to-action wording',
+          'Follow-up timing',
+          'Email subject lines',
+          'Proposal format',
+          'Discovery call structure',
+          'Offer bonuses',
+        ],
+        tools: [
+          { name: 'Google Optimize', url: 'https://optimize.google.com', description: 'Free A/B testing.' },
+          { name: 'Hotjar', url: 'https://hotjar.com', description: 'User behaviour insights.' },
+          { name: 'Unbounce', url: 'https://unbounce.com', description: 'Landing page testing.' },
+          { name: 'VWO', url: 'https://vwo.com', description: 'Conversion optimisation.' },
+        ],
+      },
+    ],
+    salesLayer: {
+      sellingPosture: `${businessName} should sell through a clear, measured, and repeatable process instead of random follow-ups, hopeful pitching, and pipeline fog.`,
+      completionCallout: {
+        badge: 'Phase 8 Complete',
+        title: 'Ready for Growth & Milestones',
+        description: 'Continue once the business has a usable sales process, lead qualification, follow-up system, and conversion tracking baseline.',
+      },
+    },
+  }
+
+  return {
+    number: 8,
+    title: 'Sales',
+    summary: 'Turn interest into paying customers with a clear and repeatable sales process.',
+    progress: {
+      totalSteps: 7,
+      completedSteps: 0,
+    },
+    content: generated,
+    generated,
+    userState: {
+      completedStepIds: [],
+      checkedStages: [],
+      checkedCriteria: [],
+      checkedObjections: [],
+      checkedFollowUps: [],
+      checkedMetrics: [],
+    },
+    tasks: buildSalesTasks(),
+  }
+}
+
+function buildLaunchScaleTasks() {
+  return [
+    {
+      title: 'Prepare for launch',
+      whatToDo: 'Run final checks across the customer journey, systems, and support flow.',
+      howToDoIt: 'Do a full end-to-end test before launch day so the obvious failures embarrass you in private instead of in public.',
+      executionReference: 'Use Step 1 to make launch feel deliberate instead of chaotic.',
+      isRequired: true,
+      stepNumber: 1,
+    },
+    {
+      title: 'Execute the initial launch',
+      whatToDo: 'Go live across the chosen channels and activate the first wave of demand.',
+      howToDoIt: 'Schedule the obvious announcements, then personally reach out to the warmest contacts instead of relying on generic posts alone.',
+      executionReference: 'Use Step 2 to create real momentum in the first 24-48 hours.',
+      isRequired: true,
+      stepNumber: 2,
+    },
+    {
+      title: 'Monitor early performance',
+      whatToDo: 'Watch traffic, conversion, revenue, and technical issues closely.',
+      howToDoIt: 'Check the key metrics on a short cadence during launch week so you can catch real problems while they still matter.',
+      executionReference: 'Use Step 3 to spot breakage, surprises, and quick wins fast.',
+      isRequired: true,
+      stepNumber: 3,
+    },
+    {
+      title: 'Collect customer feedback',
+      whatToDo: 'Ask early buyers and users what worked, what confused them, and what nearly stopped them.',
+      howToDoIt: 'Use direct outreach while the experience is still fresh, then tag patterns instead of treating every comment like sacred law.',
+      executionReference: 'Use Step 4 to turn early customers into a learning engine, not just revenue.',
+      isRequired: true,
+      stepNumber: 4,
+    },
+    {
+      title: 'Fix issues and optimise',
+      whatToDo: 'Prioritise and resolve the highest-impact problems first.',
+      howToDoIt: 'Sort issues by real business impact, then fix the revenue blockers before nibbling at cosmetic nonsense.',
+      executionReference: 'Use Step 5 to keep post-launch cleanup sharp and commercially grounded.',
+      isRequired: true,
+      stepNumber: 5,
+    },
+    {
+      title: 'Increase customer acquisition',
+      whatToDo: 'Scale the channels and tactics already showing signs of working.',
+      howToDoIt: 'Double down on proven channels before spraying effort across new ones just because they look exciting.',
+      executionReference: 'Use Step 6 to scale with discipline instead of channel ADHD.',
+      isRequired: true,
+      stepNumber: 6,
+    },
+    {
+      title: 'Build retention and repeat business',
+      whatToDo: 'Create a post-purchase journey that keeps customers engaged and coming back.',
+      howToDoIt: 'Follow up, add value, and ask for referrals after results land instead of vanishing after the sale.',
+      executionReference: 'Use Step 7 to turn one-off wins into compounding customer value.',
+      isRequired: true,
+      stepNumber: 7,
+    },
+  ]
+}
+
+export function buildLaunchScalePhase(project, blueprint, salesPhase) {
+  const businessName = project.name || 'Your Business'
+
+  const generated = {
+    steps: [
+      {
+        number: 1,
+        slug: 'prepare-for-launch',
+        title: 'Prepare for Launch',
+        description: 'Final checks across product or service, systems, and customer flow.',
+        helper: {
+          howToDoThis: 'Run the whole customer journey yourself before launch day. It is astonishing how much dumb breakage this catches.',
+          example: 'A creator testing checkout, email delivery, and mobile UX before launch finds the broken button before customers do. Miraculous concept.',
+        },
+        whatToDo: [
+          'Review the entire customer journey from discovery to delivery',
+          'Test website, checkout, email sequences, and delivery process',
+          'Confirm legal, financial, and operational elements are in place',
+          'Prepare support channels and FAQs',
+          'Brief anyone involved in launch',
+        ],
+        howToDoIt: [
+          'Do a full end-to-end test as if you were a customer',
+          'Create a launch checklist with every critical item and deadline',
+          'Test payment processing with a real transaction and refund it if needed',
+          'Trigger your own emails and onboarding flows to verify they work',
+          'Document a backup plan for each critical system',
+        ],
+        example: {
+          title: 'Pre-Launch Checklist',
+          content: 'A launch checklist catches mobile checkout friction, email trigger issues, and missing support readiness before go-live instead of during the panic window.',
+        },
+        preLaunchChecklist: [
+          { item: 'Website fully tested on all devices', category: 'Technical' },
+          { item: 'Payment processing tested with a real transaction', category: 'Technical' },
+          { item: 'Email sequences tested and working', category: 'Technical' },
+          { item: 'Support channels set up and monitored', category: 'Operations' },
+          { item: 'FAQs and help docs published', category: 'Operations' },
+          { item: 'Team or partners briefed on launch plan', category: 'Operations' },
+          { item: 'Legal requirements met', category: 'Legal' },
+          { item: 'Backup plan documented for critical failures', category: 'Risk' },
+        ],
+        tools: [
+          { name: 'Notion', url: 'https://notion.so', description: 'Launch checklist and project management.' },
+          { name: 'Stripe Test Mode', url: 'https://stripe.com', description: 'Test payments safely.' },
+          { name: 'Pingdom', url: 'https://pingdom.com', description: 'Website uptime monitoring.' },
+          { name: 'Browserstack', url: 'https://browserstack.com', description: 'Cross-browser testing.' },
+        ],
+      },
+      {
+        number: 2,
+        slug: 'execute-initial-launch',
+        title: 'Execute Initial Launch',
+        description: 'Go live, announce, and activate marketing and sales channels.',
+        helper: {
+          howToDoThis: 'Launch across the core channels, then follow up with warm contacts directly because generic broadcast alone rarely does the heavy lifting.',
+          example: 'The first sales often come from people who already know, trust, or almost bought. Shockingly inconvenient for the “just post once” strategy.',
+        },
+        whatToDo: [
+          'Announce the launch across all chosen channels',
+          'Activate any paid advertising or promotions',
+          'Notify your email list and existing network',
+          'Reach out personally to warm leads and early supporters',
+          'Monitor closely in the first 24-48 hours',
+        ],
+        launchDayActivities: [
+          { time: 'Pre-launch', activity: 'Final systems check', status: 'ready' },
+          { time: 'Launch hour', activity: 'Publish announcement email', status: 'ready' },
+          { time: '+1 hour', activity: 'Social media posts go live', status: 'ready' },
+          { time: '+2 hours', activity: 'Personal outreach to warm leads', status: 'ready' },
+          { time: 'Throughout day', activity: 'Monitor metrics and respond to inquiries', status: 'ready' },
+          { time: 'End of day', activity: 'Review results and document learnings', status: 'ready' },
+        ],
+        tools: [
+          { name: 'Buffer', url: 'https://buffer.com', description: 'Schedule social posts.' },
+          { name: 'ConvertKit', url: 'https://convertkit.com', description: 'Email launch sequences.' },
+          { name: 'Slack', url: 'https://slack.com', description: 'Team coordination and alerts.' },
+          { name: 'Zapier', url: 'https://zapier.com', description: 'Automate launch notifications.' },
+        ],
+      },
+      {
+        number: 3,
+        slug: 'monitor-early-performance',
+        title: 'Monitor Early Performance',
+        description: 'Track traffic, leads, conversions, and issues in real time.',
+        helper: {
+          howToDoThis: 'Watch the metrics that actually matter during launch week so you can spot broken flow, weird drops, or unexpected wins while they are still fixable.',
+          example: 'Launch monitoring is mostly pattern recognition under mild stress. Glorious stuff.',
+        },
+        whatToDo: [
+          'Set up a launch dashboard with key metrics visible',
+          'Monitor traffic sources and visitor behaviour',
+          'Track conversion rates through the funnel',
+          'Watch for technical issues and UX problems',
+          'Document what is working and what is not',
+        ],
+        launchMetrics: [
+          { metric: 'Website Traffic', description: 'Unique visitors during the launch period', target: 'Compare to baseline' },
+          { metric: 'Conversion Rate', description: 'Visitors to leads or customers', target: '2-5% typical' },
+          { metric: 'Revenue', description: 'Total sales generated', target: 'Your launch goal' },
+          { metric: 'Email Open Rate', description: 'Launch email performance', target: '30%+ is good' },
+          { metric: 'Support Tickets', description: 'Issues and questions received', target: 'Lower is better' },
+        ],
+        tools: [
+          { name: 'Google Analytics', url: 'https://analytics.google.com', description: 'Traffic and behaviour tracking.' },
+          { name: 'Hotjar', url: 'https://hotjar.com', description: 'User session recordings.' },
+          { name: 'Databox', url: 'https://databox.com', description: 'Real-time KPI dashboard.' },
+          { name: 'Sentry', url: 'https://sentry.io', description: 'Error tracking and monitoring.' },
+        ],
+      },
+      {
+        number: 4,
+        slug: 'collect-customer-feedback',
+        title: 'Collect Customer Feedback',
+        description: 'Gather insights from real users and customers.',
+        helper: {
+          howToDoThis: 'Reach out quickly while the experience is still fresh, then look for patterns instead of overreacting to one loud opinion.',
+          example: 'The first twenty customers are usually a goldmine if you actually ask them smart questions instead of hoping they read your mind.',
+        },
+        whatToDo: [
+          'Reach out to every early customer for feedback',
+          'Ask specific questions about their experience',
+          'Listen for patterns in complaints and praise',
+          'Collect testimonials while the experience is fresh',
+          'Use the feedback to prioritise improvements',
+        ],
+        feedbackQuestions: [
+          'What made you decide to purchase?',
+          'What almost stopped you from buying?',
+          'What was confusing about the process?',
+          'What do you like most so far?',
+          'What would you improve?',
+          'Would you recommend this to others? Why or why not?',
+        ],
+        tools: [
+          { name: 'Typeform', url: 'https://typeform.com', description: 'Feedback surveys.' },
+          { name: 'Intercom', url: 'https://intercom.com', description: 'In-app feedback and chat.' },
+          { name: 'Notion', url: 'https://notion.so', description: 'Feedback log and analysis.' },
+          { name: 'Testimonial.to', url: 'https://testimonial.to', description: 'Collect video testimonials.' },
+        ],
+      },
+      {
+        number: 5,
+        slug: 'fix-issues-and-optimise',
+        title: 'Fix Issues & Optimise',
+        description: 'Resolve problems and improve weak points quickly.',
+        helper: {
+          howToDoThis: 'Triage ruthlessly, fix the commercial blockers first, and document what changed so future launches are less feral.',
+          example: 'A one-week optimisation sprint can clean up broken forms, weak conversion steps, and delivery friction faster than months of vague intentions.',
+        },
+        whatToDo: [
+          'Prioritise issues by impact',
+          'Fix critical bugs and UX problems immediately',
+          'Improve conversion bottlenecks based on data',
+          'Streamline operational friction that showed up',
+          'Update documentation and SOPs based on learnings',
+        ],
+        issuePriorities: [
+          { priority: 'P1 - Fix Now', description: 'Revenue-blocking, reputation risk, security issues' },
+          { priority: 'P2 - This Week', description: 'Significant UX issues and conversion blockers' },
+          { priority: 'P3 - Backlog', description: 'Nice-to-have improvements and minor issues' },
+        ],
+        tools: [
+          { name: 'Linear', url: 'https://linear.app', description: 'Issue tracking and prioritisation.' },
+          { name: 'Hotjar', url: 'https://hotjar.com', description: 'Identify UX friction.' },
+          { name: 'Google Optimize', url: 'https://optimize.google.com', description: 'A/B testing.' },
+          { name: 'Loom', url: 'https://loom.com', description: 'Document fixes and processes.' },
+        ],
+      },
+      {
+        number: 6,
+        slug: 'increase-customer-acquisition',
+        title: 'Increase Customer Acquisition',
+        description: 'Scale marketing and sales efforts that are working.',
+        helper: {
+          howToDoThis: 'Find the channels that are actually earning their keep, then lean harder into those before getting distracted by every shiny acquisition idea online.',
+          example: 'If one content format or channel is clearly outperforming the rest, make more of that before widening the surface area.',
+        },
+        whatToDo: [
+          'Identify the best-performing acquisition channels',
+          'Double down on what is working before trying new things',
+          'Increase paid budgets gradually on proven channels',
+          'Expand content and organic reach in winning formats',
+          'Develop referral and partnership programs',
+        ],
+        scalingChecklist: [
+          'Identified best-performing acquisition channel',
+          'Calculated ROI or CAC for each channel',
+          'Increased budget on proven channels',
+          'Created more content in winning formats',
+          'Set up referral or affiliate program',
+          'Identified partnership opportunities',
+        ],
+        tools: [
+          { name: 'Meta Ads Manager', url: 'https://business.facebook.com/adsmanager', description: 'Scale social advertising.' },
+          { name: 'ReferralCandy', url: 'https://referralcandy.com', description: 'Referral program software.' },
+          { name: 'SparkToro', url: 'https://sparktoro.com', description: 'Find audience and channels.' },
+          { name: 'Ahrefs', url: 'https://ahrefs.com', description: 'SEO and content strategy.' },
+        ],
+      },
+      {
+        number: 7,
+        slug: 'build-retention-and-repeat-business',
+        title: 'Build Retention & Repeat Business',
+        description: 'Encourage repeat customers and long-term engagement.',
+        helper: {
+          howToDoThis: 'Design the post-purchase timeline so customers keep hearing from you in helpful ways instead of being ghosted after the invoice lands.',
+          example: 'Follow-up, check-ins, value-add content, and timely referral asks do more for retention than loud generic “community” talk ever will.',
+        },
+        whatToDo: [
+          'Create a post-purchase experience that delights customers',
+          'Develop retention strategies like loyalty, subscriptions, or upsells',
+          'Stay in touch with past customers through valuable content',
+          'Make it easy and rewarding for customers to come back',
+          'Build an ongoing relationship beyond the transaction',
+        ],
+        retentionTactics: [
+          { tactic: 'Post-purchase follow-up', timing: '24-48 hours after purchase', goal: 'Ensure success and get feedback' },
+          { tactic: 'Value-add content', timing: 'Weekly or monthly', goal: 'Stay top of mind with helpful content' },
+          { tactic: 'Check-in outreach', timing: '30, 60, 90 days', goal: 'Identify upsell opportunities' },
+          { tactic: 'Exclusive offers', timing: 'Periodically', goal: 'Reward loyalty and drive repeat purchases' },
+          { tactic: 'Referral request', timing: 'After positive outcome', goal: 'Generate word-of-mouth' },
+        ],
+        tools: [
+          { name: 'Customer.io', url: 'https://customer.io', description: 'Automated customer journeys.' },
+          { name: 'Rewardful', url: 'https://rewardful.com', description: 'Affiliate and loyalty programs.' },
+          { name: 'Circle', url: 'https://circle.so', description: 'Community platform.' },
+          { name: 'Klaviyo', url: 'https://klaviyo.com', description: 'Retention marketing.' },
+        ],
+      },
+    ],
+    launchScaleLayer: {
+      growthPosture: `${businessName} should launch with eyes open, fix issues quickly, then scale through measured acquisition and retention instead of blind hope and post-launch amnesia.`,
+      completionCallout: {
+        badge: 'Phase 9 Complete',
+        title: 'Built to Grow With the Company',
+        description: 'Keep evolving this phase around real milestones, growth targets, customer feedback, and operating lessons as the business matures.',
+      },
+    },
+  }
+
+  return {
+    number: 9,
+    title: 'Growth & Milestones',
+    summary: 'Launch the business cleanly, then keep this final phase evolving around growth, milestones, optimisation, acquisition, and retention.',
+    progress: {
+      totalSteps: 7,
+      completedSteps: 0,
+    },
+    content: generated,
+    generated,
+    userState: {
+      completedStepIds: [],
+      checkedPrelaunch: [],
+      checkedLaunchActivities: [],
+      checkedMetrics: [],
+      checkedRetention: [],
+    },
+    tasks: buildLaunchScaleTasks(),
+  }
+}

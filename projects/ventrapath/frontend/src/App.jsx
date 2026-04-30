@@ -15,12 +15,15 @@ const blueprintSectionMeta = [
 ]
 
 const defaultPhaseCards = [
-  { number: 1, title: 'Brand', state: 'available', summary: 'Turn the blueprint into a sharp external identity.' },
-  { number: 2, title: 'Legal', state: 'locked', summary: 'Jurisdiction-aware setup, filing, tax, and protection.' },
-  { number: 3, title: 'Finance', state: 'locked', summary: 'Pricing, banking, tax, and financial foundations.' },
-  { number: 4, title: 'Protection', state: 'locked', summary: 'Risk controls, policies, contracts, privacy, and core safeguards.' },
-  { number: 5, title: 'Infrastructure', state: 'locked', summary: 'Tools, systems, and operating stack.' },
-  { number: 6, title: 'Marketing', state: 'locked', summary: 'Audience reach, positioning, and growth channels.' },
+  { number: 1, title: 'Brand', state: 'available', summary: 'Turn the blueprint into a usable external identity.' },
+  { number: 2, title: 'Legal', state: 'locked', summary: 'Translate the business into a practical legal setup path for the user\'s location.' },
+  { number: 3, title: 'Finance', state: 'locked', summary: 'Set up the financial foundations of the business with guided choices and tracking.' },
+  { number: 4, title: 'Protection', state: 'locked', summary: 'Protect the business with risk controls, insurance, contracts, privacy, and compliance habits.' },
+  { number: 5, title: 'Infrastructure', state: 'locked', summary: 'Build the systems, tools, automation, and security stack the business runs on every day.' },
+  { number: 6, title: 'Marketing', state: 'locked', summary: 'Define the audience, message, channels, content rhythm, and lead capture foundation for growth.' },
+  { number: 7, title: 'Operations', state: 'locked', summary: 'Set up how the business delivers reliably, communicates clearly, and scales without breaking.' },
+  { number: 8, title: 'Sales', state: 'locked', summary: 'Turn interest into paying customers with a clear, repeatable, and measurable sales process.' },
+  { number: 9, title: 'Growth & Milestones', state: 'locked', summary: 'Guide the business through launch, growth, milestone tracking, optimisation, acquisition, and retention as it matures.' },
 ]
 
 function slugify(input) {
@@ -105,7 +108,7 @@ function Sidebar({ projects, activeProjectId, onSelectProject, onCreateNew, phas
       <div className="sidebar__section">
         <div className="sidebar__section-header">
           <h2>Phase ladder</h2>
-          <span>10</span>
+          <span>9</span>
         </div>
         <div className="phase-list">
           {phases.map((phase) => (
@@ -215,7 +218,7 @@ function ProjectForm({ formState, onChange, onSubmit, busy }) {
   )
 }
 
-function BlueprintViewer({ project, blueprint, selectedSection, onSelectSection, onRegenerate, onGenerateBrand, onGenerateLegal, onGenerateProtection, onGenerateInfrastructure, onGenerateMarketing, busy }) {
+function BlueprintViewer({ project, blueprint, selectedSection, onSelectSection, onRegenerate, onGenerateBrand, onGenerateLegal, onGenerateFinance, onGenerateProtection, onGenerateInfrastructure, onGenerateMarketing, onGenerateOperations, onGenerateSales, onGenerateLaunchScale, busy }) {
   if (!project) {
     return (
       <section className="panel empty-state">
@@ -241,6 +244,9 @@ function BlueprintViewer({ project, blueprint, selectedSection, onSelectSection,
           <button className="ghost-button" onClick={onGenerateLegal} disabled={busy || !blueprint} type="button">
             {busy ? 'Working…' : 'Generate Phase 2 Legal'}
           </button>
+          <button className="ghost-button" onClick={onGenerateFinance} disabled={busy || !blueprint} type="button">
+            {busy ? 'Working…' : 'Generate Phase 3 Finance'}
+          </button>
           <button className="ghost-button" onClick={onGenerateProtection} disabled={busy || !blueprint} type="button">
             {busy ? 'Working…' : 'Generate Phase 4 Protection'}
           </button>
@@ -249,6 +255,15 @@ function BlueprintViewer({ project, blueprint, selectedSection, onSelectSection,
           </button>
           <button className="ghost-button" onClick={onGenerateMarketing} disabled={busy || !blueprint} type="button">
             {busy ? 'Working…' : 'Generate Phase 6 Marketing'}
+          </button>
+          <button className="ghost-button" onClick={onGenerateOperations} disabled={busy || !blueprint} type="button">
+            {busy ? 'Working…' : 'Generate Phase 7 Operations'}
+          </button>
+          <button className="ghost-button" onClick={onGenerateSales} disabled={busy || !blueprint} type="button">
+            {busy ? 'Working…' : 'Generate Phase 8 Sales'}
+          </button>
+          <button className="ghost-button" onClick={onGenerateLaunchScale} disabled={busy || !blueprint} type="button">
+            {busy ? 'Working…' : 'Generate Phase 9 Growth & Milestones'}
           </button>
           <button className="ghost-button" onClick={onRegenerate} disabled={busy || !blueprint} type="button">
             {busy ? 'Working…' : 'Regenerate blueprint'}
@@ -313,7 +328,7 @@ function BrandPhaseViewer({ project, phase, onBack }) {
     <section className="workspace">
       <div className="panel project-summary">
         <div>
-          <p className="eyebrow">Phase 1 of 10</p>
+          <p className="eyebrow">Phase 1 of 9</p>
           <h2>Brand</h2>
           <p>Guided identity workflow for {project.name}</p>
         </div>
@@ -439,7 +454,7 @@ function LegalPhaseViewer({ project, phase, onBack }) {
     <section className="workspace">
       <div className="panel project-summary">
         <div>
-          <p className="eyebrow">Phase 2 of 10</p>
+          <p className="eyebrow">Phase 2 of 9</p>
           <h2>Legal</h2>
           <p>{phase.generatedContent.jurisdiction.tailoredBanner}</p>
         </div>
@@ -635,6 +650,211 @@ function LegalPhaseViewer({ project, phase, onBack }) {
   )
 }
 
+function FinancePhaseViewer({ project, phase, onBack }) {
+  if (!project || !phase) {
+    return null
+  }
+
+  return (
+    <section className="workspace">
+      <div className="panel project-summary">
+        <div>
+          <p className="eyebrow">Phase 3 of 9</p>
+          <h2>Finance</h2>
+          <p>{phase.summary}</p>
+        </div>
+        <div className="project-summary__actions">
+          <span className="status-pill">{phase.state}</span>
+          <button className="ghost-button" onClick={onBack} type="button">
+            Back to blueprint
+          </button>
+        </div>
+      </div>
+
+      <div className="panel phase-header-card">
+        <div>
+          <p className="eyebrow">0/{phase.progress?.totalSteps ?? phase.generatedContent.steps.length} steps complete</p>
+          <h3>{phase.generatedContent.financeLayer.completionCallout.title}</h3>
+        </div>
+        <p>{phase.generatedContent.financeLayer.financialPosture}</p>
+      </div>
+
+      <section className="panel phase-step-card">
+        <div className="phase-step-card__header">
+          <div>
+            <p className="eyebrow">Finance risks</p>
+            <h3>What breaks first if money stays fuzzy</h3>
+          </div>
+        </div>
+        <div className="content-grid two-up">
+          {phase.generatedContent.financeLayer.keyRisks.map((risk) => (
+            <div key={risk} className="content-card">
+              <strong>Watch this</strong>
+              <p>{risk}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <div className="phase-steps">
+        {phase.generatedContent.steps.map((step) => (
+          <section key={step.slug} className="panel phase-step-card">
+            <div className="phase-step-card__header">
+              <div className="phase-step-card__title">
+                <span className="phase-step-card__number">{step.number}</span>
+                <div>
+                  <h3>{step.title}</h3>
+                  <p>{step.description}</p>
+                </div>
+              </div>
+              <div className="phase-step-card__actions">
+                <span>How to do this</span>
+                <span>Example</span>
+              </div>
+            </div>
+
+            <div className="helper-grid">
+              <div className="helper-card">
+                <strong>How to do this</strong>
+                <p>{step.helper.howToDoThis}</p>
+              </div>
+              <div className="helper-card">
+                <strong>Example</strong>
+                <p>{step.helper.example}</p>
+              </div>
+            </div>
+
+            {step.providers ? (
+              <div className="content-grid three-up">
+                {step.providers.map((provider) => (
+                  <div key={provider.name} className="content-card">
+                    <strong>{provider.name}{provider.recommended ? ' · Recommended' : ''}</strong>
+                    <p>{provider.bestFor}</p>
+                    <p><strong>Fees:</strong> {provider.fees}</p>
+                    <p>{provider.features.join(', ')}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.accountingOptions ? (
+              <div className="content-grid three-up">
+                {step.accountingOptions.map((option) => (
+                  <div key={option.name} className="content-card">
+                    <strong>{option.name}{option.recommended ? ' · Recommended' : ''}</strong>
+                    <p>{option.bestFor}</p>
+                    <p><strong>Price:</strong> {option.price}</p>
+                    <p>{option.features.join(', ')}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.incomeCategories || step.expenseCategories ? (
+              <div className="content-grid two-up">
+                {step.incomeCategories ? (
+                  <div className="content-card">
+                    <strong>Income categories</strong>
+                    <ul className="bullet-list">
+                      {step.incomeCategories.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
+                {step.expenseCategories ? (
+                  <div className="content-card">
+                    <strong>Expense categories</strong>
+                    <ul className="bullet-list">
+                      {step.expenseCategories.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
+
+            {step.disclaimer ? (
+              <div className="helper-card">
+                <strong>Tax note</strong>
+                <p>{step.disclaimer}</p>
+              </div>
+            ) : null}
+
+            {step.taxSummary ? (
+              <div className="content-grid three-up">
+                <div className="content-card">
+                  <strong>Tax type</strong>
+                  <p>{step.taxSummary.taxType}</p>
+                </div>
+                <div className="content-card">
+                  <strong>Threshold</strong>
+                  <p>{step.taxSummary.threshold}</p>
+                </div>
+                <div className="content-card">
+                  <strong>Rate</strong>
+                  <p>{step.taxSummary.rate}</p>
+                </div>
+              </div>
+            ) : null}
+
+            {step.taxRegistrations ? (
+              <div className="content-grid three-up">
+                {step.taxRegistrations.map((item) => (
+                  <div key={item.name} className="content-card">
+                    <strong>{item.name}{item.required ? ' · Required' : ''}</strong>
+                    <p>{item.description}</p>
+                    <p>{item.link}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.tiers ? (
+              <div className="content-grid three-up">
+                {step.tiers.map((tier) => (
+                  <div key={tier.name} className="content-card">
+                    <strong>{tier.name}{tier.highlighted ? ' · Popular' : ''}</strong>
+                    <p>${tier.price}{tier.billingUnit}</p>
+                    <p>{tier.features.join(', ')}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.dashboard ? (
+              <div className="content-grid two-up">
+                <div className="content-card">
+                  <strong>{step.dashboard.periodLabel}</strong>
+                  <p>Revenue: ${step.dashboard.revenue}</p>
+                  <p>Expenses: ${step.dashboard.expenses}</p>
+                  <p>Profit: ${step.dashboard.profit}</p>
+                </div>
+                <div className="content-card">
+                  <strong>Weekly rhythm</strong>
+                  <p>Keep this review boring, short, and consistent.</p>
+                </div>
+              </div>
+            ) : null}
+
+            {step.weeklyTrackingTasks ? (
+              <div className="content-grid two-up">
+                {step.weeklyTrackingTasks.map((item) => (
+                  <div key={item} className="content-card">
+                    <strong>Weekly task</strong>
+                    <p>{item}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </section>
+        ))}
+      </div>
+    </section>
+  )
+}
+
 function ProtectionPhaseViewer({ project, phase, onBack }) {
   if (!project || !phase) {
     return null
@@ -644,7 +864,7 @@ function ProtectionPhaseViewer({ project, phase, onBack }) {
     <section className="workspace">
       <div className="panel project-summary">
         <div>
-          <p className="eyebrow">Phase 4 of 10</p>
+          <p className="eyebrow">Phase 4 of 9</p>
           <h2>Protection</h2>
           <p>{phase.summary}</p>
         </div>
@@ -797,7 +1017,7 @@ function InfrastructurePhaseViewer({ project, phase, onBack }) {
     <section className="workspace">
       <div className="panel project-summary">
         <div>
-          <p className="eyebrow">Phase 5 of 10</p>
+          <p className="eyebrow">Phase 5 of 9</p>
           <h2>Infrastructure</h2>
           <p>{phase.summary}</p>
         </div>
@@ -926,7 +1146,7 @@ function MarketingPhaseViewer({ project, phase, onBack }) {
     <section className="workspace">
       <div className="panel project-summary">
         <div>
-          <p className="eyebrow">Phase 6 of 10</p>
+          <p className="eyebrow">Phase 6 of 9</p>
           <h2>Marketing</h2>
           <p>{phase.summary}</p>
         </div>
@@ -1083,6 +1303,515 @@ function MarketingPhaseViewer({ project, phase, onBack }) {
   )
 }
 
+function OperationsPhaseViewer({ project, phase, onBack }) {
+  if (!project || !phase) {
+    return null
+  }
+
+  return (
+    <section className="workspace">
+      <div className="panel project-summary">
+        <div>
+          <p className="eyebrow">Phase 7 of 9</p>
+          <h2>Operations</h2>
+          <p>{phase.summary}</p>
+        </div>
+        <div className="project-summary__actions">
+          <span className="status-pill">{phase.state}</span>
+          <button className="ghost-button" onClick={onBack} type="button">
+            Back to blueprint
+          </button>
+        </div>
+      </div>
+
+      <div className="panel phase-header-card">
+        <div>
+          <p className="eyebrow">0/{phase.progress?.totalSteps ?? phase.generatedContent.steps.length} steps complete</p>
+          <h3>{phase.generatedContent.operationsLayer.completionCallout.title}</h3>
+        </div>
+        <p>{phase.generatedContent.operationsLayer.operatingPosture}</p>
+      </div>
+
+      <div className="phase-steps">
+        {phase.generatedContent.steps.map((step) => (
+          <section key={step.slug} className="panel phase-step-card">
+            <div className="phase-step-card__header">
+              <div className="phase-step-card__title">
+                <span className="phase-step-card__number">{step.number}</span>
+                <div>
+                  <h3>{step.title}</h3>
+                  <p>{step.description}</p>
+                </div>
+              </div>
+              <div className="phase-step-card__actions">
+                <span>How to do this</span>
+                <span>Example</span>
+              </div>
+            </div>
+
+            <div className="helper-grid">
+              <div className="helper-card">
+                <strong>How to do this</strong>
+                <p>{step.helper.howToDoThis}</p>
+              </div>
+              <div className="helper-card">
+                <strong>{step.example?.title ?? 'Example'}</strong>
+                <p>{step.example?.content ?? step.helper.example}</p>
+              </div>
+            </div>
+
+            {step.whatToDo ? (
+              <div className="content-grid two-up">
+                {step.whatToDo.map((item) => (
+                  <div key={item} className="content-card">
+                    <strong>What to do</strong>
+                    <p>{item}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.howToDoIt ? (
+              <div className="content-grid two-up">
+                {step.howToDoIt.map((item) => (
+                  <div key={item} className="content-card">
+                    <strong>Execution tip</strong>
+                    <p>{item}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.workflowStages ? (
+              <div className="content-grid two-up">
+                {step.workflowStages.map((item) => (
+                  <div key={item.stage} className="content-card">
+                    <strong>{item.stage}</strong>
+                    <p>{item.description}</p>
+                    <p>{item.action}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.sopCategories ? (
+              <div className="content-grid two-up">
+                {step.sopCategories.map((item) => (
+                  <div key={item.category} className="content-card">
+                    <strong>{item.category}</strong>
+                    <p>{item.examples}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.touchpoints ? (
+              <div className="content-grid two-up">
+                {step.touchpoints.map((item) => (
+                  <div key={item.touchpoint} className="content-card">
+                    <strong>{item.touchpoint}</strong>
+                    <p>{item.message}</p>
+                    <p>{item.timing}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.metrics ? (
+              <div className="content-grid two-up">
+                {step.metrics.map((item) => (
+                  <div key={item.metric} className="content-card">
+                    <strong>{item.metric}</strong>
+                    <p>{item.description}</p>
+                    <p>{item.target}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.scalingChecklist ? (
+              <div className="content-grid two-up">
+                {step.scalingChecklist.map((item) => (
+                  <div key={item.task} className="content-card">
+                    <strong>{item.task}</strong>
+                    <p>{item.status}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.tools ? (
+              <div className="content-grid two-up">
+                {step.tools.map((tool) => (
+                  <div key={tool.name} className="content-card">
+                    <strong>{tool.name}</strong>
+                    <p>{tool.description}</p>
+                    <p>{tool.url}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </section>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+function SalesPhaseViewer({ project, phase, onBack }) {
+  if (!project || !phase) {
+    return null
+  }
+
+  return (
+    <section className="workspace">
+      <div className="panel project-summary">
+        <div>
+          <p className="eyebrow">Phase 8 of 9</p>
+          <h2>Sales</h2>
+          <p>{phase.summary}</p>
+        </div>
+        <div className="project-summary__actions">
+          <span className="status-pill">{phase.state}</span>
+          <button className="ghost-button" onClick={onBack} type="button">
+            Back to blueprint
+          </button>
+        </div>
+      </div>
+
+      <div className="panel phase-header-card">
+        <div>
+          <p className="eyebrow">0/{phase.progress?.totalSteps ?? phase.generatedContent.steps.length} steps complete</p>
+          <h3>{phase.generatedContent.salesLayer.completionCallout.title}</h3>
+        </div>
+        <p>{phase.generatedContent.salesLayer.sellingPosture}</p>
+      </div>
+
+      <div className="phase-steps">
+        {phase.generatedContent.steps.map((step) => (
+          <section key={step.slug} className="panel phase-step-card">
+            <div className="phase-step-card__header">
+              <div className="phase-step-card__title">
+                <span className="phase-step-card__number">{step.number}</span>
+                <div>
+                  <h3>{step.title}</h3>
+                  <p>{step.description}</p>
+                </div>
+              </div>
+              <div className="phase-step-card__actions">
+                <span>How to do this</span>
+                <span>Example</span>
+              </div>
+            </div>
+
+            <div className="helper-grid">
+              <div className="helper-card">
+                <strong>How to do this</strong>
+                <p>{step.helper.howToDoThis}</p>
+              </div>
+              <div className="helper-card">
+                <strong>{step.example?.title ?? 'Example'}</strong>
+                <p>{step.example?.content ?? step.helper.example}</p>
+              </div>
+            </div>
+
+            {step.whatToDo ? (
+              <div className="content-grid two-up">
+                {step.whatToDo.map((item) => (
+                  <div key={item} className="content-card">
+                    <strong>What to do</strong>
+                    <p>{item}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.howToDoIt ? (
+              <div className="content-grid two-up">
+                {step.howToDoIt.map((item) => (
+                  <div key={item} className="content-card">
+                    <strong>Execution tip</strong>
+                    <p>{item}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.salesProcessStages ? (
+              <div className="content-grid two-up">
+                {step.salesProcessStages.map((item) => (
+                  <div key={item.stage} className="content-card">
+                    <strong>{item.stage}</strong>
+                    <p>{item.description}</p>
+                    <p>{item.timing}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.qualificationCriteria ? (
+              <div className="content-grid two-up">
+                {step.qualificationCriteria.map((item) => (
+                  <div key={item.criteria} className="content-card">
+                    <strong>{item.criteria}</strong>
+                    <p>{item.question}</p>
+                    <p>{item.importance}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.commonObjections ? (
+              <div className="content-grid two-up">
+                {step.commonObjections.map((item) => (
+                  <div key={item.objection} className="content-card">
+                    <strong>{item.objection}</strong>
+                    <p>{item.response}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.followUpSequence ? (
+              <div className="content-grid two-up">
+                {step.followUpSequence.map((item) => (
+                  <div key={item.day} className="content-card">
+                    <strong>{item.day}</strong>
+                    <p>{item.action}</p>
+                    <p>{item.channel}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.salesMetrics ? (
+              <div className="content-grid two-up">
+                {step.salesMetrics.map((item) => (
+                  <div key={item.metric} className="content-card">
+                    <strong>{item.metric}</strong>
+                    <p>{item.description}</p>
+                    <p>{item.benchmark}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.offerChecklist ? (
+              <div className="content-grid two-up">
+                {step.offerChecklist.map((item) => (
+                  <div key={item.item} className="content-card">
+                    <strong>{item.item}</strong>
+                    <p>{item.tip}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.testIdeas ? (
+              <div className="content-grid two-up">
+                {step.testIdeas.map((item) => (
+                  <div key={item} className="content-card">
+                    <strong>Test idea</strong>
+                    <p>{item}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.tools ? (
+              <div className="content-grid two-up">
+                {step.tools.map((tool) => (
+                  <div key={tool.name} className="content-card">
+                    <strong>{tool.name}</strong>
+                    <p>{tool.description}</p>
+                    <p>{tool.url}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </section>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+function LaunchScalePhaseViewer({ project, phase, onBack }) {
+  if (!project || !phase) {
+    return null
+  }
+
+  return (
+    <section className="workspace">
+      <div className="panel project-summary">
+        <div>
+          <p className="eyebrow">Phase 9 of 9</p>
+          <h2>Growth & Milestones</h2>
+          <p>{phase.summary}</p>
+        </div>
+        <div className="project-summary__actions">
+          <span className="status-pill">{phase.state}</span>
+          <button className="ghost-button" onClick={onBack} type="button">
+            Back to blueprint
+          </button>
+        </div>
+      </div>
+
+      <div className="panel phase-header-card">
+        <div>
+          <p className="eyebrow">0/{phase.progress?.totalSteps ?? phase.generatedContent.steps.length} steps complete</p>
+          <h3>{phase.generatedContent.launchScaleLayer.completionCallout.title}</h3>
+        </div>
+        <p>{phase.generatedContent.launchScaleLayer.growthPosture}</p>
+      </div>
+
+      <div className="phase-steps">
+        {phase.generatedContent.steps.map((step) => (
+          <section key={step.slug} className="panel phase-step-card">
+            <div className="phase-step-card__header">
+              <div className="phase-step-card__title">
+                <span className="phase-step-card__number">{step.number}</span>
+                <div>
+                  <h3>{step.title}</h3>
+                  <p>{step.description}</p>
+                </div>
+              </div>
+              <div className="phase-step-card__actions">
+                <span>How to do this</span>
+                <span>Example</span>
+              </div>
+            </div>
+
+            <div className="helper-grid">
+              <div className="helper-card">
+                <strong>How to do this</strong>
+                <p>{step.helper.howToDoThis}</p>
+              </div>
+              <div className="helper-card">
+                <strong>{step.example?.title ?? 'Example'}</strong>
+                <p>{step.example?.content ?? step.helper.example}</p>
+              </div>
+            </div>
+
+            {step.whatToDo ? (
+              <div className="content-grid two-up">
+                {step.whatToDo.map((item) => (
+                  <div key={item} className="content-card">
+                    <strong>What to do</strong>
+                    <p>{item}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.howToDoIt ? (
+              <div className="content-grid two-up">
+                {step.howToDoIt.map((item) => (
+                  <div key={item} className="content-card">
+                    <strong>Execution tip</strong>
+                    <p>{item}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.preLaunchChecklist ? (
+              <div className="content-grid two-up">
+                {step.preLaunchChecklist.map((item) => (
+                  <div key={item.item} className="content-card">
+                    <strong>{item.item}</strong>
+                    <p>{item.category}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.launchDayActivities ? (
+              <div className="content-grid two-up">
+                {step.launchDayActivities.map((item) => (
+                  <div key={item.activity} className="content-card">
+                    <strong>{item.activity}</strong>
+                    <p>{item.time}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.launchMetrics ? (
+              <div className="content-grid two-up">
+                {step.launchMetrics.map((item) => (
+                  <div key={item.metric} className="content-card">
+                    <strong>{item.metric}</strong>
+                    <p>{item.description}</p>
+                    <p>{item.target}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.feedbackQuestions ? (
+              <div className="content-grid two-up">
+                {step.feedbackQuestions.map((item) => (
+                  <div key={item} className="content-card">
+                    <strong>Feedback question</strong>
+                    <p>{item}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.issuePriorities ? (
+              <div className="content-grid two-up">
+                {step.issuePriorities.map((item) => (
+                  <div key={item.priority} className="content-card">
+                    <strong>{item.priority}</strong>
+                    <p>{item.description}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.scalingChecklist ? (
+              <div className="content-grid two-up">
+                {step.scalingChecklist.map((item) => (
+                  <div key={item} className="content-card">
+                    <strong>Scaling check</strong>
+                    <p>{item}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.retentionTactics ? (
+              <div className="content-grid two-up">
+                {step.retentionTactics.map((item) => (
+                  <div key={item.tactic} className="content-card">
+                    <strong>{item.tactic}</strong>
+                    <p>{item.timing}</p>
+                    <p>{item.goal}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {step.tools ? (
+              <div className="content-grid two-up">
+                {step.tools.map((tool) => (
+                  <div key={tool.name} className="content-card">
+                    <strong>{tool.name}</strong>
+                    <p>{tool.description}</p>
+                    <p>{tool.url}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </section>
+        ))}
+      </div>
+    </section>
+  )
+}
+
 function App() {
   const [projects, setProjects] = useState([])
   const [activeProjectId, setActiveProjectId] = useState(null)
@@ -1090,9 +1819,13 @@ function App() {
   const [phases, setPhases] = useState(defaultPhaseCards)
   const [brandPhase, setBrandPhase] = useState(null)
   const [legalPhase, setLegalPhase] = useState(null)
+  const [financePhase, setFinancePhase] = useState(null)
   const [protectionPhase, setProtectionPhase] = useState(null)
   const [infrastructurePhase, setInfrastructurePhase] = useState(null)
   const [marketingPhase, setMarketingPhase] = useState(null)
+  const [operationsPhase, setOperationsPhase] = useState(null)
+  const [salesPhase, setSalesPhase] = useState(null)
+  const [launchScalePhase, setLaunchScalePhase] = useState(null)
   const [selectedSection, setSelectedSection] = useState('business')
   const [currentView, setCurrentView] = useState('blueprint')
   const [busy, setBusy] = useState(false)
@@ -1132,9 +1865,13 @@ function App() {
         setBlueprint(null)
         setBrandPhase(null)
         setLegalPhase(null)
+        setFinancePhase(null)
         setProtectionPhase(null)
         setInfrastructurePhase(null)
         setMarketingPhase(null)
+        setOperationsPhase(null)
+        setSalesPhase(null)
+        setLaunchScalePhase(null)
         setPhases(defaultPhaseCards)
         return
       }
@@ -1172,6 +1909,13 @@ function App() {
         }
 
         try {
+          const financePayload = await apiRequest(`/projects/${activeProjectId}/phases/3`)
+          setFinancePhase(financePayload.phase)
+        } catch {
+          setFinancePhase(null)
+        }
+
+        try {
           const protectionPayload = await apiRequest(`/projects/${activeProjectId}/phases/4`)
           setProtectionPhase(protectionPayload.phase)
         } catch {
@@ -1191,13 +1935,38 @@ function App() {
         } catch {
           setMarketingPhase(null)
         }
+
+        try {
+          const operationsPayload = await apiRequest(`/projects/${activeProjectId}/phases/7`)
+          setOperationsPhase(operationsPayload.phase)
+        } catch {
+          setOperationsPhase(null)
+        }
+
+        try {
+          const salesPayload = await apiRequest(`/projects/${activeProjectId}/phases/8`)
+          setSalesPhase(salesPayload.phase)
+        } catch {
+          setSalesPhase(null)
+        }
+
+        try {
+          const launchScalePayload = await apiRequest(`/projects/${activeProjectId}/phases/9`)
+          setLaunchScalePhase(launchScalePayload.phase)
+        } catch {
+          setLaunchScalePhase(null)
+        }
       } catch {
         setBlueprint(null)
         setBrandPhase(null)
         setLegalPhase(null)
+        setFinancePhase(null)
         setProtectionPhase(null)
         setInfrastructurePhase(null)
         setMarketingPhase(null)
+        setOperationsPhase(null)
+        setSalesPhase(null)
+        setLaunchScalePhase(null)
         setPhases(defaultPhaseCards)
       }
     }
@@ -1262,9 +2031,13 @@ function App() {
       setBlueprint(blueprintResponse.blueprint)
       setBrandPhase(null)
       setLegalPhase(null)
+      setFinancePhase(null)
       setProtectionPhase(null)
       setInfrastructurePhase(null)
       setMarketingPhase(null)
+      setOperationsPhase(null)
+      setSalesPhase(null)
+      setLaunchScalePhase(null)
       setPhases(defaultPhaseCards)
       setSelectedSection('business')
       setCurrentView('blueprint')
@@ -1376,6 +2149,32 @@ function App() {
     }
   }
 
+  async function handleGenerateFinance() {
+    if (!activeProjectId) {
+      return
+    }
+
+    setBusy(true)
+    setError('')
+
+    try {
+      const payload = await apiRequest(`/projects/${activeProjectId}/phases/3/generate`, {
+        method: 'POST',
+        body: JSON.stringify({}),
+      })
+
+      setFinancePhase(payload.phase)
+      const phasesPayload = await apiRequest(`/projects/${activeProjectId}/phases`)
+      setPhases(phasesPayload.phases ?? defaultPhaseCards)
+      setCurrentView('finance')
+      await refreshProjects(activeProjectId)
+    } catch (phaseError) {
+      setError(phaseError.message)
+    } finally {
+      setBusy(false)
+    }
+  }
+
   async function handleGenerateInfrastructure() {
     if (!activeProjectId) {
       return
@@ -1428,6 +2227,84 @@ function App() {
     }
   }
 
+  async function handleGenerateOperations() {
+    if (!activeProjectId) {
+      return
+    }
+
+    setBusy(true)
+    setError('')
+
+    try {
+      const payload = await apiRequest(`/projects/${activeProjectId}/phases/7/generate`, {
+        method: 'POST',
+        body: JSON.stringify({}),
+      })
+
+      setOperationsPhase(payload.phase)
+      const phasesPayload = await apiRequest(`/projects/${activeProjectId}/phases`)
+      setPhases(phasesPayload.phases ?? defaultPhaseCards)
+      setCurrentView('operations')
+      await refreshProjects(activeProjectId)
+    } catch (phaseError) {
+      setError(phaseError.message)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function handleGenerateSales() {
+    if (!activeProjectId) {
+      return
+    }
+
+    setBusy(true)
+    setError('')
+
+    try {
+      const payload = await apiRequest(`/projects/${activeProjectId}/phases/8/generate`, {
+        method: 'POST',
+        body: JSON.stringify({}),
+      })
+
+      setSalesPhase(payload.phase)
+      const phasesPayload = await apiRequest(`/projects/${activeProjectId}/phases`)
+      setPhases(phasesPayload.phases ?? defaultPhaseCards)
+      setCurrentView('sales')
+      await refreshProjects(activeProjectId)
+    } catch (phaseError) {
+      setError(phaseError.message)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function handleGenerateLaunchScale() {
+    if (!activeProjectId) {
+      return
+    }
+
+    setBusy(true)
+    setError('')
+
+    try {
+      const payload = await apiRequest(`/projects/${activeProjectId}/phases/9/generate`, {
+        method: 'POST',
+        body: JSON.stringify({}),
+      })
+
+      setLaunchScalePhase(payload.phase)
+      const phasesPayload = await apiRequest(`/projects/${activeProjectId}/phases`)
+      setPhases(phasesPayload.phases ?? defaultPhaseCards)
+      setCurrentView('launch-scale')
+      await refreshProjects(activeProjectId)
+    } catch (phaseError) {
+      setError(phaseError.message)
+    } finally {
+      setBusy(false)
+    }
+  }
+
   return (
     <div className="app-shell">
       <Sidebar
@@ -1442,9 +2319,13 @@ function App() {
           setBlueprint(null)
           setBrandPhase(null)
           setLegalPhase(null)
+          setFinancePhase(null)
           setProtectionPhase(null)
           setInfrastructurePhase(null)
           setMarketingPhase(null)
+          setOperationsPhase(null)
+          setSalesPhase(null)
+          setLaunchScalePhase(null)
           setCurrentView('blueprint')
         }}
         phases={phases}
@@ -1457,6 +2338,10 @@ function App() {
             setCurrentView('legal')
           }
 
+          if (phaseNumber === 3 && financePhase) {
+            setCurrentView('finance')
+          }
+
           if (phaseNumber === 4 && protectionPhase) {
             setCurrentView('protection')
           }
@@ -1467,6 +2352,18 @@ function App() {
 
           if (phaseNumber === 6 && marketingPhase) {
             setCurrentView('marketing')
+          }
+
+          if (phaseNumber === 7 && operationsPhase) {
+            setCurrentView('operations')
+          }
+
+          if (phaseNumber === 8 && salesPhase) {
+            setCurrentView('sales')
+          }
+
+          if (phaseNumber === 9 && launchScalePhase) {
+            setCurrentView('launch-scale')
           }
         }}
       />
@@ -1485,12 +2382,20 @@ function App() {
           <BrandPhaseViewer project={activeProject} phase={brandPhase} onBack={() => setCurrentView('blueprint')} />
         ) : currentView === 'legal' && legalPhase ? (
           <LegalPhaseViewer project={activeProject} phase={legalPhase} onBack={() => setCurrentView('blueprint')} />
+        ) : currentView === 'finance' && financePhase ? (
+          <FinancePhaseViewer project={activeProject} phase={financePhase} onBack={() => setCurrentView('blueprint')} />
         ) : currentView === 'protection' && protectionPhase ? (
           <ProtectionPhaseViewer project={activeProject} phase={protectionPhase} onBack={() => setCurrentView('blueprint')} />
         ) : currentView === 'infrastructure' && infrastructurePhase ? (
           <InfrastructurePhaseViewer project={activeProject} phase={infrastructurePhase} onBack={() => setCurrentView('blueprint')} />
         ) : currentView === 'marketing' && marketingPhase ? (
           <MarketingPhaseViewer project={activeProject} phase={marketingPhase} onBack={() => setCurrentView('blueprint')} />
+        ) : currentView === 'operations' && operationsPhase ? (
+          <OperationsPhaseViewer project={activeProject} phase={operationsPhase} onBack={() => setCurrentView('blueprint')} />
+        ) : currentView === 'sales' && salesPhase ? (
+          <SalesPhaseViewer project={activeProject} phase={salesPhase} onBack={() => setCurrentView('blueprint')} />
+        ) : currentView === 'launch-scale' && launchScalePhase ? (
+          <LaunchScalePhaseViewer project={activeProject} phase={launchScalePhase} onBack={() => setCurrentView('blueprint')} />
         ) : (
           <BlueprintViewer
             project={activeProject}
@@ -1500,9 +2405,13 @@ function App() {
             onRegenerate={handleRegenerateBlueprint}
             onGenerateBrand={handleGenerateBrand}
             onGenerateLegal={handleGenerateLegal}
+            onGenerateFinance={handleGenerateFinance}
             onGenerateProtection={handleGenerateProtection}
             onGenerateInfrastructure={handleGenerateInfrastructure}
             onGenerateMarketing={handleGenerateMarketing}
+            onGenerateOperations={handleGenerateOperations}
+            onGenerateSales={handleGenerateSales}
+            onGenerateLaunchScale={handleGenerateLaunchScale}
             busy={busy}
           />
         )}
