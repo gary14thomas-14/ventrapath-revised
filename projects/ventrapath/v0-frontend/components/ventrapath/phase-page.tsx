@@ -106,6 +106,7 @@ export function PhasePage({
   const [generating, setGenerating] = useState(false)
   const [error, setError] = useState('')
   const [missing, setMissing] = useState(false)
+  const [retryKey, setRetryKey] = useState(0)
 
   useEffect(() => {
     const projectId = getStoredValue('projectId')
@@ -118,6 +119,8 @@ export function PhasePage({
     let active = true
 
     async function load() {
+      setLoading(true)
+      setError('')
       try {
         const payload = await getPhase(projectId, phaseNumber)
         if (!active) return
@@ -142,7 +145,7 @@ export function PhasePage({
     return () => {
       active = false
     }
-  }, [phaseNumber, router])
+  }, [phaseNumber, retryKey, router])
 
   const layer = useMemo(() => findLayer(phase?.generatedContent), [phase?.generatedContent])
   const completionCallout = layer?.completionCallout as Record<string, unknown> | undefined
@@ -213,6 +216,10 @@ export function PhasePage({
           <AlertTriangle className="mx-auto mb-4 h-8 w-8 text-destructive" />
           <h1 className="text-3xl font-bold">Couldn’t load {title}</h1>
           <p className="mt-2 text-muted-foreground">{error}</p>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+            <Button onClick={() => setRetryKey((value) => value + 1)}>Try again</Button>
+            <Link href="/blueprint"><Button variant="outline">Back to blueprint</Button></Link>
+          </div>
         </div>
       </div>
     )

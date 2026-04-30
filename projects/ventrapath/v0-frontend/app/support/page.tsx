@@ -44,7 +44,7 @@ export default function SupportPage() {
           <Link href="/" className="flex items-center gap-4">
             <img src="/logo.svg" alt="VentraPath" className="h-44 w-auto" />
             <span className="text-muted-foreground">/</span>
-            <span className="font-medium">Testing Notes</span>
+            <span className="font-medium">Testing Guide</span>
           </Link>
           <Link href="/">
             <Button variant="ghost" className="text-muted-foreground">
@@ -60,7 +60,7 @@ export default function SupportPage() {
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mx-auto max-w-3xl text-center">
             <h1 className="mb-6 text-4xl font-bold md:text-5xl">How to test this build well</h1>
             <p className="text-lg text-muted-foreground">
-              This page is here to help testers give useful feedback, not to pretend there’s a whole support org hiding behind the curtain.
+              Use this guide to get better feedback from testers: what felt clear, what felt rough, and what made the product feel trustworthy or shaky.
             </p>
           </motion.div>
 

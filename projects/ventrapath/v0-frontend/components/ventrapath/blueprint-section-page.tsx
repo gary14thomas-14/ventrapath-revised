@@ -37,6 +37,7 @@ export function BlueprintSectionPage({
   const [blueprint, setBlueprint] = useState<BlueprintData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [retryKey, setRetryKey] = useState(0)
   const projectName = getStoredValue('projectName')
   const projectIdea = getStoredValue('idea')
   const storedCountry = getStoredValue('country')
@@ -52,6 +53,8 @@ export function BlueprintSectionPage({
     let active = true
 
     async function load() {
+      setLoading(true)
+      setError('')
       try {
         const payload = await getBlueprint(projectId)
         if (!active) return
@@ -69,7 +72,7 @@ export function BlueprintSectionPage({
     return () => {
       active = false
     }
-  }, [router])
+  }, [retryKey, router])
 
   const sectionContent = blueprint?.sections?.[sectionKey] ?? ''
   const blocks = useMemo(() => parseMarkdownBlocks(sectionContent), [sectionContent])
@@ -93,7 +96,10 @@ export function BlueprintSectionPage({
           <AlertTriangle className="mx-auto mb-4 h-8 w-8 text-destructive" />
           <h2 className="text-2xl font-bold">Couldn’t load this section</h2>
           <p className="mt-2 text-muted-foreground">{error}</p>
-          <Button className="mt-6" onClick={() => router.push('/input')}>Start again</Button>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+            <Button onClick={() => setRetryKey((value) => value + 1)}>Try again</Button>
+            <Button variant="outline" onClick={() => router.push('/input')}>Start again</Button>
+          </div>
         </div>
       </div>
     )

@@ -62,11 +62,11 @@ export default function PricingPage() {
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mx-auto max-w-3xl text-center">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-sm text-primary">
               <ShieldCheck className="h-4 w-4" />
-              Honest product state, not fake SaaS pricing theatre
+              Tester access and rollout notes
             </div>
             <h1 className="mb-6 text-4xl font-bold md:text-5xl">Tester access and rollout status</h1>
             <p className="text-xl text-muted-foreground">
-              This build is for feedback and confidence-building, not fake checkout flows. The important bit is the product path itself — and that’s now live.
+              This build is ready for real walkthroughs and feedback. The focus here is product quality, clarity, and whether the guided planning flow feels genuinely useful.
             </p>
           </motion.div>
 
@@ -96,7 +96,7 @@ export default function PricingPage() {
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }} className="mx-auto max-w-3xl rounded-3xl border border-primary/20 bg-primary/5 p-8 text-center">
             <h2 className="mb-4 text-2xl font-bold">Tomorrow’s goal</h2>
             <p className="mb-8 text-muted-foreground">
-              Put testers through the real VentraPath experience, collect the rough edges, and use that feedback to shape the first proper production rollout.
+              Put testers through the real VentraPath experience, collect the rough edges, and use that feedback to sharpen the first proper production rollout.
             </p>
             <Link href="/input">
               <Button size="lg" className="bg-primary px-8 text-primary-foreground hover:bg-primary/90">

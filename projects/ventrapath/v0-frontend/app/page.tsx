@@ -66,7 +66,7 @@ export default function LandingPage() {
             <motion.div variants={fadeIn} className="mb-8">
               <span className="inline-flex items-center gap-2 rounded-full glass px-4 py-2 text-sm text-muted-foreground">
                 <span className="h-2 w-2 rounded-full bg-success animate-pulse" />
-                Early tester preview · real blueprint + real phase engine
+                Early tester preview · live blueprint and guided phase flow
               </span>
             </motion.div>
 
@@ -89,7 +89,7 @@ export default function LandingPage() {
               </Link>
               <Link href="/support">
                 <Button size="lg" variant="outline" className="border-border/50 px-8 py-6 text-lg hover:bg-surface">
-                  Testing Notes
+                  Testing Guide
                 </Button>
               </Link>
             </motion.div>
@@ -139,7 +139,7 @@ export default function LandingPage() {
                 },
                 {
                   title: 'Useful tester flow',
-                  description: 'Start, resume, and review a project without the old mock-only dead ends.',
+                  description: 'Start, resume, and review a project without awkward dead ends or unclear handoffs.',
                 },
               ].map((feature, index) => (
                 <motion.div key={feature.title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: index * 0.1 }} className="group rounded-2xl glass p-8 transition-all duration-300 hover:border-primary/30">
@@ -179,7 +179,7 @@ export default function LandingPage() {
           <img src="/logo.svg" alt="VentraPath" className="h-44 w-auto opacity-60" />
           <div className="flex items-center gap-8 text-sm text-muted-foreground">
             <Link href="/pricing" className="transition-colors hover:text-foreground">Tester Access</Link>
-            <Link href="/support" className="transition-colors hover:text-foreground">Testing Notes</Link>
+            <Link href="/support" className="transition-colors hover:text-foreground">Testing Guide</Link>
           </div>
         </div>
       </footer>
