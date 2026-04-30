@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { AlertTriangle, ArrowLeft, ArrowRight, CheckCircle2, Loader2, Sparkles } from 'lucide-react'
+import { AlertTriangle, ArrowLeft, ArrowRight, CheckCircle2, Compass, Home, Loader2, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { PhaseData, generatePhase, getPhase, getStoredValue } from '@/lib/ventrapath-client'
 
@@ -150,6 +150,9 @@ export function PhasePage({
   const totalSteps = phase?.progress?.totalSteps ?? steps.length
   const completedSteps = phase?.progress?.completedSteps ?? 0
   const projectId = getStoredValue('projectId')
+  const projectName = getStoredValue('projectName')
+  const projectIdea = getStoredValue('idea')
+  const storedCountry = getStoredValue('country')
 
   async function handleGenerate() {
     if (!projectId) {
@@ -230,6 +233,26 @@ export function PhasePage({
               <p className="text-2xl font-bold text-primary">{completedSteps}/{totalSteps}</p>
             </div>
           </div>
+
+          {(projectName || projectIdea || storedCountry) ? (
+            <div className="rounded-2xl border border-primary/20 bg-primary/5 p-5">
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-sm font-medium uppercase tracking-wider text-primary">
+                    <Compass className="h-4 w-4" />
+                    Current project
+                  </div>
+                  {projectName ? <p className="text-xl font-semibold">{projectName}</p> : null}
+                  {projectIdea ? <p className="max-w-2xl text-sm text-muted-foreground">{projectIdea}</p> : null}
+                  {storedCountry ? <p className="text-sm text-muted-foreground">Operating in {storedCountry}</p> : null}
+                </div>
+                <div className="flex flex-wrap gap-3">
+                  <Link href="/blueprint"><Button variant="outline">Blueprint</Button></Link>
+                  <Link href="/"><Button variant="ghost"><Home className="mr-2 h-4 w-4" />Home</Button></Link>
+                </div>
+              </div>
+            </div>
+          ) : null}
 
           {layer?.growthPosture || layer?.financialPosture || layer?.protectionPosture || layer?.operationsPosture || layer?.salesPosture || layer?.marketingPosture || layer?.infrastructurePosture ? (
             <div className="rounded-2xl border border-primary/20 bg-primary/5 p-5 text-foreground/90">

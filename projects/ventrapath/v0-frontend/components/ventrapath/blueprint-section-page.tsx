@@ -1,9 +1,10 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { AlertTriangle, Loader2, Sparkles } from 'lucide-react'
+import { AlertTriangle, Compass, Loader2, Sparkles } from 'lucide-react'
 import { BlueprintData, BlueprintSectionKey, getBlueprint, getStoredValue } from '@/lib/ventrapath-client'
 import { Button } from '@/components/ui/button'
 
@@ -36,6 +37,9 @@ export function BlueprintSectionPage({
   const [blueprint, setBlueprint] = useState<BlueprintData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const projectName = getStoredValue('projectName')
+  const projectIdea = getStoredValue('idea')
+  const storedCountry = getStoredValue('country')
 
   useEffect(() => {
     const projectId = getStoredValue('projectId')
@@ -107,8 +111,29 @@ export function BlueprintSectionPage({
             <h1 className="text-4xl font-bold tracking-tight md:text-5xl">{title}</h1>
             {blueprint?.meta?.country ? (
               <p className="text-lg text-muted-foreground">Tailored for {blueprint.meta.country}{blueprint.meta.region ? ` · ${blueprint.meta.region}` : ''}</p>
+            ) : storedCountry ? (
+              <p className="text-lg text-muted-foreground">Tailored for {storedCountry}</p>
             ) : null}
           </motion.div>
+
+          {(projectName || projectIdea || storedCountry) ? (
+            <motion.div variants={fadeInUp} className="rounded-2xl border border-primary/20 bg-primary/5 p-5">
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-sm font-medium uppercase tracking-wider text-primary">
+                    <Compass className="h-4 w-4" />
+                    Current project
+                  </div>
+                  {projectName ? <p className="text-xl font-semibold">{projectName}</p> : null}
+                  {projectIdea ? <p className="max-w-2xl text-sm text-muted-foreground">{projectIdea}</p> : null}
+                  {storedCountry ? <p className="text-sm text-muted-foreground">Operating in {storedCountry}</p> : null}
+                </div>
+                <div className="flex flex-wrap gap-3">
+                  <Link href="/input"><Button variant="outline">Start new project</Button></Link>
+                </div>
+              </div>
+            </motion.div>
+          ) : null}
 
           {blocks.length === 0 ? (
             <motion.div variants={fadeInUp} className="rounded-2xl border border-border/50 bg-surface/60 p-8">
