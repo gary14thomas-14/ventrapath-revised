@@ -81,11 +81,19 @@ function verifyMigrations() {
   console.log(`Verified ${files.length} migration(s) in ${migrationsDir}`);
 }
 
+function resolveDatabaseUrl() {
+  return process.env.DATABASE_URL
+    ?? process.env.database_DATABASE_URL
+    ?? process.env.POSTGRES_URL
+    ?? process.env.database_POSTGRES_URL
+    ?? null;
+}
+
 async function applyMigrations() {
-  const databaseUrl = process.env.DATABASE_URL;
+  const databaseUrl = resolveDatabaseUrl();
 
   if (!databaseUrl) {
-    throw new Error('DATABASE_URL is required for migrations:apply');
+    throw new Error('DATABASE_URL (or connected Postgres integration env) is required for migrations:apply');
   }
 
   const { Pool } = await import('pg');
