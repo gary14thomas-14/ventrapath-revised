@@ -2,16 +2,6 @@ import { loadEnvFile } from './load-env-file.js';
 
 loadEnvFile(process.cwd());
 
-function requireEnv(name, fallback) {
-  const value = process.env[name] ?? fallback;
-
-  if (value === undefined || value === null || value === '') {
-    throw new Error(`Missing required environment variable: ${name}`);
-  }
-
-  return value;
-}
-
 export function loadEnv() {
   const port = Number(process.env.PORT ?? 4000);
 
@@ -28,7 +18,7 @@ export function loadEnv() {
   return {
     nodeEnv: process.env.NODE_ENV ?? 'development',
     port,
-    appBaseUrl: requireEnv('APP_BASE_URL', `http://localhost:${port}`),
+    appBaseUrl: process.env.APP_BASE_URL ?? `http://localhost:${port}`,
     persistenceDriver,
     databaseUrl: process.env.DATABASE_URL ?? null,
   };

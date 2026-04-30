@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: ventrapath-test
+    runtime: node
+    rootDir: projects/ventrapath/backend
+    buildCommand: npm ci && cd ../frontend && npm ci && npm run build
+    preDeployCommand: npm run migrations:apply
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PERSISTENCE_DRIVER
+        value: postgres
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ventrapath-test-db
+          property: connectionString
+
+databases:
+  - name: ventrapath-test-db

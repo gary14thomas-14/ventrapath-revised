@@ -1,7 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import './App.css'
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000/api'
+const API_BASE = import.meta.env.VITE_API_BASE_URL
+  ?? ((typeof window !== 'undefined' && ['localhost', '127.0.0.1'].includes(window.location.hostname))
+    ? 'http://localhost:4000/api'
+    : '/api')
 const DEV_USER_ID = import.meta.env.VITE_DEV_USER_ID ?? '11111111-1111-4111-8111-111111111111'
 
 const blueprintSectionMeta = [

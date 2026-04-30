@@ -1,4 +1,5 @@
 import { notFound } from './lib/http.js';
+import { handleStaticSite } from './lib/static-site.js';
 import { handleHealth } from './routes/health.js';
 import { handleGenerateBlueprint, handleGetBlueprint, handleListBlueprintVersions } from './routes/blueprint.js';
 import { handleCreateProject, handleGetProject, handleListProjects } from './routes/projects.js';
@@ -60,6 +61,14 @@ export async function handleRequest(req, res, env) {
   const getPhaseMatch = match(pathname, /^\/api\/projects\/([^/]+)\/phases\/([^/]+)$/);
   if (getPhaseMatch && req.method === 'GET') {
     return handleGetPhase(req, res, getPhaseMatch[1], getPhaseMatch[2], env);
+  }
+
+  if (!pathname.startsWith('/api') && pathname !== '/health') {
+    const served = handleStaticSite(req, res, pathname);
+
+    if (served) {
+      return;
+    }
   }
 
   return notFound(res);
