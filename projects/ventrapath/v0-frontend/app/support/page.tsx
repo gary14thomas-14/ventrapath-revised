@@ -20,7 +20,7 @@ const notes = [
     title: 'What to watch for',
     icon: Search,
     items: [
-      'Confusing wording or fake-looking claims',
+      'Confusing wording or exaggerated claims',
       'Places where the flow feels too long or repetitive',
       'Anything that looks broken, unfinished, or untrustworthy',
     ],
@@ -96,7 +96,7 @@ export default function SupportPage() {
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="mx-auto max-w-3xl rounded-3xl border border-primary/20 bg-primary/5 p-8">
             <div className="mb-4 flex items-center gap-3 text-primary">
               <Wrench className="h-5 w-5" />
-              <span className="text-sm font-medium uppercase tracking-wider">Current reality</span>
+              <span className="text-sm font-medium uppercase tracking-wider">Current product state</span>
             </div>
             <h2 className="mb-4 text-2xl font-bold">The core flow is real. The polish pass is still in motion.</h2>
             <p className="mb-6 text-muted-foreground">

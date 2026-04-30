@@ -117,6 +117,14 @@ export default function BlueprintLayout({
                 className="h-full bg-gradient-to-r from-primary to-accent rounded-full"
               />
             </div>
+            {completedBlueprint ? (
+              <Link href="/phase1/brand" className="mt-4 block">
+                <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
+                  Start Phase 1: Brand
+                  <ChevronRight className="w-4 h-4 ml-2" />
+                </Button>
+              </Link>
+            ) : null}
           </div>
         </div>
       </aside>
@@ -186,6 +194,17 @@ export default function BlueprintLayout({
                 </Link>
               )
             })}
+            {completedBlueprint ? (
+              <Link href="/phase1/brand" onClick={() => setMobileMenuOpen(false)}>
+                <div className="mt-4 flex items-center justify-between rounded-xl border border-primary/30 bg-primary/10 px-4 py-4 text-primary">
+                  <div>
+                    <p className="font-medium">Start Phase 1</p>
+                    <p className="text-sm text-primary/80">Move from blueprint into Brand</p>
+                  </div>
+                  <ChevronRight className="w-5 h-5" />
+                </div>
+              </Link>
+            ) : null}
           </nav>
         </motion.div>
       )}
