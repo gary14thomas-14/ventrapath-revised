@@ -40,6 +40,7 @@ export default function BlueprintLayout({
   const currentIndex = navigationSections.findIndex(s => s.href === pathname)
   const nextSection = navigationSections[currentIndex + 1]
   const prevSection = navigationSections[currentIndex - 1]
+  const completedBlueprint = pathname === '/risks'
 
   return (
     <div className="min-h-screen bg-background">
@@ -206,14 +207,21 @@ export default function BlueprintLayout({
                 </Link>
               ) : <div />}
               
-              {nextSection && (
+              {nextSection ? (
                 <Link href={nextSection.href}>
                   <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
                     Next: {nextSection.label}
                     <ChevronRight className="w-4 h-4 ml-2" />
                   </Button>
                 </Link>
-              )}
+              ) : completedBlueprint ? (
+                <Link href="/phase1/brand">
+                  <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                    Start Phase 1: Brand
+                    <ChevronRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </Link>
+              ) : null}
             </div>
           </div>
         </div>
