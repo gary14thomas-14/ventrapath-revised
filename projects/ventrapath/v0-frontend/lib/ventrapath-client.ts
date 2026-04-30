@@ -1,3 +1,11 @@
+import {
+  createLocalProject,
+  generateLocalBlueprint,
+  generateLocalPhase,
+  getLocalBlueprint,
+  getLocalPhase,
+} from './ventrapath-local-engine'
+
 export const VENTRAPATH_STORAGE_KEYS = {
   userId: 'ventrapath_user_id',
   projectId: 'ventrapath_project_id',
@@ -105,6 +113,23 @@ async function apiRequest<T>(path: string, options: RequestInit = {}): Promise<T
   return payload as T
 }
 
+function canUseLocalEngine() {
+  return typeof window !== 'undefined'
+}
+
+async function withLocalFallback<T>(remote: () => Promise<T>, local: () => Promise<T>) {
+  try {
+    return await remote()
+  } catch (error) {
+    if (!canUseLocalEngine()) {
+      throw error
+    }
+
+    console.warn('[ventrapath] remote API unavailable, falling back to local engine', error)
+    return local()
+  }
+}
+
 export async function createProject(project: {
   idea: string
   country: string
@@ -113,37 +138,92 @@ export async function createProject(project: {
   currencyCode?: string
   hoursPerWeek?: number
 }) {
-  return apiRequest<{ ok: true; data: { project: { id: string; name: string } } }>('/projects', {
-    method: 'POST',
-    body: JSON.stringify({
-      name: project.name ?? 'Untitled project',
-      idea: project.idea,
-      country: project.country,
-      region: project.region ?? null,
-      currencyCode: project.currencyCode ?? 'AUD',
-      hoursPerWeek: project.hoursPerWeek ?? 10,
+  return withLocalFallback(
+    () => apiRequest<{ ok: true; data: { project: { id: string; name: string } } }>('/projects', {
+      method: 'POST',
+      body: JSON.stringify({
+        name: project.name ?? 'Untitled project',
+        idea: project.idea,
+        country: project.country,
+        region: project.region ?? null,
+        currencyCode: project.currencyCode ?? 'AUD',
+        hoursPerWeek: project.hoursPerWeek ?? 10,
+      }),
     }),
-  })
+    async () => {
+      const created = await createLocalProject({
+        userId: getOrCreateUserId(),
+        name: project.name,
+        idea: project.idea,
+        country: project.country,
+        region: project.region,
+        currencyCode: project.currencyCode,
+        hoursPerWeek: project.hoursPerWeek,
+      })
+
+      return {
+        ok: true,
+        data: {
+          project: {
+            id: created.id,
+            name: created.name,
+          },
+        },
+      }
+    },
+  )
 }
 
 export async function generateBlueprint(projectId: string) {
-  return apiRequest<{ ok: true; data: { blueprint: BlueprintData } }>(`/projects/${projectId}/blueprint/generate`, {
-    method: 'POST',
-    body: JSON.stringify({ regenerate: true }),
-  })
+  return withLocalFallback(
+    () => apiRequest<{ ok: true; data: { blueprint: BlueprintData } }>(`/projects/${projectId}/blueprint/generate`, {
+      method: 'POST',
+      body: JSON.stringify({ regenerate: true }),
+    }),
+    async () => ({
+      ok: true,
+      data: {
+        blueprint: await generateLocalBlueprint(projectId),
+      },
+    }),
+  )
 }
 
 export async function getBlueprint(projectId: string) {
-  return apiRequest<{ ok: true; data: { blueprint: BlueprintData } }>(`/projects/${projectId}/blueprint`)
+  return withLocalFallback(
+    () => apiRequest<{ ok: true; data: { blueprint: BlueprintData } }>(`/projects/${projectId}/blueprint`),
+    async () => ({
+      ok: true,
+      data: {
+        blueprint: await getLocalBlueprint(projectId),
+      },
+    }),
+  )
 }
 
 export async function getPhase(projectId: string, phaseNumber: number) {
-  return apiRequest<{ ok: true; data: { phase: PhaseData } }>(`/projects/${projectId}/phases/${phaseNumber}`)
+  return withLocalFallback(
+    () => apiRequest<{ ok: true; data: { phase: PhaseData } }>(`/projects/${projectId}/phases/${phaseNumber}`),
+    async () => ({
+      ok: true,
+      data: {
+        phase: await getLocalPhase(projectId, phaseNumber),
+      },
+    }),
+  )
 }
 
 export async function generatePhase(projectId: string, phaseNumber: number) {
-  return apiRequest<{ ok: true; data: { phase: PhaseData } }>(`/projects/${projectId}/phases/${phaseNumber}/generate`, {
-    method: 'POST',
-    body: JSON.stringify({}),
-  })
+  return withLocalFallback(
+    () => apiRequest<{ ok: true; data: { phase: PhaseData } }>(`/projects/${projectId}/phases/${phaseNumber}/generate`, {
+      method: 'POST',
+      body: JSON.stringify({}),
+    }),
+    async () => ({
+      ok: true,
+      data: {
+        phase: await generateLocalPhase(projectId, phaseNumber),
+      },
+    }),
+  )
 }
