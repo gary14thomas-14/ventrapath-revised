@@ -107,9 +107,20 @@ export function PhasePage({
   const [error, setError] = useState('')
   const [missing, setMissing] = useState(false)
   const [retryKey, setRetryKey] = useState(0)
+  const [projectContext, setProjectContext] = useState({
+    projectName: '',
+    projectIdea: '',
+    storedCountry: '',
+  })
 
   useEffect(() => {
     const projectId = getStoredValue('projectId')
+
+    setProjectContext({
+      projectName: getStoredValue('projectName') ?? '',
+      projectIdea: getStoredValue('idea') ?? '',
+      storedCountry: getStoredValue('country') ?? '',
+    })
 
     if (!projectId) {
       router.replace('/input')
@@ -153,9 +164,6 @@ export function PhasePage({
   const totalSteps = phase?.progress?.totalSteps ?? steps.length
   const completedSteps = phase?.progress?.completedSteps ?? 0
   const projectId = getStoredValue('projectId')
-  const projectName = getStoredValue('projectName')
-  const projectIdea = getStoredValue('idea')
-  const storedCountry = getStoredValue('country')
 
   async function handleGenerate() {
     if (!projectId) {
@@ -241,7 +249,7 @@ export function PhasePage({
             </div>
           </div>
 
-          {(projectName || projectIdea || storedCountry) ? (
+          {(projectContext.projectName || projectContext.projectIdea || projectContext.storedCountry) ? (
             <div className="rounded-2xl border border-primary/20 bg-primary/5 p-5">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div className="space-y-2">
@@ -249,9 +257,9 @@ export function PhasePage({
                     <Compass className="h-4 w-4" />
                     Current project
                   </div>
-                  {projectName ? <p className="text-xl font-semibold">{projectName}</p> : null}
-                  {projectIdea ? <p className="max-w-2xl text-sm text-muted-foreground">{projectIdea}</p> : null}
-                  {storedCountry ? <p className="text-sm text-muted-foreground">Operating in {storedCountry}</p> : null}
+                  {projectContext.projectName ? <p className="text-xl font-semibold">{projectContext.projectName}</p> : null}
+                  {projectContext.projectIdea ? <p className="max-w-2xl text-sm text-muted-foreground">{projectContext.projectIdea}</p> : null}
+                  {projectContext.storedCountry ? <p className="text-sm text-muted-foreground">Operating in {projectContext.storedCountry}</p> : null}
                 </div>
                 <div className="flex flex-wrap gap-3">
                   <Link href="/blueprint"><Button variant="outline">Blueprint</Button></Link>

@@ -38,12 +38,20 @@ export function BlueprintSectionPage({
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [retryKey, setRetryKey] = useState(0)
-  const projectName = getStoredValue('projectName')
-  const projectIdea = getStoredValue('idea')
-  const storedCountry = getStoredValue('country')
+  const [projectContext, setProjectContext] = useState({
+    projectName: '',
+    projectIdea: '',
+    storedCountry: '',
+  })
 
   useEffect(() => {
     const projectId = getStoredValue('projectId')
+
+    setProjectContext({
+      projectName: getStoredValue('projectName') ?? '',
+      projectIdea: getStoredValue('idea') ?? '',
+      storedCountry: getStoredValue('country') ?? '',
+    })
 
     if (!projectId) {
       router.replace('/input')
@@ -122,7 +130,7 @@ export function BlueprintSectionPage({
             ) : null}
           </motion.div>
 
-          {(projectName || projectIdea || storedCountry) ? (
+          {(projectContext.projectName || projectContext.projectIdea || projectContext.storedCountry) ? (
             <motion.div variants={fadeInUp} className="rounded-2xl border border-primary/20 bg-primary/5 p-5">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div className="space-y-2">
@@ -130,9 +138,9 @@ export function BlueprintSectionPage({
                     <Compass className="h-4 w-4" />
                     Current project
                   </div>
-                  {projectName ? <p className="text-xl font-semibold">{projectName}</p> : null}
-                  {projectIdea ? <p className="max-w-2xl text-sm text-muted-foreground">{projectIdea}</p> : null}
-                  {storedCountry ? <p className="text-sm text-muted-foreground">Operating in {storedCountry}</p> : null}
+                  {projectContext.projectName ? <p className="text-xl font-semibold">{projectContext.projectName}</p> : null}
+                  {projectContext.projectIdea ? <p className="max-w-2xl text-sm text-muted-foreground">{projectContext.projectIdea}</p> : null}
+                  {projectContext.storedCountry ? <p className="text-sm text-muted-foreground">Operating in {projectContext.storedCountry}</p> : null}
                 </div>
                 <div className="flex flex-wrap gap-3">
                   <Link href="/input"><Button variant="outline">Start new project</Button></Link>
