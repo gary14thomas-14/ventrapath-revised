@@ -30,5 +30,7 @@ export function loadEnv() {
     appBaseUrl: process.env.APP_BASE_URL ?? `http://localhost:${port}`,
     persistenceDriver,
     databaseUrl,
+    openAiApiKey: process.env.OPENAI_API_KEY ?? null,
+    openAiModel: process.env.OPENAI_MODEL ?? 'gpt-4.1',
   };
 }
