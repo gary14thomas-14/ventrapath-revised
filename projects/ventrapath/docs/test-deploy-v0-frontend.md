@@ -40,6 +40,14 @@ Optional:
 
 Use the existing backend env/config. For tester deploys, point it at Postgres when ready.
 
+Required production envs for the real blueprint path:
+
+- `OPENAI_API_KEY`
+- `OPENAI_MODEL`
+- database envs / `PERSISTENCE_DRIVER` as appropriate
+
+If `OPENAI_API_KEY` is missing in production, the live backend can silently degrade to the fallback blueprint writer. Treat that as a broken deploy, not an acceptable partial state.
+
 ## Local run
 
 ### Backend
@@ -78,6 +86,25 @@ This passed for:
 - phases 1-9 generation/fetch
 - phase ladder progression
 - project progress state
+
+## Production verification checklist
+
+After every backend production deploy:
+
+1. verify the backend project has the required production envs, especially `OPENAI_API_KEY`
+2. redeploy the actual backend project, not just the frontend
+3. run:
+
+```powershell
+python scripts\local-test\production-smoke.py
+```
+
+4. confirm the response reports:
+   - `provider: openai`
+   - `writer: openai-direct-blueprint-v1`
+5. only then trust tester-facing blueprint quality checks in the frontend
+
+This matters because a deploy can be "green" while the live generation path is still wrong.
 
 ## Important caveat
 

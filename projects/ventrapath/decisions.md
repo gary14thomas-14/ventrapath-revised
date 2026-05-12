@@ -38,11 +38,16 @@
 - New-category pricing is only justified when the difference is obvious to the customer quickly; if the premium edge is not legible within seconds, VentraPath should price more conservatively.
 - VentraPath should use a hard paywall immediately after the blueprint experience: the user gets the blueprint first, clicks Next, sees the next-steps transition/load, and then hits the paywall before proceeding into the guided build phases.
 - The blueprint should create excitement; the paywall should trigger at the exact moment of forward momentum, not before the user has seen the blueprint value.
+- VentraPath launch pricing is locked for now at USD $29/month for Single and USD $79/month for Team (up to 5 users).
+- Annual billing should offer a 15% discount from the monthly equivalent rather than inventing separate anchor pricing.
 - Every Legal section must clearly state that it is information only and the user must do their own research / local verification.
 - Phase 2 Legal must be country-specific, link users to the correct official or primary authority sites where possible, and show visible disclaimer language inside the phase UI itself.
+- All actionable links in VentraPath phases should be location-specific where location materially changes the correct destination. Do not use generic global links when the user needs the country/region-specific authority, provider, registry, or setup path.
 - Legal template or provider links must never be confused with official filing authorities; if the exact regional authority is unclear, VentraPath should label the uncertainty instead of bluffing.
 - Benchmarking should now split into two lanes with different success criteria: (1) company blueprint generation and (2) messy idea rescue/rejection.
 - In the messy-idea lane, a clean commercially honest rejection counts as success; the goal is not to force every fuzzy input into a pass.
 - Do not start detailed build/design work from this capture alone until Gaz says to begin.
 - VentraPath model policy: keep premium usage narrow. Default Bob to `openai/gpt-5.4`, default most specialists to `openai/gpt-4.1`, use `openai/gpt-4.1-mini` for mechanical/utility work, and only escalate specialists to premium when the task genuinely needs stronger judgment.
 - VentraPath caching policy: keep final blueprint reuse, but add granular Postgres-backed specialist caching next. Cache structured agent outputs aggressively with keys that include model, prompt version, normalized input, jurisdiction, and dependency hash; treat legal/reference caches as perishable and do not blindly reuse final synthesis when upstream context changed.
+- Production deploy rule: do not treat a successful Vercel deploy as proof that the live blueprint path is healthy. After backend deploys, verify the real production path with a fresh smoke test that confirms `provider=openai`, `writer=openai-direct-blueprint-v1`, and absence of fallback-template / raw-prompt output before declaring the issue fixed.
+- Production backend health must expose whether OpenAI is configured so missing `OPENAI_API_KEY` is visible immediately instead of being discovered through degraded blueprint quality later.

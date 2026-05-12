@@ -4,6 +4,7 @@ import {
   generateLocalPhase,
   getLocalBlueprint,
   getLocalPhase,
+  updateLocalPhase,
 } from './ventrapath-local-engine'
 
 export const VENTRAPATH_STORAGE_KEYS = {
@@ -12,7 +13,16 @@ export const VENTRAPATH_STORAGE_KEYS = {
   idea: 'ventrapath_idea',
   country: 'ventrapath_country',
   projectName: 'ventrapath_project_name',
+  lastVisitedPath: 'ventrapath_last_visited_path',
 } as const
+
+const LEGACY_STORAGE_KEYS: Partial<Record<keyof typeof VENTRAPATH_STORAGE_KEYS, string>> = {
+  projectId: 'projectId',
+  idea: 'idea',
+  country: 'country',
+  projectName: 'projectName',
+  lastVisitedPath: 'lastVisitedPath',
+}
 
 export type BlueprintSectionKey = 'business' | 'market' | 'monetisation' | 'execution' | 'legal' | 'website' | 'risks'
 
@@ -39,6 +49,7 @@ export interface PhaseData {
   state: string
   summary: string
   generatedContent: Record<string, unknown>
+  userState?: Record<string, unknown>
   progress?: {
     totalSteps?: number
     completedSteps?: number
@@ -53,6 +64,14 @@ export interface PhaseData {
   }>
 }
 
+export interface LogoConcept {
+  id: string
+  name: string
+  style: string
+  rationale: string
+  prompt: string
+}
+
 function getBrowserApiBase() {
   return process.env.NEXT_PUBLIC_API_BASE_URL ?? '/api'
 }
@@ -62,7 +81,23 @@ export function getStoredValue(key: keyof typeof VENTRAPATH_STORAGE_KEYS) {
     return null
   }
 
-  return window.localStorage.getItem(VENTRAPATH_STORAGE_KEYS[key])
+  const primaryKey = VENTRAPATH_STORAGE_KEYS[key]
+  const primaryValue = window.localStorage.getItem(primaryKey)
+  if (primaryValue) {
+    return primaryValue
+  }
+
+  const legacyKey = LEGACY_STORAGE_KEYS[key]
+  if (!legacyKey) {
+    return null
+  }
+
+  const legacyValue = window.localStorage.getItem(legacyKey)
+  if (legacyValue) {
+    window.localStorage.setItem(primaryKey, legacyValue)
+  }
+
+  return legacyValue
 }
 
 export function setStoredValue(key: keyof typeof VENTRAPATH_STORAGE_KEYS, value: string) {
@@ -71,6 +106,11 @@ export function setStoredValue(key: keyof typeof VENTRAPATH_STORAGE_KEYS, value:
   }
 
   window.localStorage.setItem(VENTRAPATH_STORAGE_KEYS[key], value)
+
+  const legacyKey = LEGACY_STORAGE_KEYS[key]
+  if (legacyKey) {
+    window.localStorage.setItem(legacyKey, value)
+  }
 }
 
 export function clearProjectSession() {
@@ -79,6 +119,15 @@ export function clearProjectSession() {
   }
 
   window.localStorage.removeItem(VENTRAPATH_STORAGE_KEYS.projectId)
+  window.localStorage.removeItem(VENTRAPATH_STORAGE_KEYS.projectName)
+  window.localStorage.removeItem(VENTRAPATH_STORAGE_KEYS.idea)
+  window.localStorage.removeItem(VENTRAPATH_STORAGE_KEYS.country)
+  window.localStorage.removeItem(VENTRAPATH_STORAGE_KEYS.lastVisitedPath)
+  window.localStorage.removeItem(LEGACY_STORAGE_KEYS.projectId ?? '')
+  window.localStorage.removeItem(LEGACY_STORAGE_KEYS.projectName ?? '')
+  window.localStorage.removeItem(LEGACY_STORAGE_KEYS.idea ?? '')
+  window.localStorage.removeItem(LEGACY_STORAGE_KEYS.country ?? '')
+  window.localStorage.removeItem(LEGACY_STORAGE_KEYS.lastVisitedPath ?? '')
 }
 
 export function getOrCreateUserId() {
@@ -114,7 +163,7 @@ async function apiRequest<T>(path: string, options: RequestInit = {}): Promise<T
 }
 
 function canUseLocalEngine() {
-  return typeof window !== 'undefined'
+  return typeof window !== 'undefined' && process.env.NEXT_PUBLIC_ENABLE_LOCAL_FALLBACK === 'true'
 }
 
 async function withLocalFallback<T>(remote: () => Promise<T>, local: () => Promise<T>) {
@@ -122,6 +171,7 @@ async function withLocalFallback<T>(remote: () => Promise<T>, local: () => Promi
     return await remote()
   } catch (error) {
     if (!canUseLocalEngine()) {
+      console.error('[ventrapath] remote API unavailable and local fallback is disabled', error)
       throw error
     }
 
@@ -223,6 +273,67 @@ export async function generatePhase(projectId: string, phaseNumber: number) {
       ok: true,
       data: {
         phase: await generateLocalPhase(projectId, phaseNumber),
+      },
+    }),
+  )
+}
+
+export async function updatePhase(projectId: string, phaseNumber: number, updates: {
+  userState?: Record<string, unknown>
+  progress?: {
+    totalSteps?: number
+    completedSteps?: number
+  }
+}) {
+  return withLocalFallback(
+    () => apiRequest<{ ok: true; data: { phase: PhaseData } }>(`/projects/${projectId}/phases/${phaseNumber}`, {
+      method: 'PATCH',
+      body: JSON.stringify(updates),
+    }),
+    async () => ({
+      ok: true,
+      data: {
+        phase: await updateLocalPhase(projectId, phaseNumber, updates),
+      },
+    }),
+  )
+}
+
+export async function generateLogoConcepts(projectId: string, prompt: string) {
+  return withLocalFallback(
+    () => apiRequest<{ ok: true; data: { logoConcepts: LogoConcept[]; source: string; agent: string; generatedAt: string } }>(`/projects/${projectId}/phases/1/logo-concepts`, {
+      method: 'POST',
+      body: JSON.stringify({ prompt }),
+    }),
+    async () => ({
+      ok: true,
+      data: {
+        logoConcepts: [
+          {
+            id: 'wordmark',
+            name: 'Wordmark',
+            style: 'Typography-first',
+            rationale: 'A clean wordmark gives the brand the fastest path to looking credible and premium across the product surface.',
+            prompt,
+          },
+          {
+            id: 'icon-wordmark',
+            name: 'Icon + Wordmark',
+            style: 'Symbol plus name',
+            rationale: 'A compact symbol plus wordmark gives the brand a recognisable mark for app, web, and packaging use.',
+            prompt: `${prompt} Create an icon + wordmark variant that feels ownable and commercially credible.`,
+          },
+          {
+            id: 'minimal-premium',
+            name: 'Minimal Premium',
+            style: 'Editorial / luxury restraint',
+            rationale: 'A more restrained premium direction helps the brand feel more mature and differentiated from generic startup visuals.',
+            prompt: `${prompt} Create a more minimal premium variant with restrained luxury cues and sharper typography.`,
+          },
+        ],
+        source: 'local-fallback',
+        agent: 'logo-designer',
+        generatedAt: new Date().toISOString(),
       },
     }),
   )

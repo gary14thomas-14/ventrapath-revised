@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { AlertTriangle, Compass, Loader2, Sparkles } from 'lucide-react'
-import { BlueprintData, BlueprintSectionKey, getBlueprint, getStoredValue } from '@/lib/ventrapath-client'
+import { BlueprintData, BlueprintSectionKey, clearProjectSession, getBlueprint, getStoredValue } from '@/lib/ventrapath-client'
 import { Button } from '@/components/ui/button'
 
 const fadeInUp = {
@@ -22,6 +22,26 @@ function parseMarkdownBlocks(markdown: string) {
 
 function renderListItem(item: string) {
   return item.replace(/^[-*]\s*/, '').trim()
+}
+
+function shortId(value?: string | null) {
+  if (!value) return '—'
+  return value.slice(0, 8)
+}
+
+function formatGeneratedAt(value?: string) {
+  if (!value) return 'Unknown'
+
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return value
+
+  return date.toLocaleString(undefined, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  })
 }
 
 export function BlueprintSectionPage({
@@ -45,7 +65,7 @@ export function BlueprintSectionPage({
   })
 
   useEffect(() => {
-    const projectId = getStoredValue('projectId')
+    const projectId = getStoredValue('projectId') ?? ''
 
     setProjectContext({
       projectName: getStoredValue('projectName') ?? '',
@@ -125,13 +145,13 @@ export function BlueprintSectionPage({
             <h1 className="text-4xl font-bold tracking-tight md:text-5xl">{title}</h1>
             {blueprint?.meta?.country ? (
               <p className="text-lg text-muted-foreground">Tailored for {blueprint.meta.country}{blueprint.meta.region ? ` · ${blueprint.meta.region}` : ''}</p>
-            ) : storedCountry ? (
-              <p className="text-lg text-muted-foreground">Tailored for {storedCountry}</p>
+            ) : projectContext.storedCountry ? (
+              <p className="text-lg text-muted-foreground">Tailored for {projectContext.storedCountry}</p>
             ) : null}
           </motion.div>
 
           {(projectContext.projectName || projectContext.projectIdea || projectContext.storedCountry) ? (
-            <motion.div variants={fadeInUp} className="rounded-2xl border border-primary/20 bg-primary/5 p-5">
+            <motion.div variants={fadeInUp} className="card-elevated interactive-lift rounded-2xl p-5">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-sm font-medium uppercase tracking-wider text-primary">
@@ -141,16 +161,21 @@ export function BlueprintSectionPage({
                   {projectContext.projectName ? <p className="text-xl font-semibold">{projectContext.projectName}</p> : null}
                   {projectContext.projectIdea ? <p className="max-w-2xl text-sm text-muted-foreground">{projectContext.projectIdea}</p> : null}
                   {projectContext.storedCountry ? <p className="text-sm text-muted-foreground">Operating in {projectContext.storedCountry}</p> : null}
+                  <div className="flex flex-wrap gap-x-4 gap-y-1 pt-2 text-xs text-muted-foreground">
+                    <span>Project ID: <strong>{shortId(blueprint?.projectId ?? getStoredValue('projectId'))}</strong></span>
+                    <span>Blueprint ID: <strong>{shortId(blueprint?.id)}</strong></span>
+                    <span>Generated: <strong>{formatGeneratedAt(blueprint?.meta?.generatedAt ?? blueprint?.createdAt)}</strong></span>
+                  </div>
                 </div>
                 <div className="flex flex-wrap gap-3">
-                  <Link href="/input"><Button variant="outline">Start new project</Button></Link>
+                  <Link href="/input" onClick={() => clearProjectSession()}><Button variant="outline">Start new project</Button></Link>
                 </div>
               </div>
             </motion.div>
           ) : null}
 
           {blocks.length === 0 ? (
-            <motion.div variants={fadeInUp} className="rounded-2xl border border-border/50 bg-surface/60 p-8">
+            <motion.div variants={fadeInUp} className="card-elevated rounded-2xl p-8">
               <p className="text-muted-foreground">No content landed for this section yet.</p>
             </motion.div>
           ) : (
@@ -161,7 +186,7 @@ export function BlueprintSectionPage({
               const paragraphLines = lines.filter((line) => !/^[-*]\s+/.test(line) && !line.startsWith('#'))
 
               return (
-                <motion.section key={`${sectionKey}-${index}`} variants={fadeInUp} className="rounded-2xl border border-border/50 bg-surface/60 p-6 md:p-8">
+                <motion.section key={`${sectionKey}-${index}`} variants={fadeInUp} className="card-elevated interactive-lift rounded-2xl p-6 md:p-8">
                   {heading ? <h2 className="mb-4 text-2xl font-semibold">{heading}</h2> : null}
                   {paragraphLines.length > 0 ? (
                     <div className="space-y-4 text-foreground/90">

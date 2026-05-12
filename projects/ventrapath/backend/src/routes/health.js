@@ -7,5 +7,10 @@ export function handleHealth(req, res, env) {
     environment: env.nodeEnv,
     baseUrl: env.appBaseUrl,
     now: new Date().toISOString(),
+    checks: {
+      openAiConfigured: Boolean(env.openAiApiKey),
+      persistenceDriver: env.persistenceDriver,
+      openAiModel: env.openAiModel,
+    },
   });
 }

@@ -13,24 +13,34 @@ function normalizeInlineText(input) {
     .replace(/�/g, 'é')
 }
 
+function resolveBusinessName(project, ...phases) {
+  for (const phase of phases) {
+    const phaseBusinessName = String(phase?.userState?.businessName ?? '').trim()
+    if (phaseBusinessName) return phaseBusinessName
+  }
+
+  return String(project?.name ?? '').trim() || 'Your Business'
+}
+
 function buildNameOptions(project) {
   const base = project.name || project.rawIdea || 'VentraPath Business'
   const compactBase = sentenceCase(base.replace(/[^a-zA-Z0-9 ]+/g, ' ').trim())
-  const shortBase = compactBase.split(/\s+/).slice(0, 3).join(' ')
-  const region = project.region ? sentenceCase(project.region) : sentenceCase(project.country)
+  const words = compactBase.split(/\s+/).filter(Boolean)
+  const root = words.slice(0, 2).join(' ') || compactBase
+  const fallbackRoot = root.replace(/^(A|An|The)\s+/i, '').trim() || root
 
   return [
     {
-      name: shortBase,
-      rationale: 'Closest to the original idea while sounding clean and commercially legible.',
+      name: fallbackRoot,
+      rationale: 'Simple fallback name while stronger brand-name generation is unavailable.',
     },
     {
-      name: `${shortBase} Studio`,
-      rationale: 'Adds a premium, modern layer without drifting away from the core offer.',
+      name: `${fallbackRoot} Co`,
+      rationale: 'Keeps the name compact while giving it a cleaner business-like form.',
     },
     {
-      name: `${region} ${shortBase}`,
-      rationale: 'Makes the local market fit obvious, which helps early trust and search clarity.',
+      name: `${fallbackRoot} Labs`,
+      rationale: 'Useful when the concept has a product, systems, or experimental edge.',
     },
   ]
 }
@@ -152,9 +162,9 @@ function buildBrandTasks() {
   ]
 }
 
-export function buildBrandPhase(project, blueprint) {
-  const nameOptions = buildNameOptions(project)
-  const recommendedName = nameOptions[0]
+export function buildBrandPhase(project, blueprint, naming = null) {
+  const nameOptions = naming?.nameOptions?.length ? naming.nameOptions : buildNameOptions(project)
+  const recommendedName = naming?.recommendedName?.name ? naming.recommendedName : nameOptions[0]
   const positioning = buildBrandPositioning(project, blueprint)
   const visual = buildVisualIdentity(project)
   const domain = buildDomainSection(project)
@@ -169,7 +179,7 @@ export function buildBrandPhase(project, blueprint) {
           description: 'Choose a memorable, commercially legible name that still carries the business edge.',
           helper: {
             howToDoThis: 'Avoid generic filler names. You want something clear enough to trust, but sharp enough to stand out.',
-            example: `${recommendedName.name} works because it stays close to the core offer without sounding flat or forgettable.`,
+            example: (recommendedName?.rationale || (recommendedName?.name ? `${recommendedName.name} works because it feels like an actual brand instead of a descriptive label.` : 'A compact fallback name works because it feels like an actual brand instead of a descriptive label.')),
           },
           input: {
             type: 'text',
@@ -285,8 +295,8 @@ export function buildBrandPhase(project, blueprint) {
     userState: {
       businessName: project.name ?? '',
       positioning: {
-        whatDoesBusinessDo: '',
-        whoIsItFor: '',
+        whatItDoes: '',
+        whoItsFor: '',
         whatMakesItDifferent: '',
       },
       socialHandles: {
@@ -301,6 +311,258 @@ export function buildBrandPhase(project, blueprint) {
     },
     tasks: buildBrandTasks(),
   }
+}
+
+function getCountryProfile(project) {
+  const country = String(project?.country ?? '').trim().toLowerCase()
+
+  if (country === 'australia') {
+    return {
+      businessRegistryLabel: 'ASIC',
+      businessRegistryUrl: 'https://asic.gov.au/',
+      businessRegistrySearchUrl: 'https://connectonline.asic.gov.au/RegistrySearch/faces/landing/SearchRegisters.jspx',
+      identifierLabel: 'ABN (Australian Business Number)',
+      identifierUrl: 'https://www.abr.gov.au/',
+      taxAuthorityLabel: 'ATO',
+      taxAuthorityUrl: 'https://www.ato.gov.au/',
+      taxType: 'GST (Goods and Services Tax)',
+      taxRate: '10%',
+      taxThreshold: '$75,000 annual turnover',
+      businessBankPrimary: { name: 'Up Bank', url: 'https://up.com.au/' },
+      businessBankSecondary: { name: 'Westpac', url: 'https://www.westpac.com.au/business-banking/' },
+      crossBorderBank: { name: 'Airwallex', url: 'https://www.airwallex.com/au' },
+      privacyAuthorityLabel: 'OAIC privacy guidance',
+      privacyAuthorityUrl: 'https://www.oaic.gov.au/privacy/privacy-guidance-for-organisations-and-government-agencies',
+      insuranceGuideLabel: 'business.gov.au insurance guide',
+      insuranceGuideUrl: 'https://business.gov.au/risk-management/insurance',
+    }
+  }
+
+  if (country === 'united kingdom' || country === 'uk') {
+    return {
+      businessRegistryLabel: 'Companies House',
+      businessRegistryUrl: 'https://www.gov.uk/limited-company-formation/register-your-company',
+      businessRegistrySearchUrl: 'https://find-and-update.company-information.service.gov.uk/search',
+      identifierLabel: 'UTR / Company Number',
+      identifierUrl: 'https://www.gov.uk/set-up-sole-trader',
+      taxAuthorityLabel: 'HMRC',
+      taxAuthorityUrl: 'https://www.gov.uk/browse/tax',
+      taxType: 'VAT',
+      taxRate: '20%',
+      taxThreshold: 'Check current VAT turnover threshold',
+      businessBankPrimary: { name: 'Monzo Business', url: 'https://monzo.com/business-banking/' },
+      businessBankSecondary: { name: 'Lloyds Bank Business', url: 'https://www.lloydsbank.com/business.html' },
+      crossBorderBank: { name: 'Wise Business', url: 'https://wise.com/gb/business/' },
+      privacyAuthorityLabel: 'ICO business privacy guidance',
+      privacyAuthorityUrl: 'https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/',
+      insuranceGuideLabel: 'UK business insurance guidance',
+      insuranceGuideUrl: 'https://www.gov.uk/browse/business/business-insurance',
+    }
+  }
+
+  if (country === 'canada') {
+    return {
+      businessRegistryLabel: 'Canada business registration',
+      businessRegistryUrl: 'https://www.canada.ca/en/services/business/start/register-with-gov.html',
+      businessRegistrySearchUrl: 'https://ised-isde.canada.ca/cc/lgcy/fdrlCrpSrch.html',
+      identifierLabel: 'Business Number (BN)',
+      identifierUrl: 'https://www.canada.ca/en/services/taxes/business-number.html',
+      taxAuthorityLabel: 'CRA',
+      taxAuthorityUrl: 'https://www.canada.ca/en/services/taxes.html',
+      taxType: 'GST/HST',
+      taxRate: 'Varies by province',
+      taxThreshold: 'Check current small supplier threshold',
+      businessBankPrimary: { name: 'RBC Business Banking', url: 'https://www.rbcroyalbank.com/business/index.html' },
+      businessBankSecondary: { name: 'TD Small Business Banking', url: 'https://www.td.com/ca/en/business-banking/small-business' },
+      crossBorderBank: { name: 'Wise Business', url: 'https://wise.com/ca/business/' },
+      privacyAuthorityLabel: 'OPC Canada privacy guidance',
+      privacyAuthorityUrl: 'https://www.priv.gc.ca/en/privacy-topics/privacy-laws-in-canada/the-personal-information-protection-and-electronic-documents-act-pipeda/',
+      insuranceGuideLabel: 'Canada business setup guidance',
+      insuranceGuideUrl: 'https://www.canada.ca/en/services/business/start.html',
+    }
+  }
+
+  if (country === 'united states' || country === 'us' || country === 'usa') {
+    return {
+      businessRegistryLabel: 'state business registration',
+      businessRegistryUrl: 'https://www.sba.gov/business-guide/launch-your-business/register-your-business',
+      businessRegistrySearchUrl: 'https://www.usa.gov/register-business',
+      identifierLabel: 'EIN / business tax identifier',
+      identifierUrl: 'https://www.irs.gov/businesses/small-businesses-self-employed/employer-id-numbers',
+      taxAuthorityLabel: 'IRS',
+      taxAuthorityUrl: 'https://www.irs.gov/businesses',
+      taxType: 'Sales tax / state tax obligations',
+      taxRate: 'Varies by state',
+      taxThreshold: 'Check state nexus and filing thresholds',
+      businessBankPrimary: { name: 'Bank of America Small Business', url: 'https://www.bankofamerica.com/smallbusiness/' },
+      businessBankSecondary: { name: 'Chase Business Banking', url: 'https://www.chase.com/business/banking' },
+      crossBorderBank: { name: 'Wise Business', url: 'https://wise.com/us/business/' },
+      privacyAuthorityLabel: 'FTC privacy and data security guidance',
+      privacyAuthorityUrl: 'https://www.ftc.gov/business-guidance/privacy-security',
+      insuranceGuideLabel: 'SBA business insurance guide',
+      insuranceGuideUrl: 'https://www.sba.gov/business-guide/manage-your-business/business-insurance',
+    }
+  }
+
+  return {
+    businessRegistryLabel: 'official business registry',
+    businessRegistryUrl: '',
+    businessRegistrySearchUrl: '',
+    identifierLabel: 'business / tax identifier',
+    identifierUrl: '',
+    taxAuthorityLabel: 'official tax authority',
+    taxAuthorityUrl: '',
+    taxType: 'Sales / VAT / GST obligations',
+    taxRate: 'Varies by jurisdiction',
+    taxThreshold: 'Check the official threshold for your market',
+    businessBankPrimary: { name: 'Local business bank', url: '' },
+    businessBankSecondary: { name: 'Traditional business bank', url: '' },
+    crossBorderBank: { name: 'Wise Business', url: 'https://wise.com/business/' },
+    privacyAuthorityLabel: 'Local privacy authority',
+    privacyAuthorityUrl: '',
+    insuranceGuideLabel: 'Local business insurance guidance',
+    insuranceGuideUrl: '',
+  }
+}
+
+function normalizeCountryName(country) {
+  const normalized = String(country ?? '').trim().toLowerCase()
+
+  if (normalized === 'uk') return 'united kingdom'
+  if (normalized === 'us' || normalized === 'usa') return 'united states'
+
+  return normalized
+}
+
+function getLocalizedVendorUrl(projectOrCountry, name, fallbackUrl = '') {
+  const country = normalizeCountryName(typeof projectOrCountry === 'string' ? projectOrCountry : projectOrCountry?.country)
+  const vendor = String(name ?? '').trim().toLowerCase()
+
+  const vendorUrls = {
+    stripe: {
+      australia: 'https://stripe.com/au',
+      'united kingdom': 'https://stripe.com/gb',
+      canada: 'https://stripe.com/ca',
+      'united states': 'https://stripe.com/',
+      default: 'https://stripe.com/',
+    },
+    paypal: {
+      australia: 'https://www.paypal.com/au/business',
+      'united kingdom': 'https://www.paypal.com/uk/business',
+      canada: 'https://www.paypal.com/ca/business',
+      'united states': 'https://www.paypal.com/us/business',
+      default: 'https://www.paypal.com/business/',
+    },
+    square: {
+      australia: 'https://squareup.com/au/en',
+      'united kingdom': 'https://squareup.com/gb/en',
+      canada: 'https://squareup.com/ca/en',
+      'united states': 'https://squareup.com/us/en',
+      default: 'https://squareup.com/',
+    },
+    xero: {
+      australia: 'https://www.xero.com/au/',
+      'united kingdom': 'https://www.xero.com/uk/',
+      canada: 'https://www.xero.com/ca/',
+      'united states': 'https://www.xero.com/us/',
+      default: 'https://www.xero.com/',
+    },
+    quickbooks: {
+      australia: 'https://quickbooks.intuit.com/au/',
+      'united kingdom': 'https://quickbooks.intuit.com/uk/',
+      canada: 'https://quickbooks.intuit.com/ca/',
+      'united states': 'https://quickbooks.intuit.com/',
+      default: 'https://quickbooks.intuit.com/',
+    },
+    'google workspace': {
+      australia: 'https://workspace.google.com/intl/en_au/',
+      'united kingdom': 'https://workspace.google.com/intl/en_uk/',
+      canada: 'https://workspace.google.com/intl/en_ca/',
+      'united states': 'https://workspace.google.com/intl/en/',
+      default: 'https://workspace.google.com/',
+    },
+    'microsoft 365': {
+      australia: 'https://www.microsoft.com/en-au/microsoft-365/business',
+      'united kingdom': 'https://www.microsoft.com/en-gb/microsoft-365/business',
+      canada: 'https://www.microsoft.com/en-ca/microsoft-365/business',
+      'united states': 'https://www.microsoft.com/en-us/microsoft-365/business',
+      default: 'https://www.microsoft.com/microsoft-365/business',
+    },
+    'zoho mail': {
+      australia: 'https://www.zoho.com/mail/',
+      'united kingdom': 'https://www.zoho.com/mail/',
+      canada: 'https://www.zoho.com/mail/',
+      'united states': 'https://www.zoho.com/mail/',
+      default: 'https://www.zoho.com/mail/',
+    },
+    'wise business': {
+      australia: 'https://wise.com/au/business/',
+      'united kingdom': 'https://wise.com/gb/business/',
+      canada: 'https://wise.com/ca/business/',
+      'united states': 'https://wise.com/us/business/',
+      default: 'https://wise.com/business/',
+    },
+    'google ads': {
+      australia: 'https://ads.google.com/intl/en_au/home/',
+      'united kingdom': 'https://ads.google.com/intl/en_uk/home/',
+      canada: 'https://ads.google.com/intl/en_ca/home/',
+      'united states': 'https://ads.google.com/home/',
+      default: 'https://ads.google.com/home/',
+    },
+    'google analytics': {
+      australia: 'https://analytics.google.com/analytics/web/?hl=en-AU',
+      'united kingdom': 'https://analytics.google.com/analytics/web/?hl=en-GB',
+      canada: 'https://analytics.google.com/analytics/web/?hl=en-CA',
+      'united states': 'https://analytics.google.com/analytics/web/',
+      default: 'https://analytics.google.com/analytics/web/',
+    },
+    'google drive': {
+      australia: 'https://workspace.google.com/intl/en_au/products/drive/',
+      'united kingdom': 'https://workspace.google.com/intl/en_uk/products/drive/',
+      canada: 'https://workspace.google.com/intl/en_ca/products/drive/',
+      'united states': 'https://workspace.google.com/intl/en/products/drive/',
+      default: 'https://workspace.google.com/products/drive/',
+    },
+    'google sheets': {
+      australia: 'https://workspace.google.com/intl/en_au/products/sheets/',
+      'united kingdom': 'https://workspace.google.com/intl/en_uk/products/sheets/',
+      canada: 'https://workspace.google.com/intl/en_ca/products/sheets/',
+      'united states': 'https://workspace.google.com/intl/en/products/sheets/',
+      default: 'https://workspace.google.com/products/sheets/',
+    },
+    slack: {
+      australia: 'https://slack.com/intl/en-au/',
+      'united kingdom': 'https://slack.com/intl/en-gb/',
+      canada: 'https://slack.com/intl/en-ca/',
+      'united states': 'https://slack.com/',
+      default: 'https://slack.com/',
+    },
+  }
+
+  const match = vendorUrls[vendor]
+  if (!match) return fallbackUrl
+
+  return match[country] ?? match.default ?? fallbackUrl
+}
+
+function localizeGeneratedContent(project, value) {
+  if (Array.isArray(value)) {
+    return value.map((entry) => localizeGeneratedContent(project, entry))
+  }
+
+  if (!value || typeof value !== 'object') {
+    return value
+  }
+
+  const record = Object.fromEntries(
+    Object.entries(value).map(([key, entry]) => [key, localizeGeneratedContent(project, entry)]),
+  )
+
+  if (typeof record.name === 'string' && typeof record.url === 'string' && record.url) {
+    record.url = getLocalizedVendorUrl(project, record.name, record.url)
+  }
+
+  return record
 }
 
 function buildLegalTasks(project) {
@@ -360,25 +622,16 @@ function buildLegalTasks(project) {
 
 export function buildLegalPhase(project, blueprint, brandPhase) {
   const jurisdiction = project.region ? `${project.region}, ${project.country}` : project.country
+  const countryProfile = getCountryProfile(project)
   const brandGenerated = brandPhase?.generated ?? brandPhase?.generatedContent
-  const businessName = brandGenerated?.steps?.[0]?.suggestions?.recommendedName?.name ?? project.name
-  const identifierLabel = project.country.toLowerCase() === 'australia'
-    ? 'Get Your ABN (Australian Business Number)'
-    : 'Get Your Business / Tax Identifier'
-  const identifierInputLabel = project.country.toLowerCase() === 'australia'
-    ? 'Enter your ABN (Australian Business Number)'
-    : 'Enter your business/tax identifier'
-  const identifierLink = project.country.toLowerCase() === 'australia'
-    ? {
-        label: 'Apply for an ABN',
-        subtext: 'Official registration portal',
-        url: 'https://www.abr.gov.au/',
-      }
-    : {
-        label: 'Find your official business/tax registration path',
-        subtext: 'Use the relevant government registration authority',
-        url: 'https://www.usa.gov/register-business',
-      }
+  const businessName = resolveBusinessName(project, brandPhase) || brandGenerated?.steps?.[0]?.suggestions?.recommendedName?.name || 'Your Business'
+  const identifierLabel = `Get Your ${countryProfile.identifierLabel}`
+  const identifierInputLabel = `Enter your ${countryProfile.identifierLabel}`
+  const identifierLink = {
+    label: `Apply for ${countryProfile.identifierLabel}`,
+    subtext: `Official ${countryProfile.taxAuthorityLabel} or registration pathway`,
+    url: countryProfile.identifierUrl,
+  }
 
   const generated = {
       jurisdiction: {
@@ -438,11 +691,9 @@ export function buildLegalPhase(project, blueprint, brandPhase) {
             value: businessName,
           },
           linkCard: {
-            label: project.country.toLowerCase() === 'australia'
-              ? 'Register with ASIC'
-              : 'Use the official business registration authority',
+            label: `Register with ${countryProfile.businessRegistryLabel}`,
             subtext: 'Official registration portal',
-            url: project.country.toLowerCase() === 'australia' ? 'https://asic.gov.au/' : 'https://www.usa.gov/register-business',
+            url: countryProfile.businessRegistryUrl,
           },
         },
         {
@@ -452,9 +703,7 @@ export function buildLegalPhase(project, blueprint, brandPhase) {
           description: 'Apply for the main business/tax identifier used for invoicing, registration, and admin.',
           helper: {
             howToDoThis: 'Use the country-specific official path and keep the number on file once issued.',
-            example: project.country.toLowerCase() === 'australia'
-              ? 'Australian businesses usually need an ABN before invoicing and registrations.'
-              : 'Most jurisdictions require a business or tax identifier before banking, invoicing, or registration workflows settle down.',
+            example: `Most businesses need their ${countryProfile.identifierLabel} sorted before banking, invoicing, and registration workflows settle down.`,
           },
           input: {
             type: 'text',
@@ -474,14 +723,14 @@ export function buildLegalPhase(project, blueprint, brandPhase) {
               : 'Sales/VAT/GST registration often depends on turnover and geography, so the threshold matters immediately.',
           },
           taxSummary: {
-            taxType: project.country.toLowerCase() === 'australia' ? 'GST (Goods and Services Tax)' : 'Sales / VAT / GST obligations',
-            rate: project.country.toLowerCase() === 'australia' ? '10%' : 'Varies by jurisdiction',
-            threshold: project.country.toLowerCase() === 'australia' ? '$75,000 annual turnover' : 'Check the official threshold for your market',
+            taxType: countryProfile.taxType,
+            rate: countryProfile.taxRate,
+            threshold: countryProfile.taxThreshold,
           },
           linkCard: {
-            label: project.country.toLowerCase() === 'australia' ? 'Register for GST' : 'Check official tax registration',
-            subtext: 'Official tax authority',
-            url: project.country.toLowerCase() === 'australia' ? 'https://www.ato.gov.au/' : 'https://www.irs.gov/businesses',
+            label: `Check ${countryProfile.taxType} registration`,
+            subtext: `Official ${countryProfile.taxAuthorityLabel} guidance`,
+            url: countryProfile.taxAuthorityUrl,
           },
           checklist: [
             'I understand the registration threshold that applies to this business',
@@ -499,29 +748,29 @@ export function buildLegalPhase(project, blueprint, brandPhase) {
           },
           providers: [
             {
-              name: project.country.toLowerCase() === 'australia' ? 'Up Bank' : 'Local business bank',
+              name: countryProfile.businessBankPrimary.name,
               reason: 'Simple setup and clean day-one operations.',
-              url: project.country.toLowerCase() === 'australia' ? 'https://up.com.au/' : 'https://www.nerdwallet.com/best/small-business/business-bank-account',
+              url: countryProfile.businessBankPrimary.url,
             },
             {
-              name: project.country.toLowerCase() === 'australia' ? 'Westpac' : 'Traditional business bank',
+              name: countryProfile.businessBankSecondary.name,
               reason: 'Stronger conventional business banking features if needed.',
-              url: project.country.toLowerCase() === 'australia' ? 'https://www.westpac.com.au/business-banking/' : 'https://www.bankofamerica.com/smallbusiness/',
+              url: countryProfile.businessBankSecondary.url,
             },
             {
-              name: project.country.toLowerCase() === 'australia' ? 'Airwallex' : 'Cross-border payment option',
+              name: countryProfile.crossBorderBank.name,
               reason: 'Useful if international payments or contractors matter early.',
-              url: project.country.toLowerCase() === 'australia' ? 'https://www.airwallex.com/au' : 'https://www.wise.com/business/',
+              url: countryProfile.crossBorderBank.url,
             },
           ],
         },
         {
           number: 6,
           slug: 'basic-legal-protection',
-          title: 'Basic Legal Protection',
+          title: 'Core Legal Protection',
           description: 'Create the core legal documents and claim boundaries before traffic and payments ramp up.',
           helper: {
-            howToDoThis: 'Generate only the documents that match the business model and website data flows.',
+            howToDoThis: 'Draft only the documents that match the business model and website data flows.',
             example: 'A service or digital business usually needs terms, privacy coverage, and a service agreement before scaling.',
           },
           disclaimer: 'Templates are informational starting points only. They are not legal advice, may be incomplete for your jurisdiction, and must be reviewed for local legal suitability before use.',
@@ -529,17 +778,17 @@ export function buildLegalPhase(project, blueprint, brandPhase) {
             {
               name: 'Terms & Conditions',
               purpose: 'Sets the rules for using the service and buying from the business.',
-              cta: 'Get Template',
+              cta: 'Draft starting point',
             },
             {
               name: 'Privacy Policy',
               purpose: 'Explains how customer and visitor data is collected and used.',
-              cta: 'Get Template',
+              cta: 'Draft starting point',
             },
             {
               name: 'Service Agreement',
               purpose: 'Covers scope, payment, and delivery expectations for customer work.',
-              cta: 'Get Template',
+              cta: 'Draft starting point',
             },
           ],
           checklist: [
@@ -623,6 +872,234 @@ export function buildLegalPhase(project, blueprint, brandPhase) {
   }
 }
 
+function getProjectCurrencyCode(project) {
+  const explicit = String(project?.currencyCode ?? '').trim().toUpperCase()
+  if (explicit) return explicit
+
+  const country = normalizeCountryName(project?.country)
+  if (country === 'australia') return 'AUD'
+  if (country === 'united kingdom') return 'GBP'
+  if (country === 'canada') return 'CAD'
+  if (country === 'united states') return 'USD'
+
+  return 'USD'
+}
+
+function getCurrencyDisplay(currencyCode) {
+  const normalized = String(currencyCode ?? '').trim().toUpperCase()
+
+  if (normalized === 'AUD') return 'A$'
+  if (normalized === 'CAD') return 'C$'
+  if (normalized === 'NZD') return 'NZ$'
+  if (normalized === 'GBP') return '£'
+  if (normalized === 'EUR') return '€'
+
+  return '$'
+}
+
+function formatProjectCurrencyValue(project, amount, suffix = '') {
+  return `${getCurrencyDisplay(getProjectCurrencyCode(project))}${amount}${suffix}`
+}
+
+function formatProjectCurrencyRange(project, minAmount, maxAmount, suffix = '') {
+  return `${formatProjectCurrencyValue(project, minAmount)}-${formatProjectCurrencyValue(project, maxAmount, suffix)}`
+}
+
+function inferPricingModel(project, blueprint) {
+  const context = `${project?.rawIdea ?? ''} ${blueprint?.sections?.business ?? ''} ${blueprint?.sections?.monetisation ?? ''}`.toLowerCase()
+
+  if (/(subscription|membership|saas|software|newsletter|community|retainer|monthly)/.test(context)) {
+    return 'subscription'
+  }
+
+  if (/(product|physical|ecommerce|shop|store|merch|inventory|shipping|fulfilment|fulfillment)/.test(context)) {
+    return 'product'
+  }
+
+  return 'service'
+}
+
+function buildPricingTiers(project, blueprint) {
+  const pricingModel = inferPricingModel(project, blueprint)
+  const currencyCode = getProjectCurrencyCode(project)
+  const currencyDisplay = getCurrencyDisplay(currencyCode)
+
+  if (pricingModel === 'subscription') {
+    return {
+      example: 'Use a low-friction entry tier, a clear most-popular tier, and a premium support tier so recurring pricing feels intentional instead of random.',
+      tiers: [
+        {
+          name: 'Starter',
+          price: 49,
+          currencyCode,
+          currencyDisplay,
+          billingUnit: '/month',
+          highlighted: false,
+          features: ['Core access to the main offer', 'Essential templates or resources', 'Email support'],
+        },
+        {
+          name: 'Growth',
+          price: 149,
+          currencyCode,
+          currencyDisplay,
+          billingUnit: '/month',
+          highlighted: true,
+          features: ['Everything in Starter', 'Deeper workflows or implementation help', 'Priority support or live check-ins'],
+        },
+        {
+          name: 'Premium',
+          price: 399,
+          currencyCode,
+          currencyDisplay,
+          billingUnit: '/month',
+          highlighted: false,
+          features: ['Hands-on strategic support', 'Fastest response lane', 'Custom review or advisory time'],
+        },
+      ],
+    }
+  }
+
+  if (pricingModel === 'product') {
+    return {
+      example: 'Make the middle bundle the easiest yes, then use the top tier to lift average order value without confusing the buyer.',
+      tiers: [
+        {
+          name: 'Starter Bundle',
+          price: 79,
+          currencyCode,
+          currencyDisplay,
+          billingUnit: '/bundle',
+          highlighted: false,
+          features: ['Entry-level product set', 'Standard delivery', 'Email support'],
+        },
+        {
+          name: 'Best Seller Bundle',
+          price: 149,
+          currencyCode,
+          currencyDisplay,
+          billingUnit: '/bundle',
+          highlighted: true,
+          features: ['Most useful product combination', 'Better value than buying separately', 'Bonus add-on or faster fulfilment'],
+        },
+        {
+          name: 'Premium Bundle',
+          price: 299,
+          currencyCode,
+          currencyDisplay,
+          billingUnit: '/bundle',
+          highlighted: false,
+          features: ['Full product package', 'Priority fulfilment', 'Highest-touch buyer experience'],
+        },
+      ],
+    }
+  }
+
+  return {
+    example: 'A simple three-tier service ladder helps buyers understand scope, upgrades, and where the premium value actually sits.',
+    tiers: [
+      {
+        name: 'Starter Scope',
+        price: 500,
+        currencyCode,
+        currencyDisplay,
+        billingUnit: '/project',
+        highlighted: false,
+        features: ['One clearly scoped outcome', 'Defined deliverables', 'Clean handover summary'],
+      },
+      {
+        name: 'Core Delivery',
+        price: 1000,
+        currencyCode,
+        currencyDisplay,
+        billingUnit: '/project',
+        highlighted: true,
+        features: ['Most common customer outcome', 'Revision or feedback round included', 'Implementation support'],
+      },
+      {
+        name: 'Strategic Support',
+        price: 1500,
+        currencyCode,
+        currencyDisplay,
+        billingUnit: '/project',
+        highlighted: false,
+        features: ['Deeper custom support', 'Priority turnaround', 'Higher-touch guidance'],
+      },
+    ],
+  }
+}
+
+function getFinanceMarketDefaults(project) {
+  const country = normalizeCountryName(project?.country)
+
+  if (country === 'australia') {
+    return {
+      paymentFees: {
+        stripe: 'From 1.75% + A$0.30 per successful card transaction',
+        paypal: 'From 2.6% + A$0.30 per transaction',
+        square: 'From 1.6% per tap or insert payment',
+      },
+      accountingPrices: {
+        xero: 'From A$35/month',
+        quickbooks: 'From A$27.50/month',
+      },
+    }
+  }
+
+  if (country === 'united kingdom') {
+    return {
+      paymentFees: {
+        stripe: 'From 1.5% + 20p per successful UK card transaction',
+        paypal: 'From 2.9% + £0.30 per transaction',
+        square: 'From 1.75% per in-person transaction',
+      },
+      accountingPrices: {
+        xero: 'From £16/month',
+        quickbooks: 'From £10/month',
+      },
+    }
+  }
+
+  if (country === 'canada') {
+    return {
+      paymentFees: {
+        stripe: 'From 2.9% + C$0.30 per successful card transaction',
+        paypal: 'From 2.9% + C$0.30 per transaction',
+        square: 'From 2.65% per tap or insert payment',
+      },
+      accountingPrices: {
+        xero: 'From C$20/month',
+        quickbooks: 'From C$22/month',
+      },
+    }
+  }
+
+  if (country === 'united states') {
+    return {
+      paymentFees: {
+        stripe: 'From 2.9% + $0.30 per successful card transaction',
+        paypal: 'From 2.99% + $0.49 per transaction',
+        square: 'From 2.6% + $0.10 per in-person transaction',
+      },
+      accountingPrices: {
+        xero: 'From $20/month',
+        quickbooks: 'From $35/month',
+      },
+    }
+  }
+
+  return {
+    paymentFees: {
+      stripe: 'Check local Stripe pricing',
+      paypal: 'Check local PayPal Business pricing',
+      square: 'Check local Square pricing',
+    },
+    accountingPrices: {
+      xero: 'Check local Xero pricing',
+      quickbooks: 'Check local QuickBooks pricing',
+    },
+  }
+}
+
 function buildFinanceTasks() {
   return [
     {
@@ -676,14 +1153,18 @@ function buildFinanceTasks() {
   ]
 }
 
-export function buildFinancePhase(project, blueprint, legalPhase) {
+export function buildFinancePhase(project, blueprint, brandPhase, legalPhase) {
   const jurisdiction = project.region ? `${project.region}, ${project.country}` : project.country
+  const countryProfile = getCountryProfile(project)
   const legalGenerated = legalPhase?.generated ?? legalPhase?.generatedContent
-  const taxType = project.country.toLowerCase() === 'australia' ? 'GST' : 'Sales / VAT / GST'
-  const taxThreshold = project.country.toLowerCase() === 'australia' ? '$75,000 annual turnover' : 'Check local threshold'
-  const taxRate = project.country.toLowerCase() === 'australia' ? '10%' : 'Varies by jurisdiction'
+  const businessName = resolveBusinessName(project, brandPhase, legalPhase)
+  const taxType = countryProfile.taxType
+  const taxThreshold = countryProfile.taxThreshold
+  const taxRate = countryProfile.taxRate
+  const pricingStructure = buildPricingTiers(project, blueprint)
+  const financeDefaults = getFinanceMarketDefaults(project)
 
-  const generated = {
+  const generated = localizeGeneratedContent(project, {
     steps: [
       {
         number: 1,
@@ -698,25 +1179,28 @@ export function buildFinancePhase(project, blueprint, legalPhase) {
         providers: [
           {
             name: 'Stripe',
+            url: 'https://stripe.com/',
             logo: '💳',
             bestFor: 'Online businesses, service invoicing, SaaS, and e-commerce',
-            fees: '1.75% + 30c per transaction',
+            fees: financeDefaults.paymentFees.stripe,
             features: ['Instant setup', 'Subscriptions', 'Invoicing', 'Strong ecosystem'],
             recommended: true,
           },
           {
             name: 'PayPal',
+            url: 'https://www.paypal.com/business/',
             logo: '🅿️',
             bestFor: 'International payments and customers who already trust PayPal',
-            fees: '2.6% + 30c per transaction',
+            fees: financeDefaults.paymentFees.paypal,
             features: ['Trusted brand', 'Easy invoices', 'Buyer protection', 'Fast familiar checkout'],
             recommended: false,
           },
           {
             name: 'Square',
+            url: 'https://squareup.com/',
             logo: '⬛',
             bestFor: 'In-person sales, local services, and simple POS needs',
-            fees: '1.6% per transaction',
+            fees: financeDefaults.paymentFees.square,
             features: ['POS support', 'Hardware options', 'Invoicing', 'Straightforward setup'],
             recommended: false,
           },
@@ -737,20 +1221,23 @@ export function buildFinancePhase(project, blueprint, legalPhase) {
         accountingOptions: [
           {
             name: 'Xero',
-            bestFor: 'Australian and NZ businesses, service-led operators',
-            price: 'From $29/month',
-            features: ['Bank feeds', 'Invoicing', 'GST/BAS ready', 'Mobile app'],
-            recommended: project.country.toLowerCase() === 'australia',
+            url: 'https://www.xero.com/',
+            bestFor: 'Australia, NZ, UK, and service-led operators who want a clean default',
+            price: financeDefaults.accountingPrices.xero,
+            features: ['Bank feeds', 'Invoicing', 'Tax-ready reporting', 'Mobile app'],
+            recommended: ['australia', 'new zealand', 'united kingdom', 'uk'].includes(String(project.country ?? '').toLowerCase()),
           },
           {
             name: 'QuickBooks',
-            bestFor: 'US-heavy businesses and broader SMB bookkeeping',
-            price: 'From $30/month',
+            url: 'https://quickbooks.intuit.com/',
+            bestFor: 'US and Canada-heavy businesses plus broader SMB bookkeeping',
+            price: financeDefaults.accountingPrices.quickbooks,
             features: ['Receipt capture', 'Reporting', 'Payroll add-ons', 'Tax prep'],
-            recommended: false,
+            recommended: ['united states', 'us', 'usa', 'canada'].includes(String(project.country ?? '').toLowerCase()),
           },
           {
             name: 'Wave',
+            url: 'https://www.waveapps.com/',
             bestFor: 'Very small businesses and freelancers who want the simplest starting point',
             price: 'Free (paid payroll extras)',
             features: ['Free accounting', 'Invoicing', 'Basic reports', 'Receipt scanning'],
@@ -784,21 +1271,21 @@ export function buildFinancePhase(project, blueprint, legalPhase) {
         disclaimer: `Tax requirements vary by location. Use this as guidance for ${jurisdiction} only and verify with the relevant authority or a qualified accountant.`,
         taxRegistrations: [
           {
-            name: project.country.toLowerCase() === 'australia' ? 'ABN (Australian Business Number)' : 'Business / Tax Identifier',
+            name: countryProfile.identifierLabel,
             required: true,
-            link: project.country.toLowerCase() === 'australia' ? 'https://www.abr.gov.au/' : 'https://www.irs.gov/businesses',
+            link: countryProfile.identifierUrl,
             description: 'Required to operate cleanly, invoice properly, and interact with the formal business/tax system.',
           },
           {
             name: `${taxType} Registration`,
             required: false,
-            link: project.country.toLowerCase() === 'australia' ? 'https://www.ato.gov.au/' : 'https://www.irs.gov/businesses',
+            link: countryProfile.taxAuthorityUrl,
             description: `Usually required once turnover crosses ${taxThreshold}.`,
           },
           {
             name: 'Employer / withholding registration',
             required: false,
-            link: project.country.toLowerCase() === 'australia' ? 'https://www.ato.gov.au/' : 'https://www.irs.gov/businesses/small-businesses-self-employed/employment-taxes',
+            link: countryProfile.taxAuthorityUrl,
             description: 'Only required if the business starts paying staff or contractors in ways that trigger withholding rules.',
           },
         ],
@@ -817,31 +1304,9 @@ export function buildFinancePhase(project, blueprint, legalPhase) {
         contentType: 'pricing',
         helper: {
           howToDoThis: 'Make the pricing look intentional. If customers cannot tell why one tier costs more, the structure is still weak.',
-          example: 'A three-tier model gives the buyer a clear anchor, a most-popular option, and a premium path without making the offer chaotic.',
+          example: pricingStructure.example,
         },
-        tiers: [
-          {
-            name: 'Basic',
-            price: 500,
-            billingUnit: '/project',
-            highlighted: false,
-            features: ['Feature 1', 'Feature 2', 'Feature 3'],
-          },
-          {
-            name: 'Pro',
-            price: 1000,
-            billingUnit: '/project',
-            highlighted: true,
-            features: ['Feature 1', 'Feature 2', 'Feature 3'],
-          },
-          {
-            name: 'Premium',
-            price: 1500,
-            billingUnit: '/project',
-            highlighted: false,
-            features: ['Feature 1', 'Feature 2', 'Feature 3'],
-          },
-        ],
+        tiers: pricingStructure.tiers,
       },
       {
         number: 6,
@@ -871,11 +1336,11 @@ export function buildFinancePhase(project, blueprint, legalPhase) {
       ],
       completionCallout: {
         badge: 'Phase 3 Complete',
-        title: 'Ready for Operations',
-        description: 'Continue to the next build phase once the financial foundation is clear enough to support real execution.',
+        title: 'Ready for Protection',
+        description: 'Continue once payments, bookkeeping, pricing, and tax basics are clear enough to protect the business properly.',
       },
     },
-  }
+  })
 
   return {
     number: 3,
@@ -888,6 +1353,7 @@ export function buildFinancePhase(project, blueprint, legalPhase) {
     content: generated,
     generated,
     userState: {
+      businessName,
       selectedProvider: null,
       selectedAccounting: null,
       checkedCategories: [],
@@ -959,10 +1425,16 @@ function buildProtectionTasks() {
   ]
 }
 
-export function buildProtectionPhase(project, blueprint, legalPhase, financePhase) {
+export function buildProtectionPhase(project, blueprint, brandPhase, legalPhase, financePhase) {
   const jurisdiction = project.region ? `${project.region}, ${project.country}` : project.country
+  const countryProfile = getCountryProfile(project)
+  const businessName = resolveBusinessName(project, brandPhase, financePhase, legalPhase)
+  const publicLiabilityTypicalCost = formatProjectCurrencyRange(project, 300, 800, '/year')
+  const professionalIndemnityTypicalCost = formatProjectCurrencyRange(project, 400, 1500, '/year')
+  const productLiabilityTypicalCost = formatProjectCurrencyRange(project, 400, 1200, '/year')
+  const cyberLiabilityTypicalCost = formatProjectCurrencyRange(project, 500, 2000, '/year')
 
-  const generated = {
+  const generated = localizeGeneratedContent(project, {
     steps: [
       {
         number: 1,
@@ -1006,29 +1478,36 @@ export function buildProtectionPhase(project, blueprint, legalPhase, financePhas
             name: 'Public Liability',
             description: 'Covers claims if someone is injured or their property is damaged because of your business.',
             whoNeeds: 'Any business that interacts with the public, visits client sites, or has a physical location.',
-            typicalCost: '$300-800/year',
+            typicalCost: publicLiabilityTypicalCost,
             recommended: true,
           },
           {
             name: 'Professional Indemnity',
             description: 'Covers claims arising from your professional advice, services, or recommendations.',
             whoNeeds: 'Consultants, coaches, designers, developers, accountants, and advice-based businesses.',
-            typicalCost: '$400-1,500/year',
+            typicalCost: professionalIndemnityTypicalCost,
             recommended: true,
           },
           {
             name: 'Product Liability',
             description: 'Covers claims if a product you sell causes injury or damage.',
             whoNeeds: 'Anyone selling physical products, including imported goods.',
-            typicalCost: '$400-1,200/year',
+            typicalCost: productLiabilityTypicalCost,
             recommended: false,
           },
           {
             name: 'Cyber Liability',
             description: 'Covers data breaches, cyber attacks, and related recovery costs.',
             whoNeeds: 'Any business storing customer data, especially online businesses.',
-            typicalCost: '$500-2,000/year',
+            typicalCost: cyberLiabilityTypicalCost,
             recommended: false,
+          },
+        ],
+        tools: [
+          {
+            name: countryProfile.insuranceGuideLabel,
+            url: countryProfile.insuranceGuideUrl,
+            description: `Location-specific insurance starting point for ${jurisdiction}.`,
           },
         ],
       },
@@ -1068,6 +1547,13 @@ export function buildProtectionPhase(project, blueprint, legalPhase, financePhas
         privacyNotice: project.country.toLowerCase() === 'australia'
           ? 'If your business has annual turnover of $3 million+ or handles health information, Privacy Act obligations can apply.'
           : `Check the privacy rules that apply in ${jurisdiction} before launch.`,
+        tools: [
+          {
+            name: countryProfile.privacyAuthorityLabel,
+            url: countryProfile.privacyAuthorityUrl,
+            description: `Location-specific privacy guidance for ${jurisdiction}.`,
+          },
+        ],
       },
       {
         number: 5,
@@ -1120,17 +1606,29 @@ export function buildProtectionPhase(project, blueprint, legalPhase, financePhas
           { name: 'Terms & conditions current', frequency: 'Annual review' },
           { name: 'Tax obligations met', frequency: 'Quarterly / Annual' },
         ],
+        tools: [
+          {
+            name: `${countryProfile.taxAuthorityLabel} compliance guidance`,
+            url: countryProfile.taxAuthorityUrl,
+            description: `Official tax and filing guidance for ${jurisdiction}.`,
+          },
+          {
+            name: `${countryProfile.businessRegistryLabel} registry guidance`,
+            url: countryProfile.businessRegistryUrl,
+            description: `Official registration reference for ${jurisdiction}.`,
+          },
+        ],
       },
     ],
     protectionLayer: {
-      protectionPosture: `Protection guidance tailored to ${jurisdiction}.`,
+      protectionPosture: `${businessName} protection guidance tailored to ${jurisdiction}.`,
       completionCallout: {
         badge: 'Phase 4 Complete',
-        title: 'Ready for Product & Service',
+        title: 'Ready for Infrastructure',
         description: 'Continue once the business has a workable risk, insurance, privacy, and compliance baseline.',
       },
     },
-  }
+  })
 
   return {
     number: 4,
@@ -1143,6 +1641,7 @@ export function buildProtectionPhase(project, blueprint, legalPhase, financePhas
     content: generated,
     generated,
     userState: {
+      businessName,
       completedStepIds: [],
       selectedInsurance: [],
       checkedRisks: [],
@@ -1213,10 +1712,10 @@ function buildInfrastructureTasks() {
   ]
 }
 
-export function buildInfrastructurePhase(project, blueprint, protectionPhase) {
-  const businessName = project.name || 'Your Business'
+export function buildInfrastructurePhase(project, blueprint, brandPhase, protectionPhase) {
+  const businessName = resolveBusinessName(project, brandPhase, protectionPhase)
 
-  const generated = {
+  const generated = localizeGeneratedContent(project, {
     steps: [
       {
         number: 1,
@@ -1289,7 +1788,7 @@ export function buildInfrastructurePhase(project, blueprint, protectionPhase) {
           { category: 'Design', examples: ['Figma', 'Canva', 'Adobe CC'] },
         ],
         tools: [
-          { name: 'Notion', url: 'https://notion.so', description: 'All-in-one workspace.' },
+          { name: 'Notion', url: 'https://www.notion.com', description: 'All-in-one workspace.' },
           { name: 'Linear', url: 'https://linear.app', description: 'Issue tracking and projects.' },
           { name: 'Toggl', url: 'https://toggl.com', description: 'Time tracking.' },
           { name: 'Calendly', url: 'https://calendly.com', description: 'Scheduling.' },
@@ -1320,7 +1819,7 @@ export function buildInfrastructurePhase(project, blueprint, protectionPhase) {
         ],
         tools: [
           { name: 'Google Drive', url: 'https://drive.google.com', description: 'Cloud storage.' },
-          { name: 'Notion', url: 'https://notion.so', description: 'Knowledge base and docs.' },
+          { name: 'Notion', url: 'https://www.notion.com', description: 'Knowledge base and docs.' },
           { name: 'Dropbox', url: 'https://dropbox.com', description: 'File sync and sharing.' },
           { name: 'Backblaze', url: 'https://backblaze.com', description: 'Automatic backup.' },
         ],
@@ -1355,7 +1854,7 @@ export function buildInfrastructurePhase(project, blueprint, protectionPhase) {
         tools: [
           { name: 'HubSpot CRM', url: 'https://hubspot.com/crm', description: 'Free CRM with email tracking.' },
           { name: 'Pipedrive', url: 'https://pipedrive.com', description: 'Visual sales pipeline.' },
-          { name: 'Notion', url: 'https://notion.so', description: 'Custom CRM databases.' },
+          { name: 'Notion', url: 'https://www.notion.com', description: 'Custom CRM databases.' },
           { name: 'Airtable', url: 'https://airtable.com', description: 'Flexible database-style CRM.' },
         ],
       },
@@ -1411,7 +1910,7 @@ export function buildInfrastructurePhase(project, blueprint, protectionPhase) {
         tools: [
           { name: '1Password', url: 'https://1password.com', description: 'Password manager.' },
           { name: 'Bitwarden', url: 'https://bitwarden.com', description: 'Open-source password manager.' },
-          { name: 'Authy', url: 'https://authy.com', description: 'Authenticator app.' },
+          { name: 'Google Authenticator', url: 'https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2', description: 'Simple authenticator app for 2FA codes.' },
           { name: 'Backblaze', url: 'https://backblaze.com', description: 'Automatic cloud backup.' },
         ],
       },
@@ -1420,11 +1919,11 @@ export function buildInfrastructurePhase(project, blueprint, protectionPhase) {
       operatingPosture: `${businessName} should run on a lean, recoverable infrastructure stack instead of scattered accounts and tool chaos.`,
       completionCallout: {
         badge: 'Phase 5 Complete',
-        title: 'Ready for Product & Service',
+        title: 'Ready for Marketing',
         description: 'Continue once the business has a usable operating stack, basic automation, and sane security coverage.',
       },
     },
-  }
+  })
 
   return {
     number: 5,
@@ -1437,6 +1936,7 @@ export function buildInfrastructurePhase(project, blueprint, protectionPhase) {
     content: generated,
     generated,
     userState: {
+      businessName,
       completedStepIds: [],
       selectedSoftware: {},
       checkedFolders: [],
@@ -1508,10 +2008,14 @@ function buildMarketingTasks() {
   ]
 }
 
-export function buildMarketingPhase(project, blueprint, infrastructurePhase) {
-  const businessName = project.name || 'Your Business'
+export function buildMarketingPhase(project, blueprint, brandPhase, infrastructurePhase) {
+  const businessName = resolveBusinessName(project, brandPhase, infrastructurePhase)
+  const metaAdsMinBudget = formatProjectCurrencyValue(project, 5, '/day')
+  const googleAdsMinBudget = formatProjectCurrencyValue(project, 10, '/day')
+  const linkedInAdsMinBudget = formatProjectCurrencyValue(project, 20, '/day')
+  const tiktokAdsMinBudget = formatProjectCurrencyValue(project, 20, '/day')
 
-  const generated = {
+  const generated = localizeGeneratedContent(project, {
     steps: [
       {
         number: 1,
@@ -1544,7 +2048,7 @@ export function buildMarketingPhase(project, blueprint, infrastructurePhase) {
         description: 'Create a clear value proposition and simple message the market can repeat.',
         helper: {
           howToDoThis: 'Write it plainly enough that someone could repeat it after one read.',
-          example: `“I help [audience] achieve [result] through [method]” is boring, but it works because it forces clarity.`,
+          example: `“${businessName} helps the right customer get a clearer result with a simpler path” is basic, but it forces useful clarity fast.`,
         },
         whatToDo: [
           'Write a clear one-line value proposition',
@@ -1610,15 +2114,15 @@ export function buildMarketingPhase(project, blueprint, infrastructurePhase) {
       {
         number: 5,
         slug: 'social-proof-assets',
-        title: 'Build Basic Social Proof Assets',
+        title: 'Build Social Proof Assets',
         description: 'Create the trust signals that make the business feel credible to strangers.',
         helper: {
-          howToDoThis: 'Show proof early: testimonials, simple case studies, before/after examples, founder credibility, and visible results.',
+          howToDoThis: 'Show proof early: testimonials, tight case studies, before/after examples, founder credibility, and visible results.',
           example: 'A screenshot, testimonial, short case study, and clear founder bio often do more than a month of vague posting.',
         },
         whatToDo: [
           'Collect at least a few testimonials or proof points',
-          'Create one simple case study or results post',
+          'Create one tight case study or results post',
           'Add trust signals to website, social profiles, and pitch materials',
           'Use consistent visuals and tone so the business feels real',
           'Keep a reusable bank of proof assets for future content',
@@ -1634,8 +2138,8 @@ export function buildMarketingPhase(project, blueprint, infrastructurePhase) {
       {
         number: 6,
         slug: 'paid-advertising',
-        title: 'Set Up Basic Paid Advertising',
-        description: 'Optional: configure initial ads to accelerate reach once the basics are ready.',
+        title: 'Set Up Paid Channel Testing',
+        description: 'Optional: configure initial ads to accelerate reach once the foundations are ready.',
         helper: {
           howToDoThis: 'Only run ads if the offer, landing page, and tracking are already good enough to deserve traffic.',
           example: 'Throwing ads at a vague offer is just paying money to learn your messaging is weak.',
@@ -1643,52 +2147,52 @@ export function buildMarketingPhase(project, blueprint, infrastructurePhase) {
         whatToDo: [
           'Decide if paid ads make sense at this stage',
           'Choose one platform to start with',
-          'Set up basic tracking',
+          'Set up clean tracking',
           'Use a small test budget',
-          'Test a few simple variations before scaling',
+          'Test a few focused variations before scaling',
         ],
         adPlatforms: [
-          { platform: 'Meta Ads (FB/IG)', best: 'B2C, visual products, local', minBudget: '$5/day' },
-          { platform: 'Google Ads', best: 'High-intent searches, services', minBudget: '$10/day' },
-          { platform: 'LinkedIn Ads', best: 'B2B, professional services', minBudget: '$20/day' },
-          { platform: 'TikTok Ads', best: 'Gen Z / Millennial, short-form reach', minBudget: '$20/day' },
+          { platform: 'Meta Ads (FB/IG)', best: 'B2C, visual products, local', minBudget: metaAdsMinBudget },
+          { platform: 'Google Ads', best: 'High-intent searches, services', minBudget: googleAdsMinBudget },
+          { platform: 'LinkedIn Ads', best: 'B2B, professional services', minBudget: linkedInAdsMinBudget },
+          { platform: 'TikTok Ads', best: 'Gen Z / Millennial, short-form reach', minBudget: tiktokAdsMinBudget },
         ],
         tools: [
-          { name: 'Meta Ads Manager', url: 'https://business.facebook.com/adsmanager', description: 'Facebook and Instagram ads.' },
+          { name: 'Meta Ads Manager', url: 'https://www.facebook.com/adsmanager', description: 'Facebook and Instagram ads.' },
           { name: 'Google Ads', url: 'https://ads.google.com', description: 'Search and display ads.' },
           { name: 'TikTok Ads', url: 'https://ads.tiktok.com', description: 'Short-form video ads.' },
-          { name: 'LinkedIn Ads', url: 'https://linkedin.com/campaignmanager', description: 'B2B ads.' },
+          { name: 'LinkedIn Ads', url: 'https://www.linkedin.com/campaignmanager', description: 'B2B ads.' },
         ],
       },
       {
         number: 7,
         slug: 'lead-capture-system',
-        title: 'Build a Simple Lead Capture System',
-        description: 'Collect leads through landing pages, forms, or a small lead magnet system.',
+        title: 'Build Your Lead Capture System',
+        description: 'Collect leads through landing pages, forms, or a focused lead magnet system.',
         helper: {
           howToDoThis: 'Use one compelling lead offer, one clear opt-in path, and one short welcome sequence.',
-          example: 'A checklist or template is often enough to start building a list without overcomplicating it.',
+          example: 'A checklist, buyer guide, or short diagnostic can be enough to start building a list without bloating the funnel.',
         },
         whatToDo: [
           'Create one lead magnet or enquiry hook',
           'Set up an email or newsletter platform',
-          'Build a simple landing page or form',
+          'Build a focused landing page or form',
           'Write a short welcome sequence',
           'Add lead capture to website and social touchpoints',
         ],
         leadMagnetIdeas: [
           { type: 'Checklist', example: '10-Point Website Launch Checklist', effort: 'Low' },
           { type: 'Template', example: 'Social Media Content Calendar Template', effort: 'Low' },
-          { type: 'Guide / Ebook', example: 'The Complete Guide to [Topic]', effort: 'Medium' },
-          { type: 'Mini-Course', example: '5-Day Email Course on [Skill]', effort: 'Medium' },
-          { type: 'Quiz', example: 'What’s Your [Type]?', effort: 'Medium' },
+          { type: 'Guide / Ebook', example: `Practical Buyer Guide for ${businessName}`, effort: 'Medium' },
+          { type: 'Mini-Course', example: `5-Day ${businessName} Quickstart Course`, effort: 'Medium' },
+          { type: 'Quiz', example: `Is ${businessName} the right fit for you?`, effort: 'Medium' },
           { type: 'Free Consultation', example: '15-Minute Strategy Call', effort: 'Low' },
         ],
         tools: [
           { name: 'ConvertKit', url: 'https://convertkit.com', description: 'Email marketing for creators and small businesses.' },
           { name: 'Mailchimp', url: 'https://mailchimp.com', description: 'Email marketing platform.' },
           { name: 'Beehiiv', url: 'https://beehiiv.com', description: 'Newsletter platform.' },
-          { name: 'Carrd', url: 'https://carrd.co', description: 'Simple landing pages.' },
+          { name: 'Carrd', url: 'https://carrd.co', description: 'Fast single-page landing pages.' },
         ],
       },
     ],
@@ -1696,16 +2200,16 @@ export function buildMarketingPhase(project, blueprint, infrastructurePhase) {
       positioning: `${businessName} should market with clarity, focus, and repeatability instead of shouting into the void.`,
       completionCallout: {
         badge: 'Phase 6 Complete',
-        title: 'Ready for Sales',
-        description: 'Continue once the business has a clear audience, message, channels, and basic lead capture path.',
+        title: 'Ready for Operations',
+        description: 'Continue once the business has a clear audience, message, channels, and a usable lead capture path.',
       },
     },
-  }
+  })
 
   return {
     number: 6,
     title: 'Marketing',
-    summary: 'Define the audience, message, channels, content, and lead capture foundations for growth.',
+    summary: 'Define the audience, message, channels, content, and lead capture foundations the business can actually run.',
     progress: {
       totalSteps: 7,
       completedSteps: 0,
@@ -1713,6 +2217,7 @@ export function buildMarketingPhase(project, blueprint, infrastructurePhase) {
     content: generated,
     generated,
     userState: {
+      businessName,
       completedStepIds: [],
       selectedChannels: [],
       selectedPillars: [],
@@ -1736,7 +2241,7 @@ function buildOperationsTasks() {
     {
       title: 'Set up the job workflow',
       whatToDo: 'Decide how work moves from new request to completion.',
-      howToDoIt: 'Keep the stages simple, visible, and tied to clear move-forward criteria.',
+      howToDoIt: 'Keep the stages clear, visible, and tied to move-forward criteria.',
       executionReference: 'Use Step 2 to stop work vanishing into inboxes and vague status updates.',
       isRequired: true,
       stepNumber: 2,
@@ -1760,7 +2265,7 @@ function buildOperationsTasks() {
     {
       title: 'Define the customer communication flow',
       whatToDo: 'Map the updates customers should receive throughout delivery.',
-      howToDoIt: 'Template the obvious messages so customers are informed without needing manual chasing every time.',
+      howToDoIt: 'Standardise the obvious messages so customers are informed without needing manual chasing every time.',
       executionReference: 'Use Step 5 to reduce support noise and build trust during delivery.',
       isRequired: true,
       stepNumber: 5,
@@ -1768,7 +2273,7 @@ function buildOperationsTasks() {
     {
       title: 'Track performance and efficiency',
       whatToDo: 'Measure the few operational metrics that actually matter.',
-      howToDoIt: 'Start with simple tracking and review trends regularly instead of drowning in dashboard cosplay.',
+      howToDoIt: 'Start with lightweight tracking and review trends regularly instead of drowning in dashboard cosplay.',
       executionReference: 'Use Step 6 to spot where delivery, cost, or quality is drifting.',
       isRequired: true,
       stepNumber: 6,
@@ -1784,10 +2289,10 @@ function buildOperationsTasks() {
   ]
 }
 
-export function buildOperationsPhase(project, blueprint, marketingPhase) {
-  const businessName = project.name || 'Your Business'
+export function buildOperationsPhase(project, blueprint, brandPhase, marketingPhase) {
+  const businessName = resolveBusinessName(project, brandPhase, marketingPhase)
 
-  const generated = {
+  const generated = localizeGeneratedContent(project, {
     steps: [
       {
         number: 1,
@@ -1807,7 +2312,7 @@ export function buildOperationsPhase(project, blueprint, marketingPhase) {
         ],
         howToDoIt: [
           'Start by describing your last 3 successful deliveries step by step',
-          'Use a simple flowchart or numbered list to visualize the process',
+          'Use a clear flowchart or numbered list to visualize the process',
           'Time yourself on each step to get realistic estimates',
           'Ask whether someone else could follow this process tomorrow',
           'Include quality checkpoints so errors get caught before handover',
@@ -1818,8 +2323,8 @@ export function buildOperationsPhase(project, blueprint, marketingPhase) {
         },
         tools: [
           { name: 'Miro', url: 'https://miro.com', description: 'Visual process mapping.' },
-          { name: 'Whimsical', url: 'https://whimsical.com', description: 'Simple flowcharts and diagrams.' },
-          { name: 'Notion', url: 'https://notion.so', description: 'Process documentation and internal wiki.' },
+          { name: 'Whimsical', url: 'https://whimsical.com', description: 'Fast flowcharts and diagrams.' },
+          { name: 'Notion', url: 'https://www.notion.com', description: 'Process documentation and internal wiki.' },
           { name: 'Loom', url: 'https://loom.com', description: 'Record process walkthroughs.' },
         ],
       },
@@ -1829,7 +2334,7 @@ export function buildOperationsPhase(project, blueprint, marketingPhase) {
         title: 'Set Up Order or Job Workflow',
         description: 'Define how customer requests and orders move through your system.',
         helper: {
-          howToDoThis: 'Use a simple kanban-style flow with clear stage rules so work is visible and nothing gets stuck quietly.',
+          howToDoThis: 'Use a clear kanban-style flow with stage rules so work is visible and nothing gets stuck quietly.',
           example: 'A coaching business can move leads from inquiry to discovery call, proposal, enrolled, onboarding, active client, and complete with each stage tied to a checklist.',
         },
         whatToDo: [
@@ -1847,8 +2352,8 @@ export function buildOperationsPhase(project, blueprint, marketingPhase) {
           { stage: 'Complete', description: 'Delivered and accepted.', action: 'Send invoice and request feedback' },
         ],
         tools: [
-          { name: 'Trello', url: 'https://trello.com', description: 'Simple kanban boards.' },
-          { name: 'Notion', url: 'https://notion.so', description: 'Custom workflow databases.' },
+          { name: 'Trello', url: 'https://trello.com', description: 'Lightweight kanban boards.' },
+          { name: 'Notion', url: 'https://www.notion.com', description: 'Custom workflow databases.' },
           { name: 'Monday.com', url: 'https://monday.com', description: 'Work management platform.' },
           { name: 'Linear', url: 'https://linear.app', description: 'Project and issue tracking.' },
         ],
@@ -1878,7 +2383,7 @@ export function buildOperationsPhase(project, blueprint, marketingPhase) {
           { category: 'Admin & Operations', examples: 'Invoicing, bookkeeping, tool maintenance' },
         ],
         tools: [
-          { name: 'Notion', url: 'https://notion.so', description: 'SOP documentation and wiki.' },
+          { name: 'Notion', url: 'https://www.notion.com', description: 'SOP documentation and wiki.' },
           { name: 'Scribe', url: 'https://scribehow.com', description: 'Auto-generate SOPs from screen recordings.' },
           { name: 'Loom', url: 'https://loom.com', description: 'Video walkthroughs.' },
           { name: 'Process Street', url: 'https://process.st', description: 'Checklist-based SOPs.' },
@@ -1901,7 +2406,7 @@ export function buildOperationsPhase(project, blueprint, marketingPhase) {
           'Establish quality standards and issue handling',
         ],
         tools: [
-          { name: 'Notion', url: 'https://notion.so', description: 'Supplier database and operating notes.' },
+          { name: 'Notion', url: 'https://www.notion.com', description: 'Supplier database and operating notes.' },
           { name: 'Airtable', url: 'https://airtable.com', description: 'Inventory and supplier tracking.' },
           { name: 'ShipStation', url: 'https://shipstation.com', description: 'Shipping automation.' },
           { name: 'Printful', url: 'https://printful.com', description: 'Print-on-demand fulfilment.' },
@@ -1913,12 +2418,12 @@ export function buildOperationsPhase(project, blueprint, marketingPhase) {
         title: 'Implement Customer Communication Flow',
         description: 'Define how you update customers throughout the delivery process.',
         helper: {
-          howToDoThis: 'Map the obvious communication triggers, template them, and automate the ones that should not need manual effort.',
+          howToDoThis: 'Map the obvious communication triggers, standardise the repeatable messages, and automate the ones that should not need manual effort.',
           example: 'A photographer can automate booking confirmation, prep reminders, progress updates, delivery, and follow-up so clients always know what is happening.',
         },
         whatToDo: [
           'Map every touchpoint where customers need communication',
-          'Create templates for each standard message',
+          'Create reusable drafts for each standard message',
           'Set up automated notifications where possible',
           'Define response time expectations',
           'Establish escalation paths for urgent issues',
@@ -1949,7 +2454,7 @@ export function buildOperationsPhase(project, blueprint, marketingPhase) {
         },
         whatToDo: [
           'Identify 3 to 5 key metrics that matter for operations',
-          'Set up simple tracking for each metric',
+          'Set up lightweight tracking for each metric',
           'Establish baselines and targets',
           'Schedule regular reviews',
           'Use data to identify improvement opportunities',
@@ -1963,8 +2468,8 @@ export function buildOperationsPhase(project, blueprint, marketingPhase) {
         ],
         tools: [
           { name: 'Toggl', url: 'https://toggl.com', description: 'Time tracking and reports.' },
-          { name: 'Notion', url: 'https://notion.so', description: 'Custom dashboards.' },
-          { name: 'Google Sheets', url: 'https://sheets.google.com', description: 'Simple metric tracking.' },
+          { name: 'Notion', url: 'https://www.notion.com', description: 'Custom dashboards.' },
+          { name: 'Google Sheets', url: 'https://workspace.google.com/products/sheets/', description: 'Lightweight metric tracking.' },
           { name: 'Databox', url: 'https://databox.com', description: 'Business dashboards.' },
         ],
       },
@@ -1993,10 +2498,10 @@ export function buildOperationsPhase(project, blueprint, marketingPhase) {
           { task: 'Automation implemented for repetitive tasks', status: 'Efficiency' },
         ],
         tools: [
-          { name: 'Notion', url: 'https://notion.so', description: 'Planning and documentation.' },
+          { name: 'Notion', url: 'https://www.notion.com', description: 'Planning and documentation.' },
           { name: 'Loom', url: 'https://loom.com', description: 'Training videos for delegation.' },
           { name: 'Zapier', url: 'https://zapier.com', description: 'Automation for scale.' },
-          { name: 'Upwork', url: 'https://upwork.com', description: 'Freelance talent for delegation.' },
+          { name: 'Upwork', url: 'https://www.upwork.com', description: 'Freelance talent for delegation.' },
         ],
       },
     ],
@@ -2005,10 +2510,10 @@ export function buildOperationsPhase(project, blueprint, marketingPhase) {
       completionCallout: {
         badge: 'Phase 7 Complete',
         title: 'Ready for Sales',
-        description: 'Continue once the business has a repeatable delivery process, clear customer communication, and basic operational metrics.',
+        description: 'Continue once the business has a repeatable delivery process, clear customer communication, and a usable operational metrics baseline.',
       },
     },
-  }
+  })
 
   return {
     number: 7,
@@ -2021,6 +2526,7 @@ export function buildOperationsPhase(project, blueprint, marketingPhase) {
     content: generated,
     generated,
     userState: {
+      businessName,
       completedStepIds: [],
       checkedWorkflowStages: [],
       checkedSopCategories: [],
@@ -2037,7 +2543,7 @@ function buildSalesTasks() {
       title: 'Define the sales process',
       whatToDo: 'Map the journey from first contact to payment received.',
       howToDoIt: 'Keep the stages explicit so you can see where deals move, stall, or die instead of guessing.',
-      executionReference: 'Use Step 1 to create a sales pipeline that is simple enough to run and measure.',
+      executionReference: 'Use Step 1 to create a sales pipeline that is lean enough to run and measure.',
       isRequired: true,
       stepNumber: 1,
     },
@@ -2092,10 +2598,10 @@ function buildSalesTasks() {
   ]
 }
 
-export function buildSalesPhase(project, blueprint, operationsPhase) {
-  const businessName = project.name || 'Your Business'
+export function buildSalesPhase(project, blueprint, brandPhase, operationsPhase) {
+  const businessName = resolveBusinessName(project, brandPhase, operationsPhase)
 
-  const generated = {
+  const generated = localizeGeneratedContent(project, {
     steps: [
       {
         number: 1,
@@ -2114,10 +2620,10 @@ export function buildSalesPhase(project, blueprint, operationsPhase) {
           'Create a visual pipeline you can track and measure',
         ],
         howToDoIt: [
-          'Start simple with inquiry, qualification, proposal, negotiation, and close',
+          'Start with inquiry, qualification, proposal, negotiation, and close',
           'For each stage define entry criteria, required actions, and exit criteria',
           'Map your last 5 sales and note where deals stall most often',
-          'Use a CRM or a simple tracker to keep deals moving through stages',
+          'Use a CRM or lightweight tracker to keep deals moving through stages',
           'Review pipeline bottlenecks weekly instead of waiting for revenue anxiety to do it for you',
         ],
         example: {
@@ -2135,7 +2641,7 @@ export function buildSalesPhase(project, blueprint, operationsPhase) {
         tools: [
           { name: 'Pipedrive', url: 'https://pipedrive.com', description: 'Visual sales pipeline CRM.' },
           { name: 'HubSpot CRM', url: 'https://hubspot.com/crm', description: 'Free CRM with pipeline tracking.' },
-          { name: 'Notion', url: 'https://notion.so', description: 'Custom sales tracking.' },
+          { name: 'Notion', url: 'https://www.notion.com', description: 'Custom sales tracking.' },
           { name: 'Close', url: 'https://close.com', description: 'CRM built for closing.' },
         ],
       },
@@ -2163,7 +2669,7 @@ export function buildSalesPhase(project, blueprint, operationsPhase) {
           { criteria: 'Fit', question: 'Are they the right type of customer for you?', importance: 'Important' },
         ],
         tools: [
-          { name: 'Typeform', url: 'https://typeform.com', description: 'Interactive intake forms.' },
+          { name: 'Typeform', url: 'https://www.typeform.com', description: 'Interactive intake forms.' },
           { name: 'Calendly', url: 'https://calendly.com', description: 'Booking with screening questions.' },
           { name: 'Tally', url: 'https://tally.so', description: 'Free form builder.' },
           { name: 'HubSpot', url: 'https://hubspot.com', description: 'Lead scoring automation.' },
@@ -2193,7 +2699,7 @@ export function buildSalesPhase(project, blueprint, operationsPhase) {
           { objection: 'Using a competitor', response: 'What would need to change for you to consider switching?' },
         ],
         tools: [
-          { name: 'Notion', url: 'https://notion.so', description: 'Script and objection library.' },
+          { name: 'Notion', url: 'https://www.notion.com', description: 'Script and objection library.' },
           { name: 'Otter.ai', url: 'https://otter.ai', description: 'Record and review sales calls.' },
           { name: 'Gong', url: 'https://gong.io', description: 'Sales call analysis.' },
           { name: 'Loom', url: 'https://loom.com', description: 'Video sales messages.' },
@@ -2210,7 +2716,7 @@ export function buildSalesPhase(project, blueprint, operationsPhase) {
         },
         whatToDo: [
           'Define your follow-up sequence',
-          'Create templates for each follow-up touchpoint',
+          'Create reusable follow-up drafts for each touchpoint',
           'Set up reminders or automation',
           'Know when to stop following up and how to do it gracefully',
           'Track which sequences actually recover deals',
@@ -2242,7 +2748,7 @@ export function buildSalesPhase(project, blueprint, operationsPhase) {
           'Define what counts as a conversion for your business',
           'Track each stage of the funnel',
           'Calculate core sales metrics',
-          'Build a simple dashboard',
+          'Build a lightweight dashboard',
           'Review metrics weekly and identify trends',
         ],
         salesMetrics: [
@@ -2254,7 +2760,7 @@ export function buildSalesPhase(project, blueprint, operationsPhase) {
         ],
         tools: [
           { name: 'HubSpot', url: 'https://hubspot.com', description: 'Full funnel analytics.' },
-          { name: 'Google Sheets', url: 'https://sheets.google.com', description: 'Simple tracking dashboard.' },
+          { name: 'Google Sheets', url: 'https://workspace.google.com/products/sheets/', description: 'Lightweight tracking dashboard.' },
           { name: 'Databox', url: 'https://databox.com', description: 'Sales dashboards.' },
           { name: 'Geckoboard', url: 'https://geckoboard.com', description: 'Real-time KPI dashboards.' },
         ],
@@ -2285,7 +2791,7 @@ export function buildSalesPhase(project, blueprint, operationsPhase) {
         ],
         tools: [
           { name: 'Stripe', url: 'https://stripe.com', description: 'Payment and pricing flexibility.' },
-          { name: 'Gumroad', url: 'https://gumroad.com', description: 'Simple product sales.' },
+          { name: 'Gumroad', url: 'https://gumroad.com', description: 'Fast product sales and checkout.' },
           { name: 'ThriveCart', url: 'https://thrivecart.com', description: 'High-converting checkout.' },
           { name: 'Hotjar', url: 'https://hotjar.com', description: 'See how people interact with offers.' },
         ],
@@ -2294,15 +2800,15 @@ export function buildSalesPhase(project, blueprint, operationsPhase) {
         number: 7,
         slug: 'test-and-improve-conversion-rates',
         title: 'Test and Improve Conversion Rates',
-        description: 'Run simple tests and adjust based on results.',
+        description: 'Run controlled tests and adjust based on results.',
         helper: {
           howToDoThis: 'Start with the weakest point in the funnel, test one variable at a time, and record the result like a grown-up.',
-          example: 'Specific outcome-driven headlines usually beat vague generic ones, and testing proves it instead of guessing.',
+          example: 'Specific outcome-driven headlines usually beat vague broad claims, and testing proves it instead of guessing.',
         },
         whatToDo: [
           'Identify the weakest point in your sales funnel',
           'Form a hypothesis about what might improve it',
-          'Run a simple A/B test or controlled change',
+          'Run a focused A/B test or controlled change',
           'Measure results over enough volume',
           'Keep the winners, discard the losers, and repeat',
         ],
@@ -2317,7 +2823,7 @@ export function buildSalesPhase(project, blueprint, operationsPhase) {
           'Offer bonuses',
         ],
         tools: [
-          { name: 'Google Optimize', url: 'https://optimize.google.com', description: 'Free A/B testing.' },
+          { name: 'PostHog', url: 'https://posthog.com', description: 'Product analytics and experiments in one place.' },
           { name: 'Hotjar', url: 'https://hotjar.com', description: 'User behaviour insights.' },
           { name: 'Unbounce', url: 'https://unbounce.com', description: 'Landing page testing.' },
           { name: 'VWO', url: 'https://vwo.com', description: 'Conversion optimisation.' },
@@ -2332,7 +2838,7 @@ export function buildSalesPhase(project, blueprint, operationsPhase) {
         description: 'Continue once the business has a usable sales process, lead qualification, follow-up system, and conversion tracking baseline.',
       },
     },
-  }
+  })
 
   return {
     number: 8,
@@ -2345,6 +2851,7 @@ export function buildSalesPhase(project, blueprint, operationsPhase) {
     content: generated,
     generated,
     userState: {
+      businessName,
       completedStepIds: [],
       checkedStages: [],
       checkedCriteria: [],
@@ -2369,7 +2876,7 @@ function buildLaunchScaleTasks() {
     {
       title: 'Execute the initial launch',
       whatToDo: 'Go live across the chosen channels and activate the first wave of demand.',
-      howToDoIt: 'Schedule the obvious announcements, then personally reach out to the warmest contacts instead of relying on generic posts alone.',
+      howToDoIt: 'Schedule the obvious announcements, then personally reach out to the warmest contacts instead of relying on broad posts alone.',
       executionReference: 'Use Step 2 to create real momentum in the first 24-48 hours.',
       isRequired: true,
       stepNumber: 2,
@@ -2383,44 +2890,52 @@ function buildLaunchScaleTasks() {
       stepNumber: 3,
     },
     {
+      title: 'Set growth milestones',
+      whatToDo: 'Define the next few concrete business milestones so growth has targets instead of vague ambition.',
+      howToDoIt: 'Pick the handful of milestones that actually change the business, then give each one an owner, target date, and success measure.',
+      executionReference: 'Use Step 4 to make the final phase live up to the “Growth & Milestones” promise.',
+      isRequired: true,
+      stepNumber: 4,
+    },
+    {
       title: 'Collect customer feedback',
       whatToDo: 'Ask early buyers and users what worked, what confused them, and what nearly stopped them.',
       howToDoIt: 'Use direct outreach while the experience is still fresh, then tag patterns instead of treating every comment like sacred law.',
-      executionReference: 'Use Step 4 to turn early customers into a learning engine, not just revenue.',
+      executionReference: 'Use Step 5 to turn early customers into a learning engine, not just revenue.',
       isRequired: true,
-      stepNumber: 4,
+      stepNumber: 5,
     },
     {
       title: 'Fix issues and optimise',
       whatToDo: 'Prioritise and resolve the highest-impact problems first.',
       howToDoIt: 'Sort issues by real business impact, then fix the revenue blockers before nibbling at cosmetic nonsense.',
-      executionReference: 'Use Step 5 to keep post-launch cleanup sharp and commercially grounded.',
+      executionReference: 'Use Step 6 to keep post-launch cleanup sharp and commercially grounded.',
       isRequired: true,
-      stepNumber: 5,
+      stepNumber: 6,
     },
     {
       title: 'Increase customer acquisition',
       whatToDo: 'Scale the channels and tactics already showing signs of working.',
       howToDoIt: 'Double down on proven channels before spraying effort across new ones just because they look exciting.',
-      executionReference: 'Use Step 6 to scale with discipline instead of channel ADHD.',
-      isRequired: true,
-      stepNumber: 6,
-    },
-    {
-      title: 'Build retention and repeat business',
-      whatToDo: 'Create a post-purchase journey that keeps customers engaged and coming back.',
-      howToDoIt: 'Follow up, add value, and ask for referrals after results land instead of vanishing after the sale.',
-      executionReference: 'Use Step 7 to turn one-off wins into compounding customer value.',
+      executionReference: 'Use Step 7 to scale with discipline instead of channel ADHD.',
       isRequired: true,
       stepNumber: 7,
+    },
+    {
+      title: 'Build Repeat Business & Retention',
+      whatToDo: 'Create a post-purchase journey that keeps customers engaged and coming back.',
+      howToDoIt: 'Follow up, add value, and ask for referrals after results land instead of vanishing after the sale.',
+      executionReference: 'Use Step 8 to turn one-off wins into compounding customer value.',
+      isRequired: true,
+      stepNumber: 8,
     },
   ]
 }
 
-export function buildLaunchScalePhase(project, blueprint, salesPhase) {
-  const businessName = project.name || 'Your Business'
+export function buildLaunchScalePhase(project, blueprint, brandPhase, salesPhase) {
+  const businessName = resolveBusinessName(project, brandPhase, salesPhase)
 
-  const generated = {
+  const generated = localizeGeneratedContent(project, {
     steps: [
       {
         number: 1,
@@ -2460,7 +2975,7 @@ export function buildLaunchScalePhase(project, blueprint, salesPhase) {
           { item: 'Backup plan documented for critical failures', category: 'Risk' },
         ],
         tools: [
-          { name: 'Notion', url: 'https://notion.so', description: 'Launch checklist and project management.' },
+          { name: 'Notion', url: 'https://www.notion.com', description: 'Launch checklist and project management.' },
           { name: 'Stripe Test Mode', url: 'https://stripe.com', description: 'Test payments safely.' },
           { name: 'Pingdom', url: 'https://pingdom.com', description: 'Website uptime monitoring.' },
           { name: 'Browserstack', url: 'https://browserstack.com', description: 'Cross-browser testing.' },
@@ -2472,7 +2987,7 @@ export function buildLaunchScalePhase(project, blueprint, salesPhase) {
         title: 'Execute Initial Launch',
         description: 'Go live, announce, and activate marketing and sales channels.',
         helper: {
-          howToDoThis: 'Launch across the core channels, then follow up with warm contacts directly because generic broadcast alone rarely does the heavy lifting.',
+          howToDoThis: 'Launch across the core channels, then follow up with warm contacts directly because broadcast alone rarely does the heavy lifting.',
           example: 'The first sales often come from people who already know, trust, or almost bought. Shockingly inconvenient for the “just post once” strategy.',
         },
         whatToDo: [
@@ -2529,6 +3044,35 @@ export function buildLaunchScalePhase(project, blueprint, salesPhase) {
       },
       {
         number: 4,
+        slug: 'growth-milestones',
+        title: 'Set Growth Milestones',
+        description: 'Define the next concrete checkpoints for revenue, customers, delivery, and operating stability.',
+        helper: {
+          howToDoThis: 'Choose milestones that change how the business operates, not vanity goals that look nice in a doc and do nothing in real life.',
+          example: 'First 10 paying customers, first month above break-even, and first repeat-customer milestone are all more useful than “grow brand awareness.”',
+        },
+        whatToDo: [
+          'Choose the next 3 to 5 milestones that matter most',
+          'Give each milestone a success metric, target date, and owner',
+          'Mix customer, revenue, delivery, and retention milestones instead of tracking only one dimension',
+          'Set review points so missed milestones get explained and adjusted',
+          'Keep milestone definitions tight enough that progress is obvious',
+        ],
+        growthMilestones: [
+          { milestone: 'First 10 paying customers', target: 'Validate demand', timeframe: 'Next 30-60 days' },
+          { milestone: 'Reach break-even month', target: 'Cover operating costs consistently', timeframe: 'Next 90 days' },
+          { milestone: 'Achieve repeat purchase or renewal baseline', target: 'Prove retention, not just acquisition', timeframe: 'Next 90-120 days' },
+          { milestone: 'Document founder handoff for one core workflow', target: 'Reduce operational dependency', timeframe: 'Before next growth push' },
+        ],
+        tools: [
+          { name: 'Notion', url: 'https://www.notion.com', description: 'Milestone tracker and review log.' },
+          { name: 'Airtable', url: 'https://airtable.com', description: 'Structured milestone tracking by owner and status.' },
+          { name: 'Google Sheets', url: 'https://workspace.google.com/products/sheets/', description: 'Simple milestone scorecard.' },
+          { name: 'Linear', url: 'https://linear.app', description: 'Track milestone-linked workstreams and blockers.' },
+        ],
+      },
+      {
+        number: 5,
         slug: 'collect-customer-feedback',
         title: 'Collect Customer Feedback',
         description: 'Gather insights from real users and customers.',
@@ -2552,14 +3096,14 @@ export function buildLaunchScalePhase(project, blueprint, salesPhase) {
           'Would you recommend this to others? Why or why not?',
         ],
         tools: [
-          { name: 'Typeform', url: 'https://typeform.com', description: 'Feedback surveys.' },
+          { name: 'Typeform', url: 'https://www.typeform.com', description: 'Feedback surveys.' },
           { name: 'Intercom', url: 'https://intercom.com', description: 'In-app feedback and chat.' },
-          { name: 'Notion', url: 'https://notion.so', description: 'Feedback log and analysis.' },
+          { name: 'Notion', url: 'https://www.notion.com', description: 'Feedback log and analysis.' },
           { name: 'Testimonial.to', url: 'https://testimonial.to', description: 'Collect video testimonials.' },
         ],
       },
       {
-        number: 5,
+        number: 6,
         slug: 'fix-issues-and-optimise',
         title: 'Fix Issues & Optimise',
         description: 'Resolve problems and improve weak points quickly.',
@@ -2582,12 +3126,12 @@ export function buildLaunchScalePhase(project, blueprint, salesPhase) {
         tools: [
           { name: 'Linear', url: 'https://linear.app', description: 'Issue tracking and prioritisation.' },
           { name: 'Hotjar', url: 'https://hotjar.com', description: 'Identify UX friction.' },
-          { name: 'Google Optimize', url: 'https://optimize.google.com', description: 'A/B testing.' },
+          { name: 'PostHog', url: 'https://posthog.com', description: 'Product analytics with built-in experimentation.' },
           { name: 'Loom', url: 'https://loom.com', description: 'Document fixes and processes.' },
         ],
       },
       {
-        number: 6,
+        number: 7,
         slug: 'increase-customer-acquisition',
         title: 'Increase Customer Acquisition',
         description: 'Scale marketing and sales efforts that are working.',
@@ -2611,23 +3155,23 @@ export function buildLaunchScalePhase(project, blueprint, salesPhase) {
           'Identified partnership opportunities',
         ],
         tools: [
-          { name: 'Meta Ads Manager', url: 'https://business.facebook.com/adsmanager', description: 'Scale social advertising.' },
+          { name: 'Meta Ads Manager', url: 'https://www.facebook.com/adsmanager', description: 'Scale social advertising.' },
           { name: 'ReferralCandy', url: 'https://referralcandy.com', description: 'Referral program software.' },
           { name: 'SparkToro', url: 'https://sparktoro.com', description: 'Find audience and channels.' },
           { name: 'Ahrefs', url: 'https://ahrefs.com', description: 'SEO and content strategy.' },
         ],
       },
       {
-        number: 7,
+        number: 8,
         slug: 'build-retention-and-repeat-business',
-        title: 'Build Retention & Repeat Business',
+        title: 'Build Repeat Business & Retention',
         description: 'Encourage repeat customers and long-term engagement.',
         helper: {
           howToDoThis: 'Design the post-purchase timeline so customers keep hearing from you in helpful ways instead of being ghosted after the invoice lands.',
-          example: 'Follow-up, check-ins, value-add content, and timely referral asks do more for retention than loud generic “community” talk ever will.',
+          example: 'Follow-up, check-ins, value-add content, and timely referral asks usually do more for retention than launching a half-dead “community” nobody really wanted.',
         },
         whatToDo: [
-          'Create a post-purchase experience that delights customers',
+          'Create a post-purchase experience that makes customers feel looked after',
           'Develop retention strategies like loyalty, subscriptions, or upsells',
           'Stay in touch with past customers through valuable content',
           'Make it easy and rewarding for customers to come back',
@@ -2643,7 +3187,7 @@ export function buildLaunchScalePhase(project, blueprint, salesPhase) {
         tools: [
           { name: 'Customer.io', url: 'https://customer.io', description: 'Automated customer journeys.' },
           { name: 'Rewardful', url: 'https://rewardful.com', description: 'Affiliate and loyalty programs.' },
-          { name: 'Circle', url: 'https://circle.so', description: 'Community platform.' },
+          { name: 'Circle', url: 'https://circle.so', description: 'Member community platform if an ongoing group actually suits the offer.' },
           { name: 'Klaviyo', url: 'https://klaviyo.com', description: 'Retention marketing.' },
         ],
       },
@@ -2656,23 +3200,25 @@ export function buildLaunchScalePhase(project, blueprint, salesPhase) {
         description: 'Keep evolving this phase around real milestones, growth targets, customer feedback, and operating lessons as the business matures.',
       },
     },
-  }
+  })
 
   return {
     number: 9,
     title: 'Growth & Milestones',
     summary: 'Launch the business cleanly, then keep this final phase evolving around growth, milestones, optimisation, acquisition, and retention.',
     progress: {
-      totalSteps: 7,
+      totalSteps: 8,
       completedSteps: 0,
     },
     content: generated,
     generated,
     userState: {
+      businessName,
       completedStepIds: [],
       checkedPrelaunch: [],
       checkedLaunchActivities: [],
       checkedMetrics: [],
+      checkedGrowthMilestones: [],
       checkedRetention: [],
     },
     tasks: buildLaunchScaleTasks(),

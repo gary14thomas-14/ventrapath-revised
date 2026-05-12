@@ -4,6 +4,20 @@
 
 Build a durable team of agents for VentraPath.
 
+## OpenClaw agent ids
+
+These are the canonical callable agent ids for the VentraPath specialist setup:
+
+- `main` → Bob
+- `blueprint-architect` → Blueprint Architect
+- `differentiation-strategist` → Differentiation Strategist
+- `market-intelligence` → Market Intelligence Agent
+- `monetisation-architect` → Monetisation Architect
+- `legal-compliance` → Legal & Compliance Agent
+- `execution-planner` → Execution Planner
+
+Rule: the blueprint specialist writes the blueprint backbone; legal writes legal; finance/monetisation writes finance; execution writes execution. Bob routes and resolves, but does not replace the specialist role definition.
+
 ## Operating rule
 
 Not all agents work on all tasks.

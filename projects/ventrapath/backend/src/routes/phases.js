@@ -6,7 +6,9 @@ import {
   upsertPhaseInstanceForProject,
 } from '../lib/project-store.js';
 import { buildBrandPhase, buildFinancePhase, buildInfrastructurePhase, buildLaunchScalePhase, buildLegalPhase, buildMarketingPhase, buildOperationsPhase, buildProtectionPhase, buildSalesPhase } from '../lib/phase-data.js';
-import { fail, ok } from '../lib/http.js';
+import { generateBrandNamesWithOpenAI } from '../lib/brand-name-generator.js';
+import { buildFallbackLogoConceptPayload, generateLogoConceptsWithOpenAI } from '../lib/logo-designer.js';
+import { fail, ok, parseJsonBody } from '../lib/http.js';
 
 const DEFAULT_DEV_USER_ID = '11111111-1111-4111-8111-111111111111';
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -49,6 +51,74 @@ function getRequestUserId(req, env) {
   return null;
 }
 
+function buildPhaseForNumber(phaseNumber, project, blueprint, storedPhases, brandNaming) {
+  const brandPhase = storedPhases.get(1) ?? null;
+  const legalPhase = storedPhases.get(2) ?? null;
+  const financePhase = storedPhases.get(3) ?? null;
+  const protectionPhase = storedPhases.get(4) ?? null;
+  const infrastructurePhase = storedPhases.get(5) ?? null;
+  const marketingPhase = storedPhases.get(6) ?? null;
+  const operationsPhase = storedPhases.get(7) ?? null;
+  const salesPhase = storedPhases.get(8) ?? null;
+
+  if (phaseNumber === 1) return buildBrandPhase(project, blueprint, brandNaming);
+  if (phaseNumber === 2) return buildLegalPhase(project, blueprint, brandPhase);
+  if (phaseNumber === 3) return buildFinancePhase(project, blueprint, brandPhase, legalPhase);
+  if (phaseNumber === 4) return buildProtectionPhase(project, blueprint, brandPhase, legalPhase, financePhase);
+  if (phaseNumber === 5) return buildInfrastructurePhase(project, blueprint, brandPhase, protectionPhase);
+  if (phaseNumber === 6) return buildMarketingPhase(project, blueprint, brandPhase, infrastructurePhase);
+  if (phaseNumber === 7) return buildOperationsPhase(project, blueprint, brandPhase, marketingPhase);
+  if (phaseNumber === 8) return buildSalesPhase(project, blueprint, brandPhase, operationsPhase);
+
+  return buildLaunchScalePhase(project, blueprint, brandPhase, salesPhase);
+}
+
+async function ensureStoredPhase(projectId, userId, project, blueprint, phaseNumber, env, storedPhases) {
+  const existing = storedPhases.get(phaseNumber);
+
+  if (existing) {
+    return existing;
+  }
+
+  let brandNaming = null;
+
+  if (phaseNumber === 1 && env.openAiApiKey) {
+    try {
+      brandNaming = await generateBrandNamesWithOpenAI({
+        apiKey: env.openAiApiKey,
+        model: env.openAiModel,
+        project,
+        blueprint,
+      });
+    } catch (error) {
+      console.warn('Brand naming generation failed, falling back to deterministic options:', error);
+    }
+  }
+
+  const phase = buildPhaseForNumber(phaseNumber, project, blueprint, storedPhases, brandNaming);
+  const generatedAt = new Date().toISOString();
+  const storedPhase = await upsertPhaseInstanceForProject(
+    projectId,
+    userId,
+    {
+      phaseNumber: phase.number,
+      title: phase.title,
+      state: 'ready',
+      summary: phase.summary,
+      generatedContent: phase.content,
+      userState: phase.userState ?? {},
+      progress: phase.progress ?? {},
+      tasks: phase.tasks,
+      generatedAt,
+      latestRunId: null,
+    },
+    env,
+  );
+
+  storedPhases.set(phaseNumber, storedPhase);
+  return storedPhase;
+}
+
 function validateUserId(userId, env) {
   if (env.persistenceDriver === 'postgres' && !UUID_PATTERN.test(userId)) {
     return 'User id must be a UUID when using postgres persistence';
@@ -73,7 +143,7 @@ function toPhaseOverview(project, storedPhases) {
     }
 
     const state = project.latestBlueprintVersionNumber
-      ? (phase.number <= 3 ? 'available' : 'locked')
+      ? 'available'
       : 'locked';
 
     return {
@@ -152,99 +222,26 @@ export async function handleGeneratePhase(req, res, projectId, phaseNumber, env)
     return fail(res, 400, 'BLUEPRINT_REQUIRED', 'Generate a blueprint before creating Phase 1 Brand');
   }
 
-  const brandPhase = numericPhase >= 2
-    ? await getPhaseInstanceForProject(projectId, userId, 1, env)
-    : null;
-  const legalPhase = numericPhase >= 3
-    ? await getPhaseInstanceForProject(projectId, userId, 2, env)
-    : null;
-  const financePhase = numericPhase >= 4
-    ? await getPhaseInstanceForProject(projectId, userId, 3, env)
-    : null;
-  const protectionPhase = numericPhase >= 5
-    ? await getPhaseInstanceForProject(projectId, userId, 4, env)
-    : null;
-  const infrastructurePhase = numericPhase >= 6
-    ? await getPhaseInstanceForProject(projectId, userId, 5, env)
-    : null;
-  const marketingPhase = numericPhase >= 7
-    ? await getPhaseInstanceForProject(projectId, userId, 6, env)
-    : null;
-  const operationsPhase = numericPhase >= 8
-    ? await getPhaseInstanceForProject(projectId, userId, 7, env)
-    : null;
-  const salesPhase = numericPhase === 9
-    ? await getPhaseInstanceForProject(projectId, userId, 8, env)
-    : null;
+  const storedPhases = new Map();
 
-  if (numericPhase >= 2 && !brandPhase) {
-    return fail(res, 400, 'BRAND_REQUIRED', 'Generate Phase 1 Brand before creating this phase');
+  for (let prerequisite = 1; prerequisite < numericPhase; prerequisite += 1) {
+    const existing = await getPhaseInstanceForProject(projectId, userId, prerequisite, env);
+
+    if (existing) {
+      storedPhases.set(prerequisite, existing);
+      continue;
+    }
+
+    await ensureStoredPhase(projectId, userId, project, blueprint, prerequisite, env, storedPhases);
   }
 
-  if (numericPhase >= 3 && !legalPhase) {
-    return fail(res, 400, 'LEGAL_REQUIRED', 'Generate Phase 2 Legal before creating this phase');
+  const currentPhase = await getPhaseInstanceForProject(projectId, userId, numericPhase, env);
+
+  if (currentPhase) {
+    storedPhases.set(numericPhase, currentPhase);
   }
 
-  if (numericPhase === 4 && !financePhase) {
-    return fail(res, 400, 'FINANCE_REQUIRED', 'Generate Phase 3 Finance before creating Phase 4 Protection');
-  }
-
-  if (numericPhase === 5 && !protectionPhase) {
-    return fail(res, 400, 'PROTECTION_REQUIRED', 'Generate Phase 4 Protection before creating Phase 5 Infrastructure');
-  }
-
-  if (numericPhase === 6 && !infrastructurePhase) {
-    return fail(res, 400, 'INFRASTRUCTURE_REQUIRED', 'Generate Phase 5 Infrastructure before creating Phase 6 Marketing');
-  }
-
-  if (numericPhase === 7 && !marketingPhase) {
-    return fail(res, 400, 'MARKETING_REQUIRED', 'Generate Phase 6 Marketing before creating Phase 7 Operations');
-  }
-
-  if (numericPhase === 8 && !operationsPhase) {
-    return fail(res, 400, 'OPERATIONS_REQUIRED', 'Generate Phase 7 Operations before creating Phase 8 Sales');
-  }
-
-  if (numericPhase === 9 && !salesPhase) {
-    return fail(res, 400, 'SALES_REQUIRED', 'Generate Phase 8 Sales before creating Phase 9 Growth & Milestones');
-  }
-
-  const phase = numericPhase === 1
-    ? buildBrandPhase(project, blueprint)
-    : numericPhase === 2
-      ? buildLegalPhase(project, blueprint, brandPhase)
-      : numericPhase === 3
-        ? buildFinancePhase(project, blueprint, legalPhase)
-        : numericPhase === 4
-          ? buildProtectionPhase(project, blueprint, legalPhase, financePhase)
-          : numericPhase === 5
-            ? buildInfrastructurePhase(project, blueprint, protectionPhase)
-            : numericPhase === 6
-              ? buildMarketingPhase(project, blueprint, infrastructurePhase)
-              : numericPhase === 7
-                ? buildOperationsPhase(project, blueprint, marketingPhase)
-                : numericPhase === 8
-                  ? buildSalesPhase(project, blueprint, operationsPhase)
-                  : buildLaunchScalePhase(project, blueprint, salesPhase);
-  const generatedAt = new Date().toISOString();
-
-  const storedPhase = await upsertPhaseInstanceForProject(
-    projectId,
-    userId,
-    {
-      phaseNumber: phase.number,
-      title: phase.title,
-      state: 'ready',
-      summary: phase.summary,
-      generatedContent: phase.content,
-      userState: phase.userState ?? {},
-      progress: phase.progress ?? {},
-      tasks: phase.tasks,
-      generatedAt,
-      latestRunId: null,
-    },
-    env,
-  );
+  const storedPhase = await ensureStoredPhase(projectId, userId, project, blueprint, numericPhase, env, storedPhases);
 
   return ok(res, {
     run: {
@@ -255,6 +252,150 @@ export async function handleGeneratePhase(req, res, projectId, phaseNumber, env)
     },
     phase: storedPhase,
   });
+}
+
+export async function handleGenerateLogoConcepts(req, res, projectId, env) {
+  const userId = getRequestUserId(req, env);
+
+  if (!userId) {
+    return fail(res, 401, 'UNAUTHENTICATED', 'Authenticated user is required');
+  }
+
+  const userIdError = validateUserId(userId, env);
+  if (userIdError) {
+    return fail(res, 400, 'INVALID_USER_ID', userIdError);
+  }
+
+  const project = await getProjectByIdForUser(projectId, userId, env);
+
+  if (!project) {
+    return fail(res, 404, 'PROJECT_NOT_FOUND', `Project ${projectId} was not found`);
+  }
+
+  const blueprint = await getLatestBlueprintForProject(projectId, userId, env);
+
+  if (!blueprint) {
+    return fail(res, 400, 'BLUEPRINT_REQUIRED', 'Generate a blueprint before asking the Logo Designer for concepts');
+  }
+
+  const phase = await getPhaseInstanceForProject(projectId, userId, 1, env);
+
+  if (!phase) {
+    return fail(res, 400, 'BRAND_REQUIRED', 'Generate Phase 1 Brand before asking the Logo Designer for concepts');
+  }
+
+  let body = null;
+
+  try {
+    body = await parseJsonBody(req);
+  } catch {
+    return fail(res, 400, 'INVALID_JSON', 'Request body must be valid JSON');
+  }
+
+  const requestedPrompt = typeof body?.prompt === 'string' ? body.prompt.trim() : '';
+  const promptOverride = requestedPrompt
+    ? {
+        ...phase,
+        generatedContent: {
+          ...(phase.generatedContent ?? {}),
+          brandLayer: {
+            ...((phase.generatedContent?.brandLayer && typeof phase.generatedContent.brandLayer === 'object') ? phase.generatedContent.brandLayer : {}),
+            visualDirection: {
+              ...((phase.generatedContent?.brandLayer?.visualDirection && typeof phase.generatedContent.brandLayer.visualDirection === 'object') ? phase.generatedContent.brandLayer.visualDirection : {}),
+              logoPrompt: requestedPrompt,
+            },
+          },
+        },
+      }
+    : phase;
+
+  try {
+    const payload = env.openAiApiKey
+      ? await generateLogoConceptsWithOpenAI({
+          apiKey: env.openAiApiKey,
+          model: env.openAiModel,
+          project,
+          blueprint,
+          phase: promptOverride,
+        })
+      : buildFallbackLogoConceptPayload({ project, blueprint, phase: promptOverride });
+
+    return ok(res, {
+      logoConcepts: payload.concepts,
+      source: payload.source,
+      agent: 'logo-designer',
+      generatedAt: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.warn('Logo concept generation failed, returning fallback concepts:', error);
+    const fallback = buildFallbackLogoConceptPayload({ project, blueprint, phase: promptOverride });
+
+    return ok(res, {
+      logoConcepts: fallback.concepts,
+      source: fallback.source,
+      agent: 'logo-designer',
+      generatedAt: new Date().toISOString(),
+    });
+  }
+}
+
+export async function handleUpdatePhase(req, res, projectId, phaseNumber, env) {
+  const userId = getRequestUserId(req, env);
+
+  if (!userId) {
+    return fail(res, 401, 'UNAUTHENTICATED', 'Authenticated user is required');
+  }
+
+  const userIdError = validateUserId(userId, env);
+  if (userIdError) {
+    return fail(res, 400, 'INVALID_USER_ID', userIdError);
+  }
+
+  const numericPhase = Number(phaseNumber);
+  const phase = await getPhaseInstanceForProject(projectId, userId, numericPhase, env);
+
+  if (!phase) {
+    return fail(res, 404, 'PHASE_NOT_FOUND', `Phase ${phaseNumber} was not found for project ${projectId}`);
+  }
+
+  let body = null;
+
+  try {
+    body = await parseJsonBody(req);
+  } catch {
+    return fail(res, 400, 'INVALID_JSON', 'Request body must be valid JSON');
+  }
+
+  const nextUserState = body?.userState;
+  const nextProgress = body?.progress;
+
+  if (nextUserState != null && (typeof nextUserState !== 'object' || Array.isArray(nextUserState))) {
+    return fail(res, 400, 'INVALID_USER_STATE', 'userState must be an object when provided');
+  }
+
+  if (nextProgress != null && (typeof nextProgress !== 'object' || Array.isArray(nextProgress))) {
+    return fail(res, 400, 'INVALID_PROGRESS', 'progress must be an object when provided');
+  }
+
+  const updatedPhase = await upsertPhaseInstanceForProject(
+    projectId,
+    userId,
+    {
+      phaseNumber: phase.phaseNumber,
+      title: phase.title,
+      state: phase.state,
+      summary: phase.summary,
+      generatedContent: phase.generatedContent,
+      userState: nextUserState ? { ...(phase.userState ?? {}), ...nextUserState } : (phase.userState ?? {}),
+      progress: nextProgress ? { ...(phase.progress ?? {}), ...nextProgress } : (phase.progress ?? {}),
+      tasks: phase.tasks,
+      generatedAt: phase.generatedAt ?? new Date().toISOString(),
+      latestRunId: phase.latestRunId ?? null,
+    },
+    env,
+  );
+
+  return ok(res, { phase: updatedPhase });
 }
 
 export async function handleGetPhase(req, res, projectId, phaseNumber, env) {

@@ -14,23 +14,51 @@ function normalizeInlineText(input) {
 }
 
 function buildNameOptions(project) {
+  const idea = String(project.rawIdea ?? '').trim()
+  const lowerIdea = idea.toLowerCase()
+
+  if (/(ice cream|gelato|dessert)/.test(lowerIdea)) {
+    return [
+      { name: 'Velora', rationale: 'Short, brandable, and premium without sounding like a literal dessert description.' },
+      { name: 'Lunaro', rationale: 'Feels modern and memorable, with enough softness to suit a consumer-facing indulgence brand.' },
+      { name: 'Nivaro', rationale: 'Clean and commercial, with a sharper edge than a generic food business name.' },
+    ]
+  }
+
+  if (/(tradie|trade|electrician|plumb|builder|handyman|maintenance|repair)/.test(lowerIdea)) {
+    return [
+      { name: 'Voltaro', rationale: 'Feels practical, memorable, and commercially credible for a service business.' },
+      { name: 'ForgeFlow', rationale: 'Carries an operational edge while still sounding like a real brand.' },
+      { name: 'TradePilot', rationale: 'Signals guidance and professionalism without turning into generic jargon.' },
+    ]
+  }
+
+  if (/(software|app|saas|ai|automation|tech)/.test(lowerIdea)) {
+    return [
+      { name: 'Operon', rationale: 'Short and product-like, with a systems feel that suits workflow or AI software.' },
+      { name: 'Kivora', rationale: 'Brandable and modern without reading like a sentence fragment.' },
+      { name: 'Flowset', rationale: 'Suggests control and movement while still feeling commercially usable.' },
+    ]
+  }
+
   const base = project.name || project.rawIdea || 'VentraPath Business'
   const compactBase = sentenceCase(base.replace(/[^a-zA-Z0-9 ]+/g, ' ').trim())
-  const shortBase = compactBase.split(/\s+/).slice(0, 3).join(' ')
-  const region = project.region ? sentenceCase(project.region) : sentenceCase(project.country)
+  const words = compactBase.split(/\s+/).filter(Boolean)
+  const root = words.slice(0, 2).join(' ') || compactBase
+  const fallbackRoot = root.replace(/^(A|An|The)\s+/i, '').trim() || root
 
   return [
     {
-      name: shortBase,
-      rationale: 'Closest to the original idea while sounding clean and commercially legible.',
+      name: fallbackRoot,
+      rationale: 'Simple fallback name while stronger brand-name generation is unavailable.',
     },
     {
-      name: `${shortBase} Studio`,
-      rationale: 'Adds a premium, modern layer without drifting away from the core offer.',
+      name: `${fallbackRoot} Co`,
+      rationale: 'Keeps the name compact while giving it a cleaner business-like form.',
     },
     {
-      name: `${region} ${shortBase}`,
-      rationale: 'Makes the local market fit obvious, which helps early trust and search clarity.',
+      name: `${fallbackRoot} Labs`,
+      rationale: 'Useful when the concept has a product, systems, or experimental edge.',
     },
   ]
 }
@@ -152,9 +180,9 @@ function buildBrandTasks() {
   ]
 }
 
-export function buildBrandPhase(project, blueprint) {
-  const nameOptions = buildNameOptions(project)
-  const recommendedName = nameOptions[0]
+export function buildBrandPhase(project, blueprint, naming = null) {
+  const nameOptions = naming?.nameOptions?.length ? naming.nameOptions : buildNameOptions(project)
+  const recommendedName = naming?.recommendedName?.name ? naming.recommendedName : nameOptions[0]
   const positioning = buildBrandPositioning(project, blueprint)
   const visual = buildVisualIdentity(project)
   const domain = buildDomainSection(project)
@@ -169,7 +197,7 @@ export function buildBrandPhase(project, blueprint) {
           description: 'Choose a memorable, commercially legible name that still carries the business edge.',
           helper: {
             howToDoThis: 'Avoid generic filler names. You want something clear enough to trust, but sharp enough to stand out.',
-            example: `${recommendedName.name} works because it stays close to the core offer without sounding flat or forgettable.`,
+            example: recommendedName?.rationale || `${recommendedName.name} works because it feels like an actual brand instead of a descriptive label.`,
           },
           input: {
             type: 'text',

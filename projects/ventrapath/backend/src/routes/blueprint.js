@@ -140,7 +140,7 @@ export async function handleGenerateBlueprint(req, res, projectId, env) {
 
   const prompts = await loadPromptPack();
   const cacheIdentity = buildBlueprintCacheIdentity(project, {
-    promptVersion: 'phase0-v24-prompt-only-shell',
+    promptVersion: 'phase0-v25-fallback-template-fix',
     model: 'agent-writer-synth',
     agentId: 'bob.phase0-agent-writer',
     routingMode: 'phase0-agent-writer',

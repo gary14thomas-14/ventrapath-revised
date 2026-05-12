@@ -3,9 +3,9 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { ArrowRight, CheckCircle2, Compass, Layers3, PlayCircle, Sparkles, Target } from 'lucide-react'
+import { ArrowRight, Compass, Layers3, PlayCircle, Sparkles, Target } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { getStoredValue } from '@/lib/ventrapath-client'
+import { clearProjectSession, getStoredValue } from '@/lib/ventrapath-client'
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
@@ -28,11 +28,22 @@ const proofPoints = [
 ]
 
 export default function LandingPage() {
-  const [projectName, setProjectName] = useState<string | null>(null)
+  const [resumeProjectName, setResumeProjectName] = useState<string | null>(null)
+  const [resumeHref, setResumeHref] = useState('/blueprint')
 
   useEffect(() => {
-    setProjectName(getStoredValue('projectName'))
+    const projectId = getStoredValue('projectId')
+    const projectName = getStoredValue('projectName')
+    const lastVisitedPath = getStoredValue('lastVisitedPath')
+    const safeResumeHref = lastVisitedPath && lastVisitedPath.startsWith('/') ? lastVisitedPath : '/blueprint'
+
+    setResumeProjectName(projectId && projectName ? projectName : null)
+    setResumeHref(projectId ? safeResumeHref : '/blueprint')
   }, [])
+
+  const startFresh = () => {
+    clearProjectSession()
+  }
 
   return (
     <div className="min-h-screen overflow-hidden bg-background">
@@ -50,9 +61,14 @@ export default function LandingPage() {
             <Link href="/pricing">
               <Button variant="ghost" className="text-muted-foreground hover:text-foreground">Tester Access</Button>
             </Link>
-            <Link href={projectName ? '/blueprint' : '/input'}>
+            {resumeProjectName ? (
+              <Link href={resumeHref}>
+                <Button variant="outline" className="border-border/50 hover:bg-surface">Resume Project</Button>
+              </Link>
+            ) : null}
+            <Link href="/input" onClick={startFresh}>
               <Button className="bg-primary px-6 text-primary-foreground hover:bg-primary/90">
-                {projectName ? 'Resume Project' : 'Get Started'}
+                Start New Project
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
@@ -81,12 +97,19 @@ export default function LandingPage() {
             </motion.p>
 
             <motion.div variants={fadeIn} className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <Link href={projectName ? '/blueprint' : '/input'}>
+              <Link href="/input" onClick={startFresh}>
                 <Button size="lg" className="glow-primary bg-primary px-8 py-6 text-lg text-primary-foreground hover:bg-primary/90">
-                  {projectName ? 'Continue Current Project' : 'Start Building'}
+                  Start New Project
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
+              {resumeProjectName ? (
+                <Link href={resumeHref}>
+                  <Button size="lg" variant="outline" className="border-border/50 px-8 py-6 text-lg hover:bg-surface">
+                    Resume Current Project
+                  </Button>
+                </Link>
+              ) : null}
               <Link href="/support">
                 <Button size="lg" variant="outline" className="border-border/50 px-8 py-6 text-lg hover:bg-surface">
                   Testing Guide
@@ -94,9 +117,9 @@ export default function LandingPage() {
               </Link>
             </motion.div>
 
-            {projectName ? (
+            {resumeProjectName ? (
               <motion.div variants={fadeIn} className="mx-auto mt-6 max-w-xl rounded-2xl border border-success/20 bg-success/5 px-5 py-4 text-sm text-success">
-                Current local project ready to resume: <strong>{projectName}</strong>
+                Current local project ready to resume: <strong>{resumeProjectName}</strong>
               </motion.div>
             ) : null}
           </motion.div>
@@ -139,7 +162,7 @@ export default function LandingPage() {
                 },
                 {
                   title: 'Useful tester flow',
-                  description: 'Start, resume, and review a project without awkward dead ends or unclear handoffs.',
+                  description: 'Start fresh by default, then resume only when you actually want the current local project.',
                 },
               ].map((feature, index) => (
                 <motion.div key={feature.title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: index * 0.1 }} className="group rounded-2xl glass p-8 transition-all duration-300 hover:border-primary/30">
@@ -163,12 +186,21 @@ export default function LandingPage() {
               <p className="mx-auto mb-10 max-w-2xl text-lg text-muted-foreground">
                 Use the real flow, gather feedback on clarity and usefulness, then tighten the rough edges page by page.
               </p>
-              <Link href={projectName ? '/blueprint' : '/input'}>
+              <Link href="/input" onClick={startFresh}>
                 <Button size="lg" className="bg-primary px-10 py-6 text-lg text-primary-foreground hover:bg-primary/90">
-                  {projectName ? 'Open Current Project' : 'Start the Product'}
+                  Start the Product
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
+              {resumeProjectName ? (
+                <div className="mt-4">
+                  <Link href="/blueprint">
+                    <Button size="lg" variant="outline" className="border-border/50 px-10 py-6 text-lg hover:bg-surface">
+                      Resume Current Project
+                    </Button>
+                  </Link>
+                </div>
+              ) : null}
             </div>
           </motion.div>
         </section>

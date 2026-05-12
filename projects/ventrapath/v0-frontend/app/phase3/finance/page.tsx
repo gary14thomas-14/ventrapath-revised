@@ -7,7 +7,7 @@ export default function Page() {
       title="Finance"
       prevHref="/phase2/legal"
       prevLabel="Legal"
-      nextHref="/phase4/operations"
+      nextHref="/phase4/protection"
       nextLabel="Protection"
     />
   )

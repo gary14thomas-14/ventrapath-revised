@@ -3,7 +3,7 @@ import { handleStaticSite } from './lib/static-site.js';
 import { handleHealth } from './routes/health.js';
 import { handleGenerateBlueprint, handleGetBlueprint, handleListBlueprintVersions } from './routes/blueprint.js';
 import { handleCreateProject, handleGetProject, handleListProjects } from './routes/projects.js';
-import { handleGeneratePhase, handleGetPhase, handleListPhases } from './routes/phases.js';
+import { handleGenerateLogoConcepts, handleGeneratePhase, handleGetPhase, handleListPhases, handleUpdatePhase } from './routes/phases.js';
 
 function match(pathname, pattern) {
   return pathname.match(pattern);
@@ -58,9 +58,19 @@ export async function handleRequest(req, res, env) {
     return handleGeneratePhase(req, res, generatePhaseMatch[1], generatePhaseMatch[2], env);
   }
 
+  const generateLogoConceptsMatch = match(pathname, /^\/api\/projects\/([^/]+)\/phases\/1\/logo-concepts$/);
+  if (generateLogoConceptsMatch && req.method === 'POST') {
+    return handleGenerateLogoConcepts(req, res, generateLogoConceptsMatch[1], env);
+  }
+
   const getPhaseMatch = match(pathname, /^\/api\/projects\/([^/]+)\/phases\/([^/]+)$/);
   if (getPhaseMatch && req.method === 'GET') {
     return handleGetPhase(req, res, getPhaseMatch[1], getPhaseMatch[2], env);
+  }
+
+  const updatePhaseMatch = match(pathname, /^\/api\/projects\/([^/]+)\/phases\/([^/]+)$/);
+  if (updatePhaseMatch && req.method === 'PATCH') {
+    return handleUpdatePhase(req, res, updatePhaseMatch[1], updatePhaseMatch[2], env);
   }
 
   if (!pathname.startsWith('/api') && pathname !== '/health') {

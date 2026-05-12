@@ -5,7 +5,7 @@ export default function Page() {
     <PhasePage
       phaseNumber={5}
       title="Infrastructure"
-      prevHref="/phase4/operations"
+      prevHref="/phase4/protection"
       prevLabel="Protection"
       nextHref="/phase6/marketing"
       nextLabel="Marketing"

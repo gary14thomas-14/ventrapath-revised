@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
@@ -17,6 +17,9 @@ const stages = [
   { id: 'complete', name: 'Blueprint Ready', icon: CheckCircle2 },
 ]
 
+const STAGE_DURATION_MS = 2000
+const TOTAL_DURATION_MS = stages.length * STAGE_DURATION_MS
+
 export default function GeneratingPage() {
   const router = useRouter()
   const [currentStage, setCurrentStage] = useState(0)
@@ -24,6 +27,11 @@ export default function GeneratingPage() {
   const [progress, setProgress] = useState(0)
   const [error, setError] = useState('')
   const [retryKey, setRetryKey] = useState(0)
+  const startedRef = useRef<string | null>(null)
+
+  useEffect(() => {
+    startedRef.current = null
+  }, [retryKey])
 
   useEffect(() => {
     let cancelled = false
@@ -42,7 +50,19 @@ export default function GeneratingPage() {
         return
       }
 
+      const generationKey = `${idea}::${country}::${retryKey}`
+
+      if (startedRef.current === generationKey) {
+        return
+      }
+
+      startedRef.current = generationKey
+
       let stageIndex = 0
+      let stageInterval: ReturnType<typeof setInterval> | null = null
+      let progressInterval: ReturnType<typeof setInterval> | null = null
+      let simulationComplete = false
+
       const advance = () => {
         if (cancelled || stageIndex >= stages.length) return
 
@@ -50,12 +70,31 @@ export default function GeneratingPage() {
         const currentStageDef = stages[currentStageIndex]
 
         setCurrentStage(currentStageIndex)
-        setProgress(((currentStageIndex + 1) / stages.length) * 100)
         setCompletedStages((prev) => Array.from(new Set([...prev, currentStageDef.id])))
         stageIndex += 1
+
+        if (stageIndex >= stages.length) {
+          simulationComplete = true
+          if (stageInterval) clearInterval(stageInterval)
+        }
       }
 
       advance()
+
+      stageInterval = setInterval(() => {
+        advance()
+      }, STAGE_DURATION_MS)
+
+      const startedAt = Date.now()
+      progressInterval = setInterval(() => {
+        const elapsed = Date.now() - startedAt
+        const nextProgress = Math.min((elapsed / TOTAL_DURATION_MS) * 100, 100)
+        setProgress(nextProgress)
+
+        if (nextProgress >= 100 || simulationComplete) {
+          clearInterval(progressInterval!)
+        }
+      }, 50)
 
       try {
         const projectResponse = await createProject({ idea, country })
@@ -68,16 +107,28 @@ export default function GeneratingPage() {
         await generateBlueprint(project.id)
         if (cancelled) return
 
-        while (stageIndex < stages.length) {
-          advance()
-        }
+        const remainingMs = Math.max(TOTAL_DURATION_MS - (Date.now() - startedAt), 0)
 
         setTimeout(() => {
-          if (!cancelled) router.push('/blueprint')
-        }, 500)
+          if (cancelled) return
+
+          while (stageIndex < stages.length) {
+            advance()
+          }
+          setProgress(100)
+
+          setTimeout(() => {
+            if (!cancelled) router.push('/blueprint')
+          }, 400)
+        }, remainingMs)
       } catch (generationError) {
         if (cancelled) return
         setError(generationError instanceof Error ? generationError.message : 'Something went wrong while generating the blueprint.')
+      }
+
+      return () => {
+        if (stageInterval) clearInterval(stageInterval)
+        if (progressInterval) clearInterval(progressInterval)
       }
     }
 
@@ -86,7 +137,7 @@ export default function GeneratingPage() {
     return () => {
       cancelled = true
     }
-  }, [retryKey, router])
+  }, [retryKey])
 
   const isComplete = currentStage >= stages.length - 1 && completedStages.includes('complete')
 
@@ -110,7 +161,7 @@ export default function GeneratingPage() {
                   const isActive = completedStages.includes(stages[index].id)
                   const startX = (index / (stages.length - 1)) * 100
                   const endX = ((index + 1) / (stages.length - 1)) * 100
-                  return <motion.line key={index} x1={`${startX}%`} y1="50%" x2={`${endX}%`} y2="50%" stroke={isActive ? '#6366F1' : 'rgba(255,255,255,0.1)'} strokeWidth="2" initial={{ pathLength: 0 }} animate={{ pathLength: isActive ? 1 : 0 }} transition={{ duration: 0.5, ease: 'easeOut' }} />
+                  return <motion.line key={index} x1={`${startX}%`} y1="50%" x2={`${endX}%`} y2="50%" stroke={isActive ? '#6366F1' : 'rgba(255,255,255,0.1)'} strokeWidth="2" initial={{ pathLength: 0 }} animate={{ pathLength: isActive ? 1 : 0 }} transition={{ duration: 1.1, ease: 'easeInOut' }} />
                 })}
               </svg>
 
@@ -120,7 +171,7 @@ export default function GeneratingPage() {
                 const Icon = stage.icon
                 return (
                   <motion.div key={stage.id} initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: index * 0.1, type: 'spring', stiffness: 200 }} className="relative flex flex-col items-center">
-                    <motion.div animate={isActive && !error ? { scale: [1, 1.1, 1] } : {}} transition={{ duration: 1.5, repeat: isActive && !error ? Infinity : 0 }} className={`flex h-14 w-14 items-center justify-center rounded-2xl transition-all duration-500 ${isCompleted ? 'border-2 border-success/50 bg-success/20' : ''} ${isActive && !error ? 'glow-primary border-2 border-primary bg-primary/20' : ''} ${!isActive && !isCompleted ? 'border border-border/50 bg-surface' : ''}`}>
+                    <motion.div animate={isActive && !error ? { scale: [1, 1.06, 1], opacity: [0.9, 1, 0.9] } : {}} transition={{ duration: 2, repeat: isActive && !error ? Infinity : 0, ease: 'easeInOut' }} className={`flex h-14 w-14 items-center justify-center rounded-2xl transition-all duration-700 ${isCompleted ? 'border-2 border-success/50 bg-success/20' : ''} ${isActive && !error ? 'glow-primary border-2 border-primary bg-primary/20' : ''} ${!isActive && !isCompleted ? 'border border-border/50 bg-surface' : ''}`}>
                       <Icon className={`h-6 w-6 ${isCompleted ? 'text-success' : isActive ? 'text-primary' : 'text-muted-foreground'}`} />
                     </motion.div>
                     <motion.span initial={{ opacity: 0 }} animate={{ opacity: isActive || isCompleted ? 1 : 0.5 }} className={`mt-3 max-w-[90px] text-center text-xs font-medium ${isActive ? 'text-primary' : isCompleted ? 'text-success' : 'text-muted-foreground'}`}>
@@ -146,7 +197,7 @@ export default function GeneratingPage() {
 
             <div className="mx-auto max-w-md">
               <div className="h-2 overflow-hidden rounded-full bg-surface">
-                <motion.div initial={{ width: 0 }} animate={{ width: `${progress}%` }} transition={{ duration: 0.3, ease: 'easeOut' }} className={`h-full rounded-full ${error ? 'bg-destructive' : 'bg-gradient-to-r from-primary to-accent'}`} />
+                <motion.div initial={{ width: 0 }} animate={{ width: `${progress}%` }} transition={{ duration: 0.2, ease: 'linear' }} className={`h-full rounded-full ${error ? 'bg-destructive' : 'bg-gradient-to-r from-primary to-accent'}`} />
               </div>
               <p className="mt-2 text-sm text-muted-foreground">{Math.round(progress)}% complete</p>
             </div>

@@ -54,6 +54,36 @@ function normaliseString(value) {
   return typeof value === 'string' ? value.trim() : '';
 }
 
+function titleCaseWords(value) {
+  return normaliseString(value)
+    .toLowerCase()
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function inferRegionFromIdea(idea, country) {
+  const text = normaliseString(idea);
+
+  if (!text) return null;
+
+  const patterns = [
+    /\b(?:in|around|across|throughout|serving)\s+([a-z][a-z' -]{1,40})\b/i,
+    /\b([a-z][a-z' -]{1,40})\s+(?:based|focused|service|services|brand|company|business|studio|app|platform)\b/i,
+  ];
+
+  for (const pattern of patterns) {
+    const match = text.match(pattern);
+    const rawCandidate = match?.[1] ? titleCaseWords(match[1]) : '';
+
+    if (!rawCandidate) continue;
+    if (rawCandidate.toLowerCase() === country.toLowerCase()) continue;
+    if (/^(Busy|Anxious|Small|Mobile|Online|Local|Weekly|Monthly|Healthy|Premium|Professional|Professionals|Owners|Families|Parents|Students|Tradies|Mums|Moms|Dogs|Dog|Service|Services|Business|Brand|Studio|App|Platform)$/i.test(rawCandidate)) continue;
+
+    return rawCandidate;
+  }
+
+  return null;
+}
+
 function deriveCurrencyCode(country) {
   return currencyByCountry.get(country.toLowerCase()) ?? 'USD';
 }
@@ -71,10 +101,11 @@ function toProjectListItem(project) {
 }
 
 function validateCreateProjectBody(body) {
-  const name = normaliseString(body?.name);
+  const rawName = normaliseString(body?.name);
+  const name = /^untitled project$/i.test(rawName) ? '' : rawName;
   const idea = normaliseString(body?.idea);
   const country = normaliseString(body?.country);
-  const region = body?.region == null ? null : normaliseString(body.region) || null;
+  const providedRegion = body?.region == null ? null : normaliseString(body.region) || null;
   const currencyCode = normaliseString(body?.currencyCode).toUpperCase();
   const hoursPerWeek = body?.hoursPerWeek == null ? null : Number(body.hoursPerWeek);
 
@@ -103,7 +134,7 @@ function validateCreateProjectBody(body) {
       name,
       idea,
       country,
-      region,
+      region: providedRegion || inferRegionFromIdea(idea, country),
       currencyCode: currencyCode || deriveCurrencyCode(country),
       hoursPerWeek,
     },

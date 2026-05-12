@@ -32,6 +32,9 @@ Turn specialist outputs into one coherent, commercially sharp, non-generic bluep
 - If the unique twist makes the business feel like a new category or clearly better than the best standard incumbent, pricing should usually sit above normal premium market pricing, not merely at it.
 - Only allow that new-category pricing tier if the difference is obvious to the customer within seconds; hidden sophistication does not automatically earn visible premium pricing.
 - The blueprint must have a believable operating spine: a recurring workflow, ledger, coordination layer, evidence asset, or control point the business actually owns.
+- The blueprint must be concrete enough that a human can picture the product or service happening in the real world without filling in the important bits themselves.
+- The business brief must explain a real mechanism, not just a vibe, slogan, or positioning line.
+- The best blueprint logic should usually read as input -> system behaviour -> customer experience -> business advantage, even when written naturally.
 - If the idea is mostly support, community, guidance, concierge, or motivation, require proof of a hard operating spine before allowing a pass.
 - For education, employment, wellness, care, or guidance ideas, do not treat encouragement, planning, mentoring, or accountability as enough on their own. The business should usually anchor to an externally enforced event loop or system of record such as placement, certification, appointment adherence, claims, renewals, case progress, or another deadline-bearing workflow customers already have to manage.
 - If the only way to create that operating spine is to invent a stronger institutional workflow than the input actually implies, fail the blueprint instead of upgrading it with fake structure.
@@ -40,6 +43,9 @@ Turn specialist outputs into one coherent, commercially sharp, non-generic bluep
 - Do not allow contradictions between sections.
 - Do not use generic filler language.
 - Do not let "lighter than incumbents", "AI-powered", "more supportive", or similar cosmetic positioning masquerade as the twist.
+- Do not accept abstract phrases like unique twist, local legend, repeatable ritual, emotional reasons, premium feel, or differentiated experience unless the mechanism is immediately obvious.
+- Do not approve wording that repeats the same idea in different consultant-sounding phrases.
+- Do not let the draft substitute adjectives for product logic.
 - Do not collapse to the safest twist too early if a stronger commercially believable angle is available.
 - Do not overload sections with detail; give the user enough signal to get excited and continue.
 - Do not present made-up pricing as researched truth.
@@ -75,6 +81,9 @@ It should feel energising and forward-pulling, not like a dense report.
 - the twist is weak
 - the twist is only a cosmetic improvement over incumbents instead of a real owned edge
 - the business sounds generic
+- the mechanism is blurry, ornamental, or only implied
+- the writing relies on repeated abstraction instead of showing what actually happens
+- two reasonable readers would imagine two completely different businesses from the same description
 - buyer, payer, or business form are still blurry
 - buyer, payer, or business form were only solved by fabricating a different business
 - the concept lacks a believable operating spine or owned edge

@@ -36,7 +36,9 @@ export default function InputPage() {
   const [resumeProjectName, setResumeProjectName] = useState<string | null>(null)
 
   useEffect(() => {
-    setResumeProjectName(getStoredValue('projectName'))
+    const projectId = getStoredValue('projectId')
+    const projectName = getStoredValue('projectName')
+    setResumeProjectName(projectId && projectName ? projectName : null)
   }, [])
 
   const handleSubmit = () => {
@@ -89,12 +91,17 @@ export default function InputPage() {
                   <p className="font-medium">Current project available</p>
                   <p className="text-success/80">Resume <strong>{resumeProjectName}</strong> or start a fresh one below.</p>
                 </div>
-                <Link href="/blueprint">
-                  <Button variant="outline" className="border-success/30 text-success hover:bg-success/10">
-                    <Compass className="mr-2 h-4 w-4" />
-                    Resume project
+                <div className="flex flex-wrap gap-3">
+                  <Link href="/blueprint">
+                    <Button variant="outline" className="border-success/30 text-success hover:bg-success/10">
+                      <Compass className="mr-2 h-4 w-4" />
+                      Resume project
+                    </Button>
+                  </Link>
+                  <Button variant="ghost" onClick={() => { clearProjectSession(); setResumeProjectName(null) }} className="text-muted-foreground hover:text-foreground">
+                    Start fresh instead
                   </Button>
-                </Link>
+                </div>
               </div>
             </div>
           ) : null}
@@ -103,7 +110,8 @@ export default function InputPage() {
             {step === 1 && (
               <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }} className="space-y-8">
                 <div className="space-y-4 text-center">
-                  <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
+                  <div className="relative mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 shadow-[0_0_30px_rgba(99,102,241,0.2)]">
+                    <div className="absolute inset-[-14px] -z-10 rounded-[28px] bg-gradient-to-br from-primary/30 via-primary/10 to-transparent blur-2xl" />
                     <Sparkles className="h-8 w-8 text-primary" />
                   </div>
                   <h1 className="text-3xl font-bold md:text-4xl">What’s the business idea?</h1>
@@ -111,7 +119,13 @@ export default function InputPage() {
                 </div>
 
                 <div className="space-y-4">
-                  <Textarea placeholder="e.g. A service that helps tradies turn quotes, jobs, and follow-ups into a cleaner client workflow..." value={idea} onChange={(e) => setIdea(e.target.value)} className="min-h-[140px] resize-none border-border/50 bg-surface p-5 text-lg focus:border-primary/50 focus:ring-primary/20" />
+                  <Textarea
+                    placeholder="e.g. A service that helps tradies turn quotes, jobs, and follow-ups into a cleaner client workflow..."
+                    value={idea}
+                    onChange={(e) => setIdea(e.target.value)}
+                    onInput={(e) => setIdea((e.target as HTMLTextAreaElement).value)}
+                    className="min-h-[140px] resize-none border-border/50 bg-surface p-5 text-lg focus:border-primary/50 focus:ring-primary/20"
+                  />
                   <p className="text-right text-sm text-muted-foreground">{idea.length} characters</p>
                 </div>
 

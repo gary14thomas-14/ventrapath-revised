@@ -1,6 +1,5 @@
 import { mkdir, access } from 'node:fs/promises';
 import { resolve } from 'node:path';
-import EmbeddedPostgres from 'embedded-postgres';
 import { Client } from 'pg';
 import { loadEnvFile } from '../src/config/load-env-file.js';
 
@@ -56,7 +55,15 @@ async function checkPostgres() {
   }
 }
 
-function createEmbeddedPostgres() {
+async function createEmbeddedPostgres() {
+  let EmbeddedPostgres;
+
+  try {
+    ({ default: EmbeddedPostgres } = await import('embedded-postgres'));
+  } catch (error) {
+    throw new Error('embedded-postgres is not installed. Run npm install before using local Postgres helpers.', { cause: error });
+  }
+
   return new EmbeddedPostgres({
     databaseDir,
     user,
@@ -78,7 +85,7 @@ async function isInitialisedDatabaseDir() {
 }
 
 async function stopPostgres() {
-  const postgres = createEmbeddedPostgres();
+  const postgres = await createEmbeddedPostgres();
   await postgres.stop();
   console.log('[embedded-postgres] stopped');
 }
@@ -86,7 +93,7 @@ async function stopPostgres() {
 async function startPostgres() {
   await mkdir(databaseDir, { recursive: true });
 
-  const postgres = createEmbeddedPostgres();
+  const postgres = await createEmbeddedPostgres();
   const alreadyInitialised = await isInitialisedDatabaseDir();
 
   if (!alreadyInitialised) {

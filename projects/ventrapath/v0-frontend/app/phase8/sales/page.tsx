@@ -7,7 +7,7 @@ export default function Page() {
       title="Sales"
       prevHref="/phase7/operations"
       prevLabel="Operations"
-      nextHref="/phase9/launch"
+      nextHref="/phase9/growth"
       nextLabel="Growth & Milestones"
     />
   )

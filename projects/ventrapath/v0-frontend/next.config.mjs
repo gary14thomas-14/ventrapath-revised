@@ -8,6 +8,21 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  allowedDevOrigins: ['127.0.0.1'],
+  async redirects() {
+    return [
+      {
+        source: '/phase4/operations',
+        destination: '/phase7/operations',
+        permanent: true,
+      },
+      {
+        source: '/phase9/launch',
+        destination: '/phase9/growth',
+        permanent: true,
+      },
+    ]
+  },
   async rewrites() {
     if (!backendUrl) {
       return []

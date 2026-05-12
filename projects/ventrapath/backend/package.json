@@ -18,7 +18,9 @@
     "postgres:stop": "node scripts/local-postgres.js stop"
   },
   "dependencies": {
-    "embedded-postgres": "^18.3.0-beta.17",
     "pg": "^8.20.0"
+  },
+  "optionalDependencies": {
+    "embedded-postgres": "^18.3.0-beta.17"
   }
 }

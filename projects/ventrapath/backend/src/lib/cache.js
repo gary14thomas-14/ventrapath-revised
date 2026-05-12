@@ -22,11 +22,11 @@ export function hashObject(value) {
 }
 
 export function buildBlueprintCacheIdentity(project, options = {}) {
-  const promptVersion = options.promptVersion ?? 'phase0-v1';
-  const model = options.model ?? 'template';
+  const promptVersion = options.promptVersion ?? 'phase0-v2-brief-twist';
+  const model = options.model ?? 'orchestrated-template';
   const phaseNumber = 0;
   const taskKind = 'blueprint_sections';
-  const agentId = 'blueprint_stub';
+  const agentId = options.agentId ?? 'bob.blueprint-architect+differentiation-strategist';
   const normalizedInput = {
     rawIdea: project.rawIdea,
     country: project.country,
