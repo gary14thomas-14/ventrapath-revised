@@ -1,35 +1,17 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { ArrowRight, Compass, Layers3, PlayCircle, Sparkles, Target } from 'lucide-react'
+import { ArrowRight, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { clearProjectSession, getStoredValue } from '@/lib/ventrapath-client'
-
-const fadeIn = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0 },
-}
-
-const staggerContainer = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.1, delayChildren: 0.15 },
-  },
-}
-
-const proofPoints = [
-  { name: 'Blueprint', icon: Compass },
-  { name: '9 Guided Phases', icon: Layers3 },
-  { name: 'Actionable Steps', icon: Target },
-  { name: 'Ready to Start', icon: PlayCircle },
-]
+import { launchConfig } from '@/lib/launch-config'
 
 export default function LandingPage() {
   const [resumeProjectName, setResumeProjectName] = useState<string | null>(null)
   const [resumeHref, setResumeHref] = useState('/blueprint')
+  const [prelaunchRedirected, setPrelaunchRedirected] = useState(false)
+  const prelaunchMode = launchConfig.prelaunchMode
 
   useEffect(() => {
     const projectId = getStoredValue('projectId')
@@ -39,6 +21,11 @@ export default function LandingPage() {
 
     setResumeProjectName(projectId && projectName ? projectName : null)
     setResumeHref(projectId ? safeResumeHref : '/blueprint')
+
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search)
+      setPrelaunchRedirected(params.get('prelaunch') === '1')
+    }
   }, [])
 
   const startFresh = () => {
@@ -47,8 +34,9 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen overflow-hidden bg-background">
+
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 h-[600px] w-[600px] rounded-full bg-primary/20 blur-[120px] animate-glow-breathe" />
+        <div className="absolute top-1/3 left-1/2 h-[700px] w-[700px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/30 blur-[140px]" />
         <div className="absolute bottom-1/4 right-1/4 h-[500px] w-[500px] rounded-full bg-accent/15 blur-[100px] animate-glow-breathe" style={{ animationDelay: '2s' }} />
       </div>
 
@@ -58,17 +46,14 @@ export default function LandingPage() {
             <img src="/logo.svg" alt="VentraPath" className="h-48 w-auto" />
           </Link>
           <div className="flex items-center gap-4">
-            <Link href="/pricing">
-              <Button variant="ghost" className="text-muted-foreground hover:text-foreground">Tester Access</Button>
-            </Link>
             {resumeProjectName ? (
               <Link href={resumeHref}>
                 <Button variant="outline" className="border-border/50 hover:bg-surface">Resume Project</Button>
               </Link>
             ) : null}
-            <Link href="/input" onClick={startFresh}>
+            <Link href={prelaunchMode ? '/pricing' : '/input'} onClick={prelaunchMode ? undefined : startFresh}>
               <Button className="bg-primary px-6 text-primary-foreground hover:bg-primary/90">
-                Start New Project
+                {prelaunchMode ? 'Launch pricing' : 'Start New Project'}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
@@ -78,28 +63,35 @@ export default function LandingPage() {
 
       <main className="relative z-10">
         <section className="mx-auto max-w-7xl px-6 pb-28 pt-16">
-          <motion.div initial="hidden" animate="visible" variants={staggerContainer} className="mx-auto max-w-4xl text-center">
-            <motion.div variants={fadeIn} className="mb-8">
+          <div className="mx-auto max-w-4xl text-center">
+            {prelaunchMode ? (
+              <div className="mb-6 inline-flex max-w-2xl items-center justify-center gap-2 rounded-2xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-primary">
+                {prelaunchRedirected
+                  ? 'Launching soon. The free blueprint and 9 paid phases open here on launch day.'
+                  : 'Launching soon. The free blueprint and 9 paid phases open here on launch day.'}
+              </div>
+            ) : null}
+            <div className="mb-8">
               <span className="inline-flex items-center gap-2 rounded-full glass px-4 py-2 text-sm text-muted-foreground">
                 <span className="h-2 w-2 rounded-full bg-success animate-pulse" />
-                Early tester preview · live blueprint and guided phase flow
+                {prelaunchMode ? 'Launching soon — see pricing' : 'Live blueprint and guided phase flow'}
               </span>
-            </motion.div>
+            </div>
 
-            <motion.h1 variants={fadeIn} className="mb-8 text-5xl font-bold tracking-tight md:text-7xl">
-              <span className="text-foreground">Turn an idea into a</span>
+            <h1 className="mb-8 text-5xl font-bold tracking-tight md:text-7xl">
+              <span className="text-foreground">Build the company</span>
               <br />
-              <span className="gradient-text">business plan you can actually act on</span>
-            </motion.h1>
+              <span className="gradient-text">you've been thinking about</span>
+            </h1>
 
-            <motion.p variants={fadeIn} className="mx-auto mb-10 max-w-3xl text-xl leading-relaxed text-muted-foreground">
-              VentraPath takes a business idea, adapts it to your country, and walks you from blueprint through nine guided phases ending in <strong className="text-foreground">Growth & Milestones</strong>.
-            </motion.p>
+            <p className="mx-auto mb-10 max-w-3xl text-xl leading-relaxed text-muted-foreground">
+              You bring the idea. VentraPath turns it into a clear blueprint, then walks you through the actual setup work — legal, brand, marketing, sales, all the way through launch and what comes after.
+            </p>
 
-            <motion.div variants={fadeIn} className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <Link href="/input" onClick={startFresh}>
+            <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+              <Link href={prelaunchMode ? '/pricing' : '/input'} onClick={prelaunchMode ? undefined : startFresh}>
                 <Button size="lg" className="glow-primary bg-primary px-8 py-6 text-lg text-primary-foreground hover:bg-primary/90">
-                  Start New Project
+                  {prelaunchMode ? 'Launching soon' : 'Start New Project'}
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
@@ -112,97 +104,53 @@ export default function LandingPage() {
               ) : null}
               <Link href="/support">
                 <Button size="lg" variant="outline" className="border-border/50 px-8 py-6 text-lg hover:bg-surface">
-                  Testing Guide
+                  Support
                 </Button>
               </Link>
-            </motion.div>
+            </div>
 
             {resumeProjectName ? (
-              <motion.div variants={fadeIn} className="mx-auto mt-6 max-w-xl rounded-2xl border border-success/20 bg-success/5 px-5 py-4 text-sm text-success">
-                Current local project ready to resume: <strong>{resumeProjectName}</strong>
-              </motion.div>
-            ) : null}
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45, duration: 0.8 }} className="mx-auto mt-24 max-w-3xl">
-            <div className="relative">
-              <div className="absolute left-0 right-0 top-1/2 h-px -translate-y-1/2 bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
-              <div className="relative flex items-center justify-between gap-4">
-                {proofPoints.map((item, index) => (
-                  <motion.div key={item.name} initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.65 + index * 0.12, duration: 0.4 }} className="flex flex-col items-center gap-3">
-                    <div className="flex h-16 w-16 cursor-default items-center justify-center rounded-2xl glass border border-border/50 transition-all duration-300 hover:border-primary/50 hover:glow-primary">
-                      <item.icon className="h-7 w-7 text-primary" />
-                    </div>
-                    <span className="text-center text-sm font-medium text-muted-foreground">{item.name}</span>
-                  </motion.div>
-                ))}
+              <div className="mx-auto mt-6 max-w-xl rounded-2xl border border-success/20 bg-success/5 px-5 py-4 text-sm text-success">
+                Current project ready to resume: <strong>{resumeProjectName}</strong>
               </div>
-            </div>
-          </motion.div>
+            ) : null}
+          </div>
         </section>
 
         <section className="border-t border-border/50 bg-surface/30">
           <div className="mx-auto max-w-7xl px-6 py-24">
-            <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mb-16 text-center">
-              <h2 className="mb-4 text-3xl font-bold md:text-4xl">What testers can use right now</h2>
+            <div className="mb-16 text-center">
+              <h2 className="mb-4 text-3xl font-bold md:text-4xl">What VentraPath helps you do</h2>
               <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
-                This is no longer just a nice-looking shell. The core generation flow is wired to the live backend and ready for real walkthroughs.
+                The full path between the idea in your head and a business that's actually open — without losing track of what comes next.
               </p>
-            </motion.div>
+            </div>
 
             <div className="grid gap-6 md:grid-cols-3">
               {[
                 {
-                  title: 'Country-aware blueprint',
-                  description: 'Generate business, market, legal, website, and risk sections from a real project record.',
+                  title: 'A blueprint with a real angle',
+                  description: 'You get a clear picture of the business, market, money side, and legal side — built around what actually makes your idea different, not a fill-in-the-blank template.',
                 },
                 {
-                  title: 'Nine guided phases',
-                  description: 'Move from Brand and Legal all the way through Sales and Growth & Milestones.',
+                  title: 'Every step, in the right order',
+                  description: 'Brand, legal, finance, marketing, sales, launch — the whole setup, broken into work you can actually finish without burning a weekend.',
                 },
                 {
-                  title: 'Useful tester flow',
-                  description: 'Start fresh by default, then resume only when you actually want the current local project.',
+                  title: 'Built for the time you actually have',
+                  description: 'Tell it how much you can commit each week, and the workload shapes around it. No "just spend a weekend on this" nonsense.',
                 },
               ].map((feature, index) => (
-                <motion.div key={feature.title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: index * 0.1 }} className="group rounded-2xl glass p-8 transition-all duration-300 hover:border-primary/30">
+                <div key={feature.title} className="group rounded-2xl glass p-8 transition-all duration-300 hover:border-primary/30">
                   <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 transition-colors group-hover:bg-primary/20">
                     <Sparkles className="h-6 w-6 text-primary" />
                   </div>
                   <h3 className="mb-3 text-xl font-semibold">{feature.title}</h3>
                   <p className="leading-relaxed text-muted-foreground">{feature.description}</p>
-                </motion.div>
+                </div>
               ))}
             </div>
           </div>
-        </section>
-
-        <section className="mx-auto max-w-7xl px-6 py-24">
-          <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} className="relative overflow-hidden rounded-3xl">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/10" />
-            <div className="absolute inset-0 glass" />
-            <div className="relative px-8 py-16 text-center md:px-16 md:py-20">
-              <h2 className="mb-6 text-3xl font-bold md:text-4xl">Ready for tomorrow’s tester walkthrough</h2>
-              <p className="mx-auto mb-10 max-w-2xl text-lg text-muted-foreground">
-                Use the real flow, gather feedback on clarity and usefulness, then tighten the rough edges page by page.
-              </p>
-              <Link href="/input" onClick={startFresh}>
-                <Button size="lg" className="bg-primary px-10 py-6 text-lg text-primary-foreground hover:bg-primary/90">
-                  Start the Product
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
-              </Link>
-              {resumeProjectName ? (
-                <div className="mt-4">
-                  <Link href="/blueprint">
-                    <Button size="lg" variant="outline" className="border-border/50 px-10 py-6 text-lg hover:bg-surface">
-                      Resume Current Project
-                    </Button>
-                  </Link>
-                </div>
-              ) : null}
-            </div>
-          </motion.div>
         </section>
       </main>
 
@@ -210,8 +158,7 @@ export default function LandingPage() {
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 px-6 py-12 md:flex-row">
           <img src="/logo.svg" alt="VentraPath" className="h-44 w-auto opacity-60" />
           <div className="flex items-center gap-8 text-sm text-muted-foreground">
-            <Link href="/pricing" className="transition-colors hover:text-foreground">Tester Access</Link>
-            <Link href="/support" className="transition-colors hover:text-foreground">Testing Guide</Link>
+            <Link href="/support" className="transition-colors hover:text-foreground">Support</Link>
           </div>
         </div>
       </footer>
