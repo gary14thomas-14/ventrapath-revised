@@ -137,8 +137,8 @@ export default function LandingPage() {
                   description: 'Brand, legal, finance, marketing, sales, launch — the whole setup, broken into work you can actually finish without burning a weekend.',
                 },
                 {
-                  title: 'Built for the time you actually have',
-                  description: 'Tell it how much you can commit each week, and the workload shapes around it. No "just spend a weekend on this" nonsense.',
+                  title: 'Past launch is where it gets fun',
+                  description: 'First customer. First repeat customer. First time something works without you in the room. Scaling is the exciting part — and the messy part — and where most tools quietly leave. We stay with you through it.',
                 },
               ].map((feature, index) => (
                 <div key={feature.title} className="group rounded-2xl glass p-8 transition-all duration-300 hover:border-primary/30">
