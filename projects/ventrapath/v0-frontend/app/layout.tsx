@@ -14,13 +14,13 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'VentraPath - Idea to Blueprint',
-  description: 'Turn a business idea into a country-aware blueprint and work through nine guided phases toward Growth & Milestones.',
-  keywords: ['business', 'startup', 'AI', 'business plan', 'entrepreneur', 'blueprint'],
+  title: 'VentraPath — Build the company you\'ve been thinking about',
+  description: 'Take your idea, get a clear blueprint, then move step by step through brand, legal, finance, marketing, sales, launch — and what comes after.',
+  keywords: ['business', 'startup', 'business plan', 'entrepreneur', 'blueprint', 'launch'],
   authors: [{ name: 'VentraPath' }],
   openGraph: {
-    title: 'VentraPath - Idea to Blueprint',
-    description: 'Business blueprint generation with a guided nine-phase planning flow.',
+    title: 'VentraPath — Build the company you\'ve been thinking about',
+    description: 'From idea to a real, running company — in clear, manageable steps.',
     type: 'website',
   },
 }
